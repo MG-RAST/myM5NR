@@ -14,6 +14,9 @@ Installation
   - download from sources and create tables
   - load data
 
+### Installing database schema
+
+
 Directories
 -----------
 
@@ -22,3 +25,10 @@ Directories
 - db
 - service
 - ui
+
+Dependencies
+------------
+
+- PostgreSQL
+- Perl 5, version 12, subversion 3 (v5.12.3) (tested)
+- Solr (http://lucene.apache.org/solr/)
