@@ -39,7 +39,12 @@ The ftp site contains:
 After creating the mapping tables locally or downloading the mapping tables from
 
 
+### User Interface
 
+### Developing
+The user interface is based on the Retina git submodule. Please execute from within you repo following two commands to get the code.
+1. git submodule init
+2. git submodule update
 
 Directories
 -----------
