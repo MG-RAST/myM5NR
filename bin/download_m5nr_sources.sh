@@ -97,8 +97,8 @@ function download_IMG {
 }
 
 function download_InterPro {
+	# see release_notes.txt for version
 	time lftp -c "open -e 'mirror -v --no-recursion /pub/databases/interpro/Current/ ${1}' ftp://ftp.ebi.ac.uk" || return $?
-	#time lftp -c "open -e 'mirror -v --no-recursion -I names.dat /pub/databases/interpro/Current/ ${1}' ftp://ftp.ebi.ac.uk"
 }
 
 function download_KEGG {
@@ -131,6 +131,7 @@ function download_Phantome {
 }
 
 function download_RefSeq {
+	time lftp -c "open -e 'mirror -v -e --delete-first -I RELEASE_NUMBER /refseq/release/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I *.genomic.gbff.gz /refseq/release/complete/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
 }
 
@@ -165,6 +166,7 @@ function download_SILVA {
 }
 
 function download_UniProt {
+	time lftp -c "open -e 'mirror -v -e --delete-first -I reldate.txt  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_sprot.dat.gz  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_trembl.dat.gz /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
 }
