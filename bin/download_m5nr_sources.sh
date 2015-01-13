@@ -49,7 +49,7 @@ DOWNLOADS_BAD=""
 # download functions
 
 # ${1} is download directory, specific to individual source
-
+set -x
 
 function download_test1 {
 	# this one is for testing
@@ -171,7 +171,7 @@ function download_UniProt {
 	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_trembl.dat.gz /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
 }
 
-
+set +x
 
 ###########################################################
 
@@ -192,7 +192,7 @@ do
 
 		set -x
 		# this is the function call. It will (should) stop the script if download fails.
-		download_${i} ${i} ${SOURCE_DIR_PART}
+		download_${i} ${SOURCE_DIR_PART}
 		DOWNLOAD_RESULT=$?
 		set +x
 		if [ ${DOWNLOAD_RESULT} -ne 0 ] ; then
