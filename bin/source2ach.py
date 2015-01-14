@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys, shutil, re, hashlib, json
+import os, sys, shutil, re, hashlib, json, gzip
 from optparse import OptionParser
 from multiprocessing import Pool
 from Bio import SeqIO
@@ -419,6 +419,9 @@ def process_file(infile):
     o_hdls  = []
     fformat = params.format
     fname   = os.path.basename(infile)
+    infile_argument = infile # is a filename if uncompressed or file handle if gzip compressed
+    if infile.endswith('.gz') :
+        infile_argument = gzip.open(infile, 'rb')
     for e in file_ext: o_files.append( os.path.join(params.outdir, fname + e) )
     for f in o_files:  o_hdls.append( open(f, 'w') )
 
@@ -434,11 +437,13 @@ def process_file(infile):
     else:
         if fformat == 'nr': fformat = 'fasta'
         try:
-            for rec in SeqIO.parse(infile, fformat):
+            for rec in SeqIO.parse(infile_argument, fformat):
                 parse_format(rec)
         except Exception as ex:
             sys.stderr.write("Unable to parse %s file %s: %s %s\n"%(fformat, infile, type(ex).__name__, ex.args))
 
+    if infile.endswith('.gz') :
+        infile_argument.close()
     for h in o_hdls: h.close()
     return os.path.join(params.outdir, fname)
     
