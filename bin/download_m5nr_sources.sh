@@ -14,7 +14,7 @@
 # DOWNLOADS_BAD=   sources that failed
 
 
-SOURCES="InterPro UniProt RefSeq SILVA FungiDB Greengenes GenbankNR PATRIC RDP COGs Phantome"
+SOURCES="InterPro UniProt RefSeq SILVA Greengenes GenbankNR PATRIC RDP COGs Phantome"
 #"Phantome(is down?) SEED? "
 
 
