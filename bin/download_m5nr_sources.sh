@@ -2,8 +2,10 @@
 
 # DOCUMENTATION
 #
-# This script will download from a source if the <source> directory does not exist yet. When download starts, files are stored in
-# a directory called <source>_part. Once download has finished successfully, the directory <source>_part will be renamed <source>.
+# This script will try to download all sources specified in SOURCES. For each source it will create a directory within the
+# general download directory passed as an argument to this script. Individual sources are only downloaded if its
+# <source> directory does not exist yet. When download starts, files are stored in a directory called <source>_part.
+# Once download has finished successfully, the directory <source>_part will be renamed <source>.
 # If a download fails, the download function return with an error and the script will continue downloading other sources. A
 # summary at the end shows what sources were downloaded and which failed:
 #
@@ -29,6 +31,7 @@ STATIC="Cazy KEGG IMG FungiDB eggNOG"
 if [ $# -ne 1 ]
 then
 	echo "USAGE: download_ach_sources.sh <download dir>"
+	echo "<download dir> will contain the individual source download directories"
 	exit 1
 fi
 
