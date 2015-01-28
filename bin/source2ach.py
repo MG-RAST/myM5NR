@@ -1,12 +1,20 @@
 #!/usr/bin/env python
 
-import os, sys, shutil, re, hashlib, json, gzip
+import os, sys, shutil, re, hashlib, json, subprocess, traceback
 from optparse import OptionParser
 from multiprocessing import Pool
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
+
+# needed for zcat and popen
+if sys.version.startswith("3"):
+    import io
+    io_method = io.BytesIO
+else:
+    import cStringIO
+    io_method = cStringIO.StringIO
 
 __doc__ = """
 Script to take a repository file from the following formats:
@@ -38,6 +46,7 @@ class Info:
         self.gettax  = False
         self.amap    = {}
         self.interpro = False
+        self.continue_on_error = False
 
 func_map = {'LSU': '23S/28S ribosomal RNA', 'SSU': '16S/18S ribosomal RNA'}
 desc_re  = re.compile('(Rec|Sub)Name: Full=(.*?);')
@@ -209,7 +218,7 @@ def format_factory(out_files):
                     func = rec.features[1].qualifiers['product'][0]
                 seq_f.write("%s\t%s\n" %(md5, seq))
                 prot_f.write("\t".join([md5, rec.name, func, org, source]) + "\n")
-                if get_tax and ('taxonomy' in rec.annotations):
+                if get_tax and ('taxonomy' in rec.annotations) and (len(rec.annotations['taxonomy']) > 0):
                     if rec.annotations['taxonomy'][0] == 'Root':
                         x = rec.annotations['taxonomy'].pop(0)
                     tax_f.write("%s\t%s;%s\n" %(rec.name, ";".join(rec.annotations['taxonomy']), org))
@@ -414,6 +423,15 @@ def format_factory(out_files):
     else:
         return None
 
+def process_file_wrapper(infile):
+    try:
+        # This is where you do your actual work
+        return process_file(infile)
+    except:
+        # Put all exception text into an exception and raise that
+        raise Exception("Exception while parsing input file "+infile+": "+"".join(traceback.format_exception(*sys.exc_info())))
+
+
 def process_file(infile):
     o_files = []
     o_hdls  = []
@@ -421,7 +439,11 @@ def process_file(infile):
     fname   = os.path.basename(infile)
     infile_argument = infile # is a filename if uncompressed or file handle if gzip compressed
     if infile.endswith('.gz') :
-        infile_argument = gzip.open(infile, 'rb')
+        fname = os.path.splitext(fname)[0] # remove .gz suffix
+        p = subprocess.Popen(["zcat", infile], stdout = subprocess.PIPE)
+        #infile_argument = io_method(p.communicate()[0])
+        infile_argument = p.stdout
+        # slow: infile_argument = gzip.open(infile, 'rb')
     for e in file_ext: o_files.append( os.path.join(params.outdir, fname + e) )
     for f in o_files:  o_hdls.append( open(f, 'w') )
 
@@ -436,11 +458,22 @@ def process_file(infile):
             parse_format(rec)
     else:
         if fformat == 'nr': fformat = 'fasta'
+        n = 0
+        
         try:
             for rec in SeqIO.parse(infile_argument, fformat):
                 parse_format(rec)
+                n += 1
         except Exception as ex:
-            sys.stderr.write("Unable to parse %s file %s: %s %s\n"%(fformat, infile, type(ex).__name__, ex.args))
+            #sys.stderr.write("Unable to parse %s file %s: %s %s\n"%(fformat, infile, type(ex).__name__, ex.args))
+            myerror = "Error: Unable to parse %s file %s at record %d: %s %s\n"%(fformat, infile, n, type(ex).__name__, ex.args)+"\n"
+            myerror += "".join(traceback.format_exception(*sys.exc_info()))
+            if params.continue_on_error:
+                sys.stderr.write(myerror)
+                sys.stdout.write("Error: this file was not parsed: %s\n"%infile)
+            else:
+                raise Exception(myerror) 
+                        
 
     if infile.endswith('.gz') :
         infile_argument.close()
@@ -469,6 +502,7 @@ def main(args):
     parser.add_option("-t", "--get_tax", dest="gettax", action="store_true", default=False, help="Output taxonomy string for genbank files [default is off]")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False, help="Wordy [default is off]")
     parser.add_option("-s", "--sort_dir", dest="sortdir", metavar="DIR", default="/tmp", help="temp DIR to use for sorting [default is /tmp]")
+    parser.add_option("-u", "--continue_on_error", dest="continue_on_error", default=False, help="continue on parsing error [default is off]")
     
     (opts, args) = parser.parse_args()
     if len(args) < 2:
@@ -486,6 +520,7 @@ def main(args):
     params.getont  = opts.getont
     params.getctg  = opts.getcontig
     params.gettax  = opts.gettax
+    params.continue_on_error = opts.continue_on_error
     
     if (params.format == 'nr') and opts.nrdbs:
         for d in opts.nrdbs.split(','):
@@ -513,7 +548,7 @@ def main(args):
     elif min_proc > 1:
         if params.verbose: sys.stdout.write("Parsing %d %s files using %d threades\n"%(scount, params.format, min_proc))
         pool   = Pool(processes=min_proc)
-        rfiles = pool.map(process_file, sfiles, 1)
+        rfiles = pool.map(process_file_wrapper, sfiles, 1)
         pool.close()
         pool.join()
     else:

@@ -14,12 +14,12 @@
 # DOWNLOADS_BAD=   sources that failed
 
 
-SOURCES="InterPro UniProt RefSeq SILVA Greengenes GenbankNR PATRIC RDP COGs Phantome"
+SOURCES="SEED InterPro UniProt RefSeq SILVA Greengenes GenBankNR PATRIC RDP Phantome CAZy"
 #"Phantome(is down?) SEED? "
 
 
 #sources where we use archived version:
-STATIC="Cazy KEGG IMG FungiDB eggNOG"
+STATIC="KEGG IMG FungiDB eggNOG" # COGs from eggNOG
 
 
 
@@ -30,7 +30,7 @@ STATIC="Cazy KEGG IMG FungiDB eggNOG"
 
 if [ $# -ne 1 ]
 then
-	echo "USAGE: download_ach_sources.sh <download dir>"
+	echo "USAGE: download_ach_sources.sh <download dir> 2>&1 | tee logfile1.txt"
 	echo "<download dir> will contain the individual source download directories"
 	exit 1
 fi
@@ -42,6 +42,8 @@ if [ ! -d "$DOWNLOAD_DIR" ]; then
 	exit 1
 fi
 
+# binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 DOWNLOADS_EXIST=""
 DOWNLOADS_GOOD=""
@@ -51,24 +53,18 @@ DOWNLOADS_BAD=""
 ###########################################################
 # download functions
 
-# ${1} is download directory, specific to individual source
+# ${1} is the "..._part" download directory, specific to individual source
+
+
 set -x
 
-function download_test1 {
-	# this one is for testing
-	time wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/releaseREADME.txt' || return $? # should work
+#### proteins
+
+function download_CAZy {
+	${BIN}/get_cazy_table.pl ${1}/cazy_all_v042314.txt || return $?
+	echo `date +"%Y%m%d"` > ${1}/timestamp.txt
 }
 
-function download_test2 {
-	# this one is for testing
-	time wget -v -N -P ${1} 'http://google.com/test.txt' || return $? # will fail
-}
-
-
-function download_COGs {
-	# not sure if this the data we need
-	time lftp -c "open -e 'mirror -v --no-recursion /pub/COG/COG2014/data/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
-}
 
 function download_eggNOG {
 	# version 4 available, but different format, thus we use old version for now.
@@ -82,16 +78,15 @@ function download_eggNOG {
 	wget -v -N -P ${1} 'http://eggnog.embl.de/version_3.0/data/downloads/NOG.description.txt.gz' || return $?
 }
 
+function download_COGs {
+	time lftp -c "open -e 'mirror -v --no-recursion /pub/COG/COG2014/data/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
+}
+
 function download_FungiDB {
-	# does not seem to be updated anymore
-	wget -v -N -P ${1} 'http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz' || return $?
+	# use old version, does not seem to be updated anymore
+	exit 1
+	#wget -v -N -P ${1} 'http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz' || return $?
 }
-
-function download_Greengenes {
-	# from 2011 ?
-	wget -v -N -P ${1} 'http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz' || return $?
-}
-
 
 function download_IMG {
 	echo ftp path is missing
@@ -114,14 +109,14 @@ function download_KEGG {
 }
 
 function download_MO {
-	# issue with recursive wget and links on page, this hack works
 	echo not using for now
 	exit 1
+	# issue with recursive wget and links on page, this hack works
 	for i in `seq 1 907348`; do wget -N -P ${1} http://www.microbesonline.org/genbank/${i}.gbk.gz 2> /dev/null; done
 	wget -v -N -P ${1} http://www.microbesonline.org/genbank/10000550.gbk.gz
 }
 
-function download_GenbankNR {
+function download_GenBankNR {
 	time lftp -c "open -e 'mirror -v -e --no-recursion -I nr.gz /blast/db/FASTA/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
 }
 
@@ -130,12 +125,43 @@ function download_PATRIC {
 }
 
 function download_Phantome {
-	wget -v -O ${1}/phage_proteins.fasta.gz 'http://www.phantome.org/Downloads/proteins/all_sequences/current'  || return $? # website down ?
+	wget -v -O ${1}/phage_proteins.fasta.gz 'http://www.phantome.org/Downloads/proteins/all_sequences/current'  || return $?
 }
 
 function download_RefSeq {
 	time lftp -c "open -e 'mirror -v -e --delete-first -I RELEASE_NUMBER /refseq/release/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I *.genomic.gbff.gz /refseq/release/complete/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
+}
+
+
+
+function download_SEED {
+
+	# TODO use current
+	#CURRENT="ProblemSets.current"
+	CURRENT="ProblemSets.2015.01"
+	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/${CURRENT}/ ${1}' ftp://ftp.theseed.org"
+
+	#old:
+	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ ${1}' ftp://ftp.theseed.org"
+	#time lftp -c "open -e 'mirror -v --no-recursion -I subsystems2role.gz /subsystems/ ${1}' ftp://ftp.theseed.org"
+}
+
+
+
+function download_UniProt {
+	time lftp -c "open -e 'mirror -v -e --delete-first -I reldate.txt  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
+	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_sprot.dat.gz  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
+	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_trembl.dat.gz /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
+}
+
+
+#### RNA
+
+function download_SILVA {
+	time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/ ${1}' ftp://ftp.arb-silva.de" || return $?
+	mdir -p ${1}/rast
+	time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/rast ${1}/rast' ftp://ftp.arb-silva.de" || return $?
 }
 
 function download_RDP {
@@ -146,32 +172,11 @@ function download_RDP {
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz' || return $?
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz' || return $?
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz' || return $?
-
-	# old
-	#wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/release11_1_Bacteria_unaligned.gb.gz'
-	#wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/release11_1_Archaea_unaligned.gb.gz'
-	#wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/release11_1_Fungi_unaligned.gb.gz'
 }
 
-function download_SEED {
-	echo can not ftp, must extract painfully through SEED API
-	exit 1
-	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ ${1}' ftp://ftp.theseed.org"
-	#time lftp -c "open -e 'mirror -v --no-recursion -I subsystems2role.gz /subsystems/ ${1}' ftp://ftp.theseed.org"
-}
-
-function download_SILVA {
-	time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/ ${1}' ftp://ftp.arb-silva.de" || return $?
-	#wget -v -N -P ${1} 'http://www.arb-silva.de/fileadmin/silva_databases/release_108/Exports/lsu-parc.fasta.tgz'
-	#wget -v -N -P ${1} 'http://www.arb-silva.de/fileadmin/silva_databases/release_108/Exports/lsu-parc.rast.tgz'
-	#wget -v -N -P ${1} 'http://www.arb-silva.de/fileadmin/silva_databases/release_108/Exports/ssu-parc.fasta.tgz'
-	#wget -v -N -P ${1} 'http://www.arb-silva.de/fileadmin/silva_databases/release_108/Exports/ssu-parc.rast.tgz'
-}
-
-function download_UniProt {
-	time lftp -c "open -e 'mirror -v -e --delete-first -I reldate.txt  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
-	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_sprot.dat.gz  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
-	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_trembl.dat.gz /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
+function download_Greengenes {
+	# from 2011 ?
+	wget -v -N -P ${1} 'http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz' || return $?
 }
 
 set +x
