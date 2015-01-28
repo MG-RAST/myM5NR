@@ -12,7 +12,13 @@
 use LWP::Simple;
 use LWP::UserAgent;
 
-open OUTFILE, "> cazy_all_v042314.txt" or die "could not open out file";
+if (@ARGV == 0) {
+	die "please provide output file as argument";
+}
+
+my $output_file = $ARGV[0]; # e.g. cazy_all_v042314.txt
+
+open OUTFILE, "> ".$output_file or die "could not open out file";
 print OUTFILE "family_id\tprotein\torganism\tec\tgbk_prot\tuniprot\n";
 
 my %hash_family = ('GH' => '133', 'GT' => '95', 'PL' => '23', 'CE' => '16', 'CBM' => '69', 'AA' => '11');

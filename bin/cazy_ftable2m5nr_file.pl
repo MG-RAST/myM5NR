@@ -35,7 +35,7 @@ my $help     = 0;                                        # flag for help output
 my $batch    = 0;                                        # flag for batch mode
 my $file     = undef;                                    # input file
 my $header         = 1;        # if true will skip first line of input file
-my $md5mappingFile = undef;    # output file
+my $md5mappingFile = undef;    # output file, this is the .md52id2func file
 my $aliasFile      = undef;    # output file
 my $batch_size     = 1000;	   # default batch size
 
@@ -161,7 +161,7 @@ if ($batch) {
                 }
             }
 		    # reset id list
-		    %ids = {};
+		    %ids = ();
 			
         }
     }
