@@ -38,6 +38,19 @@ fi
 BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 
+SOURCE_CONFIG=${BIN}/../sources.cfg
+
+if [ ! -e ${SOURCE_CONFIG}]; then
+echo "source config file ${SOURCE_CONFIG} not found"
+exit 1
+fi
+
+source ${SOURCE_CONFIG} # this defines ${SOURCES}
+
+
+
+
+
 OUTPUT_EXIST=""
 OUTPUT_GOOD=""
 OUTPUT_BAD=""
@@ -61,6 +74,18 @@ set -x
 ### proteins ###
 
 #TODO: why are RefSeq and GenbankNR in directory NCBI?
+
+
+function source2ach_eggNOG {
+	# this includes COG annotations
+	PARSED_UNIPROT="${1}/../../Parsed/UniProt/"
+	[ -d ${PARSED_UNIPROT}] || return $?
+
+	perl -e 'foreach(`cat ${1}/UniProtAC2eggNOG.3.0.tsv`) {chomp $_; @x = split(/\t/,$_); $id = shift @x; $map{$id} = [@x];} foreach(`cat ${PARSED_UNIPROT}/*.md52id2func`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {foreach $id (@{$map{$z[1]}}) {($src) = ($id =~ /^([A-Za-z]+)/); unless($src =~ /^[NC]OG$/){next;} print join("\t", ($z[0], $id, $z[2], $src))."\n";}}}' | sort -u > ${2}/eggNOG.md52id2ont.tmp || return $?
+	perl -e 'foreach(`cat ${1}/*.description.txt`) {chomp $_; ($id, $func) = split(/\t/,$_); if($func){$map{$id} = $func;}} foreach(`cat ${2}/eggNOG.md52id2ont.tmp`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {$z[2] = $map{$z[1]};} print join("\t", @z)."\n";}' | sort -u > ${2}/eggNOG.md52id2ont || return $?
+	rm -f ${2}/eggNOG.md52id2ont.tmp
+	$BIN/create_eggnog_hierarchies.pl --func ${1}/fun.txt --cat ${1}/COG.funccat.txt --cat ${1}/NOG.funccat.txt --desc ${1}/COG.description.txt --desc ${1}/NOG.description.txt > ${2}/hierarchies/eggNOG.hierarchy || return $?
+}
 
 
 function source2ach_CAZy {
