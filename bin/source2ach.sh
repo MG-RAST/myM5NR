@@ -54,7 +54,7 @@ source ${SOURCE_CONFIG} # this defines ${SOURCES}
 OUTPUT_EXIST=""
 OUTPUT_GOOD=""
 OUTPUT_BAD=""
-
+SOURCE_MISSING=""
 
 
 # developer notes:
@@ -242,15 +242,6 @@ function source2ach_FungiDB {
 #rm raw/KEGG/genes.tar.gz
 #$BIN/source2ach.py -v -o -k raw/kegg.genome -f kegg -p 8 -d parsed/KEGG KEGG raw/KEGG/*
 
-# eggNOG
-#mkdir parsed/eggNOG
-#gunzip raw/eggNOG/*
-#perl -e 'foreach(`cat raw/eggNOG/UniProtAC2eggNOG.3.0.tsv`) {chomp $_; @x = split(/\t/,$_); $id = shift @x; $map{$id} = [@x];} foreach(`cat parsed/UniProt/*.md52id2func`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {foreach $id (@{$map{$z[1]}}) {($src) = ($id =~ /^([A-Za-z]+)/); unless($src =~ /^[NC]OG$/){next;} print join("\t", ($z[0], $id, $z[2], $src))."\n";}}}' | sort -u > parsed/eggNOG/eggNOG.md52id2ont.tmp
-#perl -e 'foreach(`cat raw/eggNOG/*.description.txt`) {chomp $_; ($id, $func) = split(/\t/,$_); if($func){$map{$id} = $func;}} foreach(`cat parsed/eggNOG/eggNOG.md52id2ont.tmp`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {$z[2] = $map{$z[1]};} print join("\t", @z)."\n";}' | sort -u > parsed/eggNOG/eggNOG.md52id2ont
-#rm parsed/eggNOG/eggNOG.md52id2ont.tmp
-#$BIN/create_eggnog_hierarchies.pl --func raw/eggNOG/fun.txt --cat raw/eggNOG/COG.funccat.txt --cat raw/eggNOG/NOG.funccat.txt --desc raw/eggNOG/COG.description.txt --desc raw/eggNOG/NOG.description.txt > hierarchies/eggNOG.hierarchy
-
-
 
 
 
@@ -258,17 +249,17 @@ set +x
 
 ###########################################################
 
-# iterate over all source dirs
-for inputdir in $(ls -d ${SOURCES_DIR}/*/)
+for i in ${SOURCES}
 do
+	inputdir=${SOURCES_DIR}/${i}
 	echo "inputdir=$inputdir"
-	inputdir=${inputdir%/} # remove trailing slash
-	i=${inputdir##*/} # basename
 	echo "check $i"
+
 
 	if [ ! -d "${inputdir}" ]; then
 		echo "${inputdir} not found!?" `date`
-		exit 1
+		OUTPUT_BAD="${SOURCE_MISSING} ${i}"
+		continue
 	fi
 
 	OUTDIR="${OUTPUT_DIRECTORY}/${i}"
@@ -306,6 +297,7 @@ do
 	echo "OUTPUT_EXIST=${OUTPUT_EXIST}"
 	echo "OUTPUT_GOOD=${OUTPUT_GOOD}"
 	echo "OUTPUT_BAD=${OUTPUT_BAD}"
+	echo "SOURCE_MISSING=${SOURCE_MISSING}"
 
 done
 
