@@ -38,15 +38,28 @@ fi
 BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 
+SOURCE_CONFIG=${BIN}/../sources.cfg
+
+if [ ! -e ${SOURCE_CONFIG}]; then
+echo "source config file ${SOURCE_CONFIG} not found"
+exit 1
+fi
+
+source ${SOURCE_CONFIG} # this defines ${SOURCES}
+
+
+
+
+
 OUTPUT_EXIST=""
 OUTPUT_GOOD=""
 OUTPUT_BAD=""
+SOURCE_MISSING=""
 
 
-
-# developer notes:
-#ls raw/RefSeq/* | xargs -n1 -P8 -I {} gunzip {}
-
+# developer notes: *** READ THIS ***
+# ls raw/RefSeq/* | xargs -n1 -P8 -I {} gunzip {}
+# perl -s enables rudimentary switch parsing for switches on the command line after the program name
 
 ###########################################################
 # source2ach functions (proteins and rna)
@@ -61,6 +74,34 @@ set -x
 ### proteins ###
 
 #TODO: why are RefSeq and GenbankNR in directory NCBI?
+
+
+function source2ach_eggNOG {
+	# this includes COG annotations
+	PARSED_UNIPROT="${1}/../../Parsed/UniProt/"
+	[ -d ${PARSED_UNIPROT} ]  || return $?
+
+
+	perl -s -e 'foreach(`zcat -f $input`) {chomp $_; @x = split(/\t/,$_); $id = shift @x; $map{$id} = [@x];} foreach(`cat $md52id2func`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {foreach $id (@{$map{$z[1]}}) {($src) = ($id =~ /^([A-Za-z]+)/); unless($src =~ /^[NC]OG$/){next;} print join("\t", ($z[0], $id, $z[2], $src))."\n";}}}' -- -input=${1}/UniProtAC2eggNOG.3.0.tsv.gz -md52id2func=${PARSED_UNIPROT}/\*.md52id2func  | sort -u > ${2}/eggNOG.md52id2ont.tmp || return $?
+
+	[ -s ${2}/eggNOG.md52id2ont.tmp ] || return $?
+
+	perl -s -e 'foreach(`zcat $descrCOG $descrNOG`) {chomp $_; ($id, $func) = split(/\t/,$_); if($func){$map{$id} = $func;}} foreach(`cat $output`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {$z[2] = $map{$z[1]};} print join("\t", @z)."\n";}' -- -descrCOG=${1}/COG.description.txt.gz -descrNOG=${1}/NOG.description.txt.gz -output=${2}/eggNOG.md52id2ont.tmp | sort -u > ${2}/eggNOG.md52id2ont || return $?
+
+	[ -s ${2}/eggNOG.md52id2ont ] || return $?
+	rm -f ${2}/eggNOG.md52id2ont.tmp
+
+	$BIN/create_eggnog_hierarchies.pl --func ${1}/fun.txt --cat ${1}/COG.funccat.txt --cat ${1}/NOG.funccat.txt --desc ${1}/COG.description.txt --desc ${1}/NOG.description.txt > ${2}/hierarchies/eggNOG.hierarchy || return $?
+
+	# eggNOG protein sequences
+	mkdir -p ${2}/tmp/
+	tar xvzf ${1}/sequences.v3.tar.gz  -C ${2}/tmp/ || return $?
+
+	$BIN/source2ach.py -v -f fasta -p ${THREADS} -d ${2} eggNOG ${2}/tmp/*.fa || return $?
+
+	rm -f ${2}/tmp/*
+	rmdir -f ${2}/tmp/
+}
 
 
 function source2ach_CAZy {
@@ -217,15 +258,6 @@ function source2ach_FungiDB {
 #rm raw/KEGG/genes.tar.gz
 #$BIN/source2ach.py -v -o -k raw/kegg.genome -f kegg -p 8 -d parsed/KEGG KEGG raw/KEGG/*
 
-# eggNOG
-#mkdir parsed/eggNOG
-#gunzip raw/eggNOG/*
-#perl -e 'foreach(`cat raw/eggNOG/UniProtAC2eggNOG.3.0.tsv`) {chomp $_; @x = split(/\t/,$_); $id = shift @x; $map{$id} = [@x];} foreach(`cat parsed/UniProt/*.md52id2func`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {foreach $id (@{$map{$z[1]}}) {($src) = ($id =~ /^([A-Za-z]+)/); unless($src =~ /^[NC]OG$/){next;} print join("\t", ($z[0], $id, $z[2], $src))."\n";}}}' | sort -u > parsed/eggNOG/eggNOG.md52id2ont.tmp
-#perl -e 'foreach(`cat raw/eggNOG/*.description.txt`) {chomp $_; ($id, $func) = split(/\t/,$_); if($func){$map{$id} = $func;}} foreach(`cat parsed/eggNOG/eggNOG.md52id2ont.tmp`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {$z[2] = $map{$z[1]};} print join("\t", @z)."\n";}' | sort -u > parsed/eggNOG/eggNOG.md52id2ont
-#rm parsed/eggNOG/eggNOG.md52id2ont.tmp
-#$BIN/create_eggnog_hierarchies.pl --func raw/eggNOG/fun.txt --cat raw/eggNOG/COG.funccat.txt --cat raw/eggNOG/NOG.funccat.txt --desc raw/eggNOG/COG.description.txt --desc raw/eggNOG/NOG.description.txt > hierarchies/eggNOG.hierarchy
-
-
 
 
 
@@ -233,17 +265,17 @@ set +x
 
 ###########################################################
 
-# iterate over all source dirs
-for inputdir in $(ls -d ${SOURCES_DIR}/*/)
+for i in ${SOURCES}
 do
+	inputdir=${SOURCES_DIR}/${i}
 	echo "inputdir=$inputdir"
-	inputdir=${inputdir%/} # remove trailing slash
-	i=${inputdir##*/} # basename
 	echo "check $i"
+
 
 	if [ ! -d "${inputdir}" ]; then
 		echo "${inputdir} not found!?" `date`
-		exit 1
+		OUTPUT_BAD="${SOURCE_MISSING} ${i}"
+		continue
 	fi
 
 	OUTDIR="${OUTPUT_DIRECTORY}/${i}"
@@ -281,6 +313,7 @@ do
 	echo "OUTPUT_EXIST=${OUTPUT_EXIST}"
 	echo "OUTPUT_GOOD=${OUTPUT_GOOD}"
 	echo "OUTPUT_BAD=${OUTPUT_BAD}"
+	echo "SOURCE_MISSING=${SOURCE_MISSING}"
 
 done
 

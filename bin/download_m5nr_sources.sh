@@ -14,12 +14,11 @@
 # DOWNLOADS_BAD=   sources that failed
 
 
-SOURCES="SEED InterPro UniProt RefSeq SILVA Greengenes GenBankNR PATRIC RDP Phantome CAZy"
-#"Phantome(is down?) SEED? "
 
 
-#sources where we use archived version:
-STATIC="KEGG IMG FungiDB eggNOG" # COGs from eggNOG
+
+
+
 
 
 
@@ -45,6 +44,17 @@ fi
 # binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+
+SOURCE_CONFIG=${BIN}/../sources.cfg
+
+if [ ! -e ${SOURCE_CONFIG}]; then
+	echo "source config file ${SOURCE_CONFIG} not found"
+	exit 1
+fi
+
+source ${SOURCE_CONFIG} # this defines ${SOURCES}
+
+
 DOWNLOADS_EXIST=""
 DOWNLOADS_GOOD=""
 DOWNLOADS_BAD=""
@@ -68,14 +78,39 @@ function download_CAZy {
 
 function download_eggNOG {
 	# version 4 available, but different format, thus we use old version for now.
-	echo "not updated to v4 yet"
-	exit 1
-	wget -v -N -P ${1} 'http://eggnog.embl.de/version_3.0/data/downloads/fun.txt.gz' || return $?
-	wget -v -N -P ${1} 'http://eggnog.embl.de/version_3.0/data/downloads/UniProtAC2eggNOG.3.0.tsv.gz' || return $?
-	wget -v -N -P ${1} 'http://eggnog.embl.de/version_3.0/data/downloads/COG.funccat.txt.gz' || return $?
-	wget -v -N -P ${1} 'http://eggnog.embl.de/version_3.0/data/downloads/NOG.funccat.txt.gz' || return $?
-	wget -v -N -P ${1} 'http://eggnog.embl.de/version_3.0/data/downloads/COG.description.txt.gz' || return $?
-	wget -v -N -P ${1} 'http://eggnog.embl.de/version_3.0/data/downloads/NOG.description.txt.gz' || return $?
+	echo "Using v3 not v4 yet"
+
+	########## v4.0 (COG stuff seems to be missing, UniProtAC2eggNOG changed)
+	# former fun.txt.gz
+	#ftp://eggnog.embl.de/eggNOG/4.0/eggnogv4.funccats.txt
+
+	### UniProtAC2eggNOG contains content that was provided by UniProtAC2eggNOG.3.0.tsv.gz, but different format!
+	#ftp://eggnog.embl.de/eggNOG/4.0/id_conversion.tsv
+
+	### funcat
+	# COG.funccat.txt.gz missing !? use old v3 ?
+	#ftp://eggnog.embl.de/eggNOG/4.0/funccat/NOG.funccat.txt.gz
+
+	### description
+	# COG.description.txt.gz is missing
+	#ftp://eggnog.embl.de/eggNOG/4.0/description/NOG.description.txt.gz
+
+	### sequence
+	# ftp://eggnog.embl.de/eggNOG/4.0/eggnogv4.proteins.all.fa.gz
+
+
+	# v3.0
+	time lftp -c "open -e 'mirror -v -e --no-recursion \\
+		-I fun.txt.gz \\
+		-I UniProtAC2eggNOG.3.0.tsv.gz \\
+		-I COG.funccat.txt.gz \\
+		-I NOG.funccat.txt.gz \\
+		-I COG.description.txt.gz \\
+		-I NOG.description.txt.gz \\
+		-I sequences.v3.tar.gz \\
+		/eggNOG/3.0/ ${1}' ftp://eggnog.embl.de" || return $?
+
+
 }
 
 function download_COGs {
@@ -84,7 +119,8 @@ function download_COGs {
 
 function download_FungiDB {
 	# use old version, does not seem to be updated anymore
-	exit 1
+	echo "Please use archvied version for FungiDB."
+	return 1
 	#wget -v -N -P ${1} 'http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz' || return $?
 }
 
@@ -100,8 +136,8 @@ function download_InterPro {
 }
 
 function download_KEGG {
-	echo ftp is no longer accessable
-	exit 1
+	echo KEGG is no longer available.
+	return 1
 	#time lftp -c "open -e 'mirror -v --no-recursion -I genome /pub/kegg/genes/ ${1}' ftp://ftp.genome.ad.jp"
 	#time lftp -c "open -e 'mirror -v --no-recursion -I genes.tar.gz /pub/kegg/release/current/ ${1}' ftp://ftp.genome.ad.jp"
 	#time lftp -c "open -e 'mirror -v --no-recursion -I ko /pub/kegg/genes/ ${DOWNLOAD_DIR}/KO' ftp://ftp.genome.ad.jp"
@@ -109,8 +145,7 @@ function download_KEGG {
 }
 
 function download_MO {
-	echo not using for now
-	exit 1
+	# we are not using this MG right now.
 	# issue with recursive wget and links on page, this hack works
 	for i in `seq 1 907348`; do wget -N -P ${1} http://www.microbesonline.org/genbank/${i}.gbk.gz 2> /dev/null; done
 	wget -v -N -P ${1} http://www.microbesonline.org/genbank/10000550.gbk.gz
@@ -177,6 +212,7 @@ function download_RDP {
 function download_Greengenes {
 	# from 2011 ?
 	wget -v -N -P ${1} 'http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz' || return $?
+	echo `date +"%Y%m%d"` > ${1}/timestamp.txt
 }
 
 set +x
