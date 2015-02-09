@@ -115,7 +115,7 @@ for i in ${SOURCES_PROTEIN} ; do file ${i}_sorted.md52seq ; done
 
 Merge sorted files (sort -m does not sort!)
 ```bash
-sort -m -u -S 50% `for i in ${SOURCES_PROTEIN} ; do echo -n "${i}_sorted.md52seq " ; done` -o all_protein.md5seq
+sort -m -u -S 50% `for i in ${SOURCES_PROTEIN} ; do echo -n "${i}_sorted.md52seq " ; done` -o all_protein.md52seq
 ```
 
 Create actual FASTA files
