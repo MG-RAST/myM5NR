@@ -57,9 +57,9 @@ OUTPUT_BAD=""
 SOURCE_MISSING=""
 
 
-# developer notes:
-#ls raw/RefSeq/* | xargs -n1 -P8 -I {} gunzip {}
-
+# developer notes: *** READ THIS ***
+# ls raw/RefSeq/* | xargs -n1 -P8 -I {} gunzip {}
+# perl -s enables rudimentary switch parsing for switches on the command line after the program name
 
 ###########################################################
 # source2ach functions (proteins and rna)
@@ -79,12 +79,28 @@ set -x
 function source2ach_eggNOG {
 	# this includes COG annotations
 	PARSED_UNIPROT="${1}/../../Parsed/UniProt/"
-	[ -d ${PARSED_UNIPROT}] || return $?
+	[ -d ${PARSED_UNIPROT} ]  || return $?
 
-	perl -e 'foreach(`cat ${1}/UniProtAC2eggNOG.3.0.tsv`) {chomp $_; @x = split(/\t/,$_); $id = shift @x; $map{$id} = [@x];} foreach(`cat ${PARSED_UNIPROT}/*.md52id2func`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {foreach $id (@{$map{$z[1]}}) {($src) = ($id =~ /^([A-Za-z]+)/); unless($src =~ /^[NC]OG$/){next;} print join("\t", ($z[0], $id, $z[2], $src))."\n";}}}' | sort -u > ${2}/eggNOG.md52id2ont.tmp || return $?
-	perl -e 'foreach(`cat ${1}/*.description.txt`) {chomp $_; ($id, $func) = split(/\t/,$_); if($func){$map{$id} = $func;}} foreach(`cat ${2}/eggNOG.md52id2ont.tmp`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {$z[2] = $map{$z[1]};} print join("\t", @z)."\n";}' | sort -u > ${2}/eggNOG.md52id2ont || return $?
+
+	perl -s -e 'foreach(`zcat -f $input`) {chomp $_; @x = split(/\t/,$_); $id = shift @x; $map{$id} = [@x];} foreach(`cat $md52id2func`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {foreach $id (@{$map{$z[1]}}) {($src) = ($id =~ /^([A-Za-z]+)/); unless($src =~ /^[NC]OG$/){next;} print join("\t", ($z[0], $id, $z[2], $src))."\n";}}}' -- -input=${1}/UniProtAC2eggNOG.3.0.tsv.gz -md52id2func=${PARSED_UNIPROT}/\*.md52id2func  | sort -u > ${2}/eggNOG.md52id2ont.tmp || return $?
+
+	[ -s ${2}/eggNOG.md52id2ont.tmp ] || return $?
+
+	perl -s -e 'foreach(`zcat $descrCOG $descrNOG`) {chomp $_; ($id, $func) = split(/\t/,$_); if($func){$map{$id} = $func;}} foreach(`cat $output`) {chomp $_; @z = split(/\t/,$_); if(exists $map{$z[1]}) {$z[2] = $map{$z[1]};} print join("\t", @z)."\n";}' -- -descrCOG=${1}/COG.description.txt.gz -descrNOG=${1}/NOG.description.txt.gz -output=${2}/eggNOG.md52id2ont.tmp | sort -u > ${2}/eggNOG.md52id2ont || return $?
+
+	[ -s ${2}/eggNOG.md52id2ont ] || return $?
 	rm -f ${2}/eggNOG.md52id2ont.tmp
+
 	$BIN/create_eggnog_hierarchies.pl --func ${1}/fun.txt --cat ${1}/COG.funccat.txt --cat ${1}/NOG.funccat.txt --desc ${1}/COG.description.txt --desc ${1}/NOG.description.txt > ${2}/hierarchies/eggNOG.hierarchy || return $?
+
+	# eggNOG protein sequences
+	mkdir -p ${2}/tmp/
+	tar xvzf ${1}/sequences.v3.tar.gz  -C ${2}/tmp/ || return $?
+
+	$BIN/source2ach.py -v -f fasta -p ${THREADS} -d ${2} eggNOG ${2}/tmp/*.fa || return $?
+
+	rm -f ${2}/tmp/*
+	rmdir -f ${2}/tmp/
 }
 
 
