@@ -120,8 +120,8 @@ sort -m -u -S 50% `for i in ${SOURCES_PROTEIN} ; do echo -n "${i}_sorted.md52seq
 
 Create actual FASTA files
 ```bash
-while read md5 seq ; do echo ">"$md5 ; echo $seq ; done < all_rna.md52seq > m5rna.fasta
-while read md5 seq ; do echo ">"$md5 ; echo $seq ; done < all_protein.md52seq > m5nr.fasta
+cat all_rna.md52seq | while read md5 seq ; do echo ">"$md5 ; echo $seq ; done > m5rna.fasta
+cat all_protein.md52seq | while read md5 seq ; do echo ">"$md5 ; echo $seq ; done > m5nr.fasta
 ```
 
 
