@@ -203,6 +203,8 @@ def format_factory(out_files):
             cid   = rec.id
             cdesc = rec.description.rstrip('.')
             seq   = str(rec.seq).upper()
+            if params.fix_front_dash && seq[0] == '-': # PATRIC protein sequences have that sometimes
+                seq = 'M'+seq[1:]
             clen  = len(seq)
             if 'organism' in rec.annotations:
                 org = rec.annotations['organism']
@@ -503,6 +505,7 @@ def main(args):
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False, help="Wordy [default is off]")
     parser.add_option("-s", "--sort_dir", dest="sortdir", metavar="DIR", default="/tmp", help="temp DIR to use for sorting [default is /tmp]")
     parser.add_option("-u", "--continue_on_error", dest="continue_on_error", default=False, help="continue on parsing error [default is off]")
+    parser.add_option("-x", "--fix_front_dash", dest="fix_front_dash", default=False, help="replace dash in front of protein sequence with a M [default is off]")
     
     (opts, args) = parser.parse_args()
     if len(args) < 2:
@@ -521,6 +524,7 @@ def main(args):
     params.getctg  = opts.getcontig
     params.gettax  = opts.gettax
     params.continue_on_error = opts.continue_on_error
+    params.fix_front_dash = opts.fix_front_dash
     
     if (params.format == 'nr') and opts.nrdbs:
         for d in opts.nrdbs.split(','):
