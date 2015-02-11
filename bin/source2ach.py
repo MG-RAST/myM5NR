@@ -197,14 +197,14 @@ def format_factory(out_files):
     get_tax  = params.gettax
     get_ip   = params.interpro
     amap     = params.amap
+    fix_front_dash = params.fix_front_dash
     if form == 'genbank':    
         def parse_genbank(rec):
             if (not rec) or (not rec.id) or (not rec.seq): return
             cid   = rec.id
             cdesc = rec.description.rstrip('.')
             seq   = str(rec.seq).upper()
-            if params.fix_front_dash and seq[0] == '-': # PATRIC protein sequences have that sometimes
-                seq = 'M'+seq[1:]
+               
             clen  = len(seq)
             if 'organism' in rec.annotations:
                 org = rec.annotations['organism']
@@ -239,6 +239,8 @@ def format_factory(out_files):
                     else:
                         continue
                     seq  = feat.qualifiers['translation'][0]
+                    if fix_front_dash and seq[0] == '-': # PATRIC protein sequences have that sometimes
+                        seq = 'M'+seq[1:]
                     md5  = hashlib.md5(seq).hexdigest()
                     func = feat.qualifiers['product'][0]
                     beg  = feat.location.start.position
@@ -466,6 +468,7 @@ def process_file(infile):
             for rec in SeqIO.parse(infile_argument, fformat):
                 parse_format(rec)
                 n += 1
+                
         except Exception as ex:
             #sys.stderr.write("Unable to parse %s file %s: %s %s\n"%(fformat, infile, type(ex).__name__, ex.args))
             myerror = "Error: Unable to parse %s file %s at record %d: %s %s\n"%(fformat, infile, n, type(ex).__name__, ex.args)+"\n"
@@ -504,8 +507,8 @@ def main(args):
     parser.add_option("-t", "--get_tax", dest="gettax", action="store_true", default=False, help="Output taxonomy string for genbank files [default is off]")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", default=False, help="Wordy [default is off]")
     parser.add_option("-s", "--sort_dir", dest="sortdir", metavar="DIR", default="/tmp", help="temp DIR to use for sorting [default is /tmp]")
-    parser.add_option("-u", "--continue_on_error", dest="continue_on_error", default=False, help="continue on parsing error [default is off]")
-    parser.add_option("-x", "--fix_front_dash", dest="fix_front_dash", default=False, help="replace dash in front of protein sequence with a M [default is off]")
+    parser.add_option("-u", "--continue_on_error", dest="continue_on_error", action="store_true", default=False, help="continue on parsing error [default is off]")
+    parser.add_option("-x", "--fix_front_dash", dest="fix_front_dash", action="store_true", default=False, help="replace dash in front of protein sequence with a M [default is off]")
     
     (opts, args) = parser.parse_args()
     if len(args) < 2:
@@ -570,7 +573,9 @@ def main(args):
             shutil.copyfileobj( open(f, 'r'), out_tmp )
             os.remove(f)
         out_tmp.close()
-        os.system( "sort -T %s -u %s.tmp > %s"%(opts.sortdir, out_file, out_file) )
+        sort_cmd = "sort -T %s -u %s.tmp > %s"%(opts.sortdir, out_file, out_file)
+        if params.verbose: sys.stdout.write("running: %s\n"%(sort_cmd))
+        os.system( sort_cmd )
         os.remove(out_file+'.tmp')
         if os.path.isfile(out_file) and (os.path.getsize(out_file) == 0):
             os.remove(out_file)
