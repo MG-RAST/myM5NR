@@ -203,7 +203,7 @@ def format_factory(out_files):
             cid   = rec.id
             cdesc = rec.description.rstrip('.')
             seq   = str(rec.seq).upper()
-            if params.fix_front_dash && seq[0] == '-': # PATRIC protein sequences have that sometimes
+            if params.fix_front_dash and seq[0] == '-': # PATRIC protein sequences have that sometimes
                 seq = 'M'+seq[1:]
             clen  = len(seq)
             if 'organism' in rec.annotations:
