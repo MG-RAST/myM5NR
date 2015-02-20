@@ -14,11 +14,11 @@ a) Check and adapt parameters in /m5nr/Makefile, e.g. M5NR Version. Then run:
 ```bash
 cd /m5nr/ && make standalone-solr
 ```
-b) 
+b) Or, only install and configure solr:
 ```bash
 cd /m5nr/ && make dependencies install-solr config-solr
 ```
-This should do the same as standalone-solr, but skips the loading. Aftwards download solr dump from Shock and the place files in /mnt/m5nr_1/data/index/:
+This should do the same as the make target standalone-solr, but skips the loading. Aftwards download solr dump from Shock and the place files in /mnt/m5nr_1/data/index/:
 ```bash
 cd /mnt/m5nr_1/data/index/ && curl <shock_node_url> | tar xvz 
 ```
@@ -26,7 +26,7 @@ cd /mnt/m5nr_1/data/index/ && curl <shock_node_url> | tar xvz
 
 ## Upload Solr dump to Shock
 
-Please specify solr version used, as the dump will be version specific:
+To be sure stop solr: "/etc/init.d/solr stop". For the upload to Shock, please specify the solr version used, as the dump will be solr-version specific:
 
 ```bash
 curl -X POST -H "Authorization: OAuth $TOKEN" -F "upload=@solr-m5nr_v1_solr_v4.10.3.tgz" -F attributes_str='{"type":"data-library","data-library-name":"Solr M5NR v1 with Solr v4.10.3", "version":"1", "member": "1/1", "provenance" : { "creation_type" : "manual", "note": "tar -zcvf solr-m5nr_v1_solr_v4.10.3.tgz -C /mnt/m5nr_1/data/index/ ."} }' "http://shock.metagenomics.anl.gov/node"
