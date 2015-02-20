@@ -40,7 +40,7 @@ BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 SOURCE_CONFIG=${BIN}/../sources.cfg
 
-if [ ! -e ${SOURCE_CONFIG}]; then
+if [ ! -e ${SOURCE_CONFIG} ] ; then
 echo "source config file ${SOURCE_CONFIG} not found"
 exit 1
 fi
@@ -129,7 +129,7 @@ function source2ach_InterPro {
 
 function source2ach_PATRIC {
 	# --continue_on_error is enabled! There are issues with biopython parser parsing genbank (some qualifiers are missing in genbank file)
-	$BIN/source2ach.py --continue_on_error -v -t -o -f genbank -p ${THREADS} -d ${2} PATRIC ${1}/*/*.gbf || return $?
+	$BIN/source2ach.py --continue_on_error --fix_front_dash -v -t -o -f genbank -p ${THREADS} -d ${2} PATRIC ${1}/*/*.gbf || return $?
 }
 
 function source2ach_IMG {
