@@ -20,7 +20,9 @@ cd /m5nr/ && make dependencies install-solr config-solr
 ```
 This should do the same as the make target standalone-solr, but skips the loading. Aftwards download solr dump from Shock and the place files in /mnt/m5nr_1/data/index/:
 ```bash
+/etc/init.d/solr stop
 cd /mnt/m5nr_1/data/index/ && curl <shock_node_url> | tar xvz 
+/etc/init.d/solr start
 ```
 
 
