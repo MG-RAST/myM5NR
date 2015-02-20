@@ -2,10 +2,15 @@
 
 # Solr M5NR
 
+Build image:
+```bash
+docker build --tag=mgrast/m5nr-solr:latest --force-rm --no-cache https://raw.githubusercontent.com/MG-RAST/myM5NR/master/solr/docker/Dockerfile
+```
+
 After building the image using the Dockerfile in this repo you can start it like this:
 
 ```bash
-sudo docker run -t -i -v /mnt/solr_mnt/:/mnt -p 8983:8983 solr-m5nr
+sudo docker run -t -i -v /mnt/solr/:/mnt -p 8983:8983 mgrast/m5nr-solr:latest
 ```
 
 You can either a) load the database using the Makefile or b) use an existing solr dump.
