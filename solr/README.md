@@ -33,7 +33,12 @@ cd /mnt/m5nr_1/data/index/ && curl <shock_node_url> | tar xvz
 
 ## Upload Solr dump to Shock
 
-To be sure stop solr: "/etc/init.d/solr stop". For the upload to Shock, please specify the solr version used, as the dump will be solr-version specific:
+To be sure stop solr: "/etc/init.d/solr stop". 
+```bash
+tar -zcvf solr-m5nr_v1_solr_v4.10.3.tgz -C /mnt/m5nr_1/data/index/ .
+```
+
+For the upload to Shock, please specify the solr version used, as the dump will be solr-version specific:
 
 ```bash
 curl -X POST -H "Authorization: OAuth $TOKEN" -F "upload=@solr-m5nr_v1_solr_v4.10.3.tgz" -F attributes_str='{"type":"data-library","data-library-name":"Solr M5NR", "description": "Solr M5NR v1 with Solr v4.10.3", "version":"1", "member": "1/1", "provenance" : { "creation_type" : "manual", "note": "tar -zcvf solr-m5nr_v1_solr_v4.10.3.tgz -C /mnt/m5nr_1/data/index/ ."} }' "http://shock.metagenomics.anl.gov/node"
