@@ -13,25 +13,18 @@ After building the image using the Dockerfile in this repo you can start it like
 sudo docker run -t -i -v /mnt/solr/:/mnt -p 8983:8983 mgrast/m5nr-solr:latest
 ```
 
-You can either a) load the database using the Makefile or b) use an existing solr dump.
+You can either a) load the database using the Makefile or b) use an existing solr dump. In both cases check and adapt parameters in the Makefile, e.g. M5NR Version and shock node url if you want to use the cached solr database.
 
-a) Check and adapt parameters in /m5nr/Makefile, e.g. M5NR Version. Then run:
+a) Loading from scratch:
 ```bash
 cd /m5nr/ && make standalone-solr
 ```
-b) Or, only install and configure solr:
+b) Deploy cached solr database: 
 ```bash
-cd /m5nr/ && make dependencies install-solr config-solr
-```
-This should do the same as the make target standalone-solr, but skips the loading. Aftwards download solr dump from Shock and the place files in /mnt/m5nr_1/data/index/:
-```bash
-/etc/init.d/solr stop
-cd /mnt/m5nr_1/data/index/ && curl <shock_node_url> | tar xvz 
-/etc/init.d/solr start
+cd /m5nr/ && make standalone-cached-solr
 ```
 
-
-## Upload Solr dump to Shock
+## Create Solr dump and upload to Shock
 
 To be sure stop solr: "/etc/init.d/solr stop". 
 ```bash
