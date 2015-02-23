@@ -17,11 +17,11 @@ You can either a) load the database using the Makefile or b) use an existing sol
 
 a) Loading from scratch:
 ```bash
-cd /m5nr/ && make standalone-solr
+cd /m5nr/ && make load-solr
 ```
 b) Deploy cached solr database: 
 ```bash
-cd /m5nr/ && make standalone-cached-solr
+cd /m5nr/ && make load-cached-solr
 ```
 
 ## Create Solr dump and upload to Shock
