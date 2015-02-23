@@ -11,5 +11,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 
 RUN mkdir -p /kb/runtime/ ; mkdir -p /kb/deployment
 
-RUN git clone https://github.com/kbase/m5nr.git
+RUN git clone https://github.com/kbase/m5nr.git && \
+	cd /m5nr/ && \
+	make dependencies install-solr config-solr
 
+# now run "make load-solr" or "make load-cached-solr" manually
