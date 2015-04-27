@@ -4,13 +4,14 @@
 FROM      ubuntu:14.10
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+                libtemplate-perl \
 		git \
 		wget \
 		openjdk-8-jre
 
 RUN git clone https://github.com/MG-RAST/myM5NR.git
 
-RUN ./myM5NR/
+RUN ./myM5NR/solr/install-solr.sh
 
 #FROM      ubuntu:14.04
 
