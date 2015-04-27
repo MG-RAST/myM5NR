@@ -49,8 +49,11 @@ echo "SOLR_VERSION = $SOLR_VERSION"
 echo "TARGET = $TARGET"
 echo ""
 
-wget http:/ apache.mirrors.hoobly.com/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz
-./install_solr_service.sh solr-${SOLR_VERSION}.tgz
+set -e
+set -x
+
+wget http://apache.mirrors.hoobly.com/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz
+tar zxvf solr-${SOLR_VERSION}.tgz /opt
 cp -av /opt/solr/server/solr/configsets/sample_techproducts_configs /opt/solr/server/solr/m5nr_${M5NR_VERSION}
 echo "name=m5nr_$(M5NR_VERSION)" > /opt/solr/server/solr/m5nr_$(M5NR_VERSION)/core.properties
 cp schema.xml /opt/solr/server/solr/m5nr_${M5NR_VERSION}/conf/schema.xml
