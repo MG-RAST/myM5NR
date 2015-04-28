@@ -53,6 +53,7 @@ set -e
 set -x
 
 wget http://apache.mirrors.hoobly.com/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz
+mkdir -p /opt
 tar zxvf solr-${SOLR_VERSION}.tgz -C /opt
 cp -av /opt/solr/server/solr/configsets/sample_techproducts_configs /opt/solr/server/solr/m5nr_${M5NR_VERSION}
 echo "name=m5nr_$(M5NR_VERSION)" > /opt/solr/server/solr/m5nr_$(M5NR_VERSION)/core.properties
