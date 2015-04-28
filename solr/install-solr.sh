@@ -57,6 +57,6 @@ mkdir -p /opt
 tar zxvf solr-${SOLR_VERSION}.tgz -C /opt
 ln -s /opt/solr-${SOLR_VERSION} /opt/solr
 cp -av /opt/solr/server/solr/configsets/sample_techproducts_configs /opt/solr/server/solr/m5nr_${M5NR_VERSION}
-echo "name=m5nr_$(M5NR_VERSION)" > /opt/solr/server/solr/m5nr_$(M5NR_VERSION)/core.properties
+echo "name=m5nr_${M5NR_VERSION}" > /opt/solr/server/solr/m5nr_${M5NR_VERSION}/core.properties
 cp schema.xml /opt/solr/server/solr/m5nr_${M5NR_VERSION}/conf/schema.xml
-tpage --define data_dir=/mnt/data --define max_bool=100000 solrconfig.xml.tt > /opt/solr/server/solr/m5nr_$(M5NR_VERSION)/conf/solrconfig.xml
+tpage --define data_dir=/mnt/data --define max_bool=100000 solrconfig.xml.tt > /opt/solr/server/solr/m5nr_${M5NR_VERSION}/conf/solrconfig.xml
