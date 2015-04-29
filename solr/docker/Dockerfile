@@ -12,6 +12,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 
 RUN git clone https://github.com/MG-RAST/myM5NR.git && cd myM5NR/solr && ./install-solr.sh
 
+RUN ./download-solr-index.sh
+
 #FROM      ubuntu:14.04
 
 #RUN apt-get update && apt-get upgrade -y && apt-get install -y \
