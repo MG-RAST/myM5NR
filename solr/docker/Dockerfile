@@ -7,7 +7,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
                 libtemplate-perl \
 		git \
 		wget \
-		openjdk-8-jre
+		openjdk-8-jre \
+		unzip
 
 RUN git clone https://github.com/MG-RAST/myM5NR.git && cd myM5NR/solr && ./install-solr.sh
 
