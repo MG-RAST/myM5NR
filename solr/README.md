@@ -24,6 +24,12 @@ b) Deploy cached solr database:
 cd /m5nr/ && make load-cached-solr
 ```
 
+Start solr:
+```bash
+SOLR_INCLUDE=/opt/solr/bin/solr.in.sh /opt/solr/bin/solr -f start
+```
+
+
 ## Create Solr dump and upload to Shock
 
 To be sure stop solr: "/etc/init.d/solr stop". 
