@@ -110,14 +110,14 @@
    <field name="id" type="text_full" indexed="true" stored="true" />
 
    <!-- These are the fields for md5_annotation objects -->
-   <field name="md5_id" type="int" indexed="true" stored="false" />
+   <field name="md5_id" type="int" indexed="true" stored="true" />
    <field name="md5" type="text_full" indexed="true" stored="true" />
    <field name="accession" type="text_full" indexed="true" stored="true" />
    <field name="alias" type="text_general_rev" indexed="true" stored="true" multiValued="true" />
-   <field name="ontology_id" type="int" indexed="true" stored="false" />
-   <field name="function_id" type="int" indexed="true" stored="false" />
+   <field name="ontology_id" type="int" indexed="true" stored="true" />
+   <field name="function_id" type="int" indexed="true" stored="true" />
    <field name="function" type="text_general_rev" indexed="true" stored="true" />
-   <field name="organism_id" type="int" indexed="true" stored="false" />
+   <field name="organism_id" type="int" indexed="true" stored="true" />
    <field name="organism" type="text_general_rev" indexed="true" stored="true" />
    <field name="domain" type="text_general_rev" indexed="true" stored="true" />
    <field name="phylum" type="text_general_rev" indexed="true" stored="true" />
@@ -127,7 +127,7 @@
    <field name="genus" type="text_general_rev" indexed="true" stored="true" />
    <field name="species" type="text_general_rev" indexed="true" stored="true" />
    <field name="ncbi_tax_id" type="int" indexed="true" stored="true" />
-   <field name="source_id" type="int" indexed="true" stored="false" />
+   <field name="source_id" type="int" indexed="true" stored="true" />
    <field name="source" type="text_full" indexed="true" stored="true" />
    <field name="type" type="text_full" indexed="true" stored="true" />
    <field name="organization" type="string" indexed="false" stored="true" />
@@ -204,7 +204,6 @@
    <dynamicField name="*_td" type="tdouble" indexed="true"  stored="true"/>
    <dynamicField name="*_tdt" type="tdate"  indexed="true"  stored="true"/>
 
-   <dynamicField name="*_pi"  type="pint"    indexed="true"  stored="true"/>
    <dynamicField name="*_c"   type="currency" indexed="true"  stored="true"/>
 
    <dynamicField name="ignored_*" type="ignored" multiValued="true"/>
@@ -365,21 +364,6 @@
 
     <!--Binary data type. The data should be sent/retrieved in as Base64 encoded Strings -->
     <fieldtype name="binary" class="solr.BinaryField"/>
-
-    <!--
-      Note:
-      These should only be used for compatibility with existing indexes (created with lucene or older Solr versions).
-      Use Trie based fields instead. As of Solr 3.5 and 4.x, Trie based fields support sortMissingFirst/Last
-      
-      Plain numeric field types that store and index the text
-      value verbatim (and hence don't correctly support range queries, since the
-      lexicographic ordering isn't equal to the numeric ordering)
-    -->
-    <fieldType name="pint" class="solr.IntField"/>
-    <fieldType name="plong" class="solr.LongField"/>
-    <fieldType name="pfloat" class="solr.FloatField"/>
-    <fieldType name="pdouble" class="solr.DoubleField"/>
-    <fieldType name="pdate" class="solr.DateField" sortMissingLast="true"/>
 
     <!-- The "RandomSortField" is not used to store or search any
          data.  You can declare fields of this type it in your schema
@@ -756,7 +740,7 @@
         <!-- for any non-arabic -->
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_ar.txt" enablePositionIncrements="true"/>
-        <!-- normalizes ﻯ to ﻱ, etc -->
+        <!-- normalizes ï¯ to ï±, etc -->
         <filter class="solr.ArabicNormalizationFilterFactory"/>
         <filter class="solr.ArabicStemFilterFactory"/>
       </analyzer>
@@ -899,20 +883,6 @@
       </analyzer>
     </fieldType>
     
-    <!-- Irish -->
-    <fieldType name="text_ga" class="solr.TextField" positionIncrementGap="100">
-      <analyzer> 
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <!-- removes d', etc -->
-        <filter class="solr.ElisionFilterFactory" ignoreCase="true" articles="lang/contractions_ga.txt"/>
-        <!-- removes n-, etc. position increments is intentionally false! -->
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/hyphenations_ga.txt" enablePositionIncrements="false"/>
-        <filter class="solr.IrishLowerCaseFilterFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_ga.txt" enablePositionIncrements="true"/>
-        <filter class="solr.SnowballPorterFilterFactory" language="Irish"/>
-      </analyzer>
-    </fieldType>
-    
     <!-- Galician -->
     <fieldType name="text_gl" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
@@ -1021,7 +991,7 @@
         -->
         <tokenizer class="solr.JapaneseTokenizerFactory" mode="search"/>
         <!--<tokenizer class="solr.JapaneseTokenizerFactory" mode="search" userDictionary="lang/userdict_ja.txt"/>-->
-        <!-- Reduces inflected verbs and adjectives to their base/dictionary forms (辞書形) -->
+        <!-- Reduces inflected verbs and adjectives to their base/dictionary forms (èæ¸å¢) -->
         <filter class="solr.JapaneseBaseFormFilterFactory"/>
         <!-- Removes tokens with certain part-of-speech tags -->
         <filter class="solr.JapanesePartOfSpeechStopFilterFactory" tags="lang/stoptags_ja.txt" enablePositionIncrements="true"/>
