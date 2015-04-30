@@ -4,13 +4,13 @@
 
 Build image:
 ```bash
-docker build --tag=mgrast/m5nr-solr:latest --force-rm --no-cache https://raw.githubusercontent.com/MG-RAST/myM5NR/master/solr/docker/Dockerfile
+docker build --tag=mgrast/solr-m5nr:latest https://raw.githubusercontent.com/MG-RAST/myM5NR/master/solr/docker/Dockerfile
 ```
 
 After building the image using the Dockerfile in this repo you can start it like this:
 
 ```bash
-sudo docker run -t -i -v /mnt/solr/:/mnt -p 8983:8983 mgrast/m5nr-solr:latest
+sudo docker run -t -i -v /mnt/solr/:/mnt -p 8983:8983 mgrast/solr-m5nr:latest
 ```
 
 You can either a) load the database using the Makefile or b) use an existing solr dump. In both cases check and adapt parameters in the Makefile, e.g. M5NR Version and shock node url if you want to use the cached solr database.
