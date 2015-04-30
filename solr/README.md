@@ -4,7 +4,7 @@
 
 Build image:
 ```bash
-docker build --tag=mgrast/solr-m5nr:latest --force-rm --no-cache https://raw.githubusercontent.com/MG-RAST/myM5NR/master/solr/docker/Dockerfile
+docker build --tag=mgrast/solr-m5nr:latest https://raw.githubusercontent.com/MG-RAST/myM5NR/master/solr/docker/Dockerfile
 ```
 
 After building the image using the Dockerfile in this repo you can start it like this:
