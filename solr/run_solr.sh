@@ -10,7 +10,7 @@ set -x
 export PIDFILE="/var/run/solr.pid"
 export SOLR_INCLUDE="/opt/solr/bin/solr.in.sh"
 
-/opt/solr/bin/solr -f start
+/opt/solr/bin/solr start -f
 
 # max Java memory is 80% of system memory
 
