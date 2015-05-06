@@ -13,9 +13,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 
 
 # install solr
-ENV SOLR_VERSION '5.0.0'
-
-RUN mkdir -p /opt && \
+RUN export SOLR_VERSION='5.0.0' && \
+  mkdir -p /opt && \
   curl -s http://apache.mirrors.hoobly.com/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz | tar -zxvf - -C /opt/ && \
   ln -s /opt/solr-${SOLR_VERSION} /opt/solr
 
