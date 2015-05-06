@@ -6,7 +6,7 @@ FROM ubuntu:14.10
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
                 libtemplate-perl \
 		git \
-		wget \
+		curl \
 		openjdk-8-jre \
 		unzip \
 		bc
@@ -15,8 +15,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 # install solr
 ENV SOLR_VERSION '5.0.0'
 
-ADD http://apache.mirrors.hoobly.com/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz /solr-${SOLR_VERSION}.tgz
-RUN mkdir -p /opt && tar zxvf solr-${SOLR_VERSION}.tgz -C /opt && ln -s /opt/solr-${SOLR_VERSION} /opt/solr
+RUN mkdir -p /opt && \
+  curl -s http://apache.mirrors.hoobly.com/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz | tar -zxvf - -C /opt/ && \
+  ln -s /opt/solr-${SOLR_VERSION} /opt/solr
 
 # configure solr
 RUN git clone https://github.com/MG-RAST/myM5NR.git && cd myM5NR/solr && ./install-solr.sh
