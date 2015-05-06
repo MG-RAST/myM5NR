@@ -9,7 +9,7 @@ HELP=0
 
 # set a default value for options
 M5NR_VERSION=10
-SOLR_VERSION='5.0.0'
+#SOLR_VERSION='5.0.0'
 
 # read the options
 TEMP=`getopt -o hm:s: --long help,m5nr:,solr: -n 'install-solr.sh' -- "$@"`
@@ -45,10 +45,11 @@ echo ""
 set -e
 set -x
 
-wget http://apache.mirrors.hoobly.com/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz
-mkdir -p /opt
-tar zxvf solr-${SOLR_VERSION}.tgz -C /opt
-ln -s /opt/solr-${SOLR_VERSION} /opt/solr
+#wget http://apache.mirrors.hoobly.com/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz
+#mkdir -p /opt
+#tar zxvf solr-${SOLR_VERSION}.tgz -C /opt
+#ln -s /opt/solr-${SOLR_VERSION} /opt/solr
+
 cp -av /opt/solr/server/solr/configsets/sample_techproducts_configs /opt/solr/server/solr/m5nr_${M5NR_VERSION}
 echo "name=m5nr_${M5NR_VERSION}" > /opt/solr/server/solr/m5nr_${M5NR_VERSION}/core.properties
 cp schema.xml /opt/solr/server/solr/m5nr_${M5NR_VERSION}/conf/schema.xml

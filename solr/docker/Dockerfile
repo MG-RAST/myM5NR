@@ -11,7 +11,17 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 		unzip \
 		bc
 
+
+# install solr
+ENV SOLR_VERSION '5.0.0'
+
+ADD http://apache.mirrors.hoobly.com/lucene/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz /solr-${SOLR_VERSION}.tgz
+RUN mkdir -p /opt && tar zxvf solr-${SOLR_VERSION}.tgz -C /opt && ln -s /opt/solr-${SOLR_VERSION} /opt/solr
+
+# configure solr
 RUN git clone https://github.com/MG-RAST/myM5NR.git && cd myM5NR/solr && ./install-solr.sh
+
+
 
 EXPOSE 8983
 
