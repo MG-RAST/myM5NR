@@ -10,23 +10,23 @@ docker build --tag=mgrast/solr-m5nr:`date +"%Y%m%d.%H%M"` https://raw.githubuser
 After building the image using the Dockerfile in this repo you can start it like this:
 
 ```bash
-sudo docker run -t -i -v /mnt/solr/:/mnt -p 8983:8983 mgrast/solr-m5nr
+sudo docker run -t -i -v /media/ephemeral/solr-m5nr/:/mnt -p 8983:8983 mgrast/solr-m5nr
 ```
 
 You can either a) load the database using the Makefile or b) use an existing solr dump. In both cases check and adapt parameters in the Makefile, e.g. M5NR Version and shock node url if you want to use the cached solr database.
 
 a) Loading from scratch:
 ```bash
-cd /m5nr/ && make load-solr
+/myM5NR/solr/???
 ```
 b) Deploy cached solr database: 
 ```bash
-cd /m5nr/ && make load-cached-solr
+/myM5NR/solr/download-solr-index.sh
 ```
 
 Start solr:
 ```bash
-SOLR_INCLUDE=/opt/solr/bin/solr.in.sh /opt/solr/bin/solr -f start
+/myM5NR/solr/run-solr.sh
 ```
 
 
