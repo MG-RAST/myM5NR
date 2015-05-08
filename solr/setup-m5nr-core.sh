@@ -9,6 +9,18 @@ HELP=0
 # set a default value for options
 M5NR_VERSION=10
 
+# binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+DEP_CONFIG=${BIN}/../deployment.cfg
+
+if [ ! -e ${DEP_CONFIG}]; then
+	echo "source config file ${DEP_CONFIG} not found"
+	exit 1
+fi
+
+source ${DEP_CONFIG}
+
 # read the options
 TEMP=`getopt -o hm:s: --long help,m5nr:,solr: -n ${BASH_SOURCE[0]} -- "$@"`
 eval set -- "$TEMP"
@@ -26,7 +38,6 @@ while true ; do
     esac
 done
 
-echo "HELP = $HELP"
 if [ $HELP -eq 1 ]; then
     echo "Usage: $0 [-h] [-m m5nr_version]";
     exit 0;

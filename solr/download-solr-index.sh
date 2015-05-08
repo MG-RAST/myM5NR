@@ -13,8 +13,21 @@ M5NR_VERSION="10"
 SOLR_VERSION="5.0.0"
 TARGET="/mnt"
 
+# binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+
+DEP_CONFIG=${BIN}/../deployment.cfg
+
+if [ ! -e ${DEP_CONFIG}]; then
+	echo "source config file ${DEP_CONFIG} not found"
+	exit 1
+fi
+
+source ${DEP_CONFIG}
+
 # read the options
-TEMP=`getopt -o hm:s: --long help,m5nr:,solr: -n 'install-solr.sh' -- "$@"`
+TEMP=`getopt -o hm:s: --long help,m5nr:,solr: -n ${BASH_SOURCE[0]} -- "$@"`
 eval set -- "$TEMP"
 
 # extract options and their arguments into variables.
@@ -65,9 +78,10 @@ if [ "$URL" == "" ]; then
 fi
 
 echo "URL = $URL";
-mkdir -p ${TARGET}/m5nr_${M5NR_VERSION}/data/index
-if [ ! -f "solr-m5nr_v${M5NR_VERSION}_solr_v${SOLR_VERSION}.tgz" ]; then
-    wget ${URL} > solr-m5nr_v${M5NR_VERSION}_solr_v${SOLR_VERSION}.tgz
+
+export INDEX_DIR=${TARGET}/m5nr_${M5NR_VERSION}/data/index/
+if [ ! -d ${INDEX_DIR} ]; then
+  mkdir -p ${INDEX_DIR}
+  curl -s ${URL} | tar -zcvf - -C ${INDEX_DIR}
 fi
-tar -zcvf solr-m5nr_v${M5NR_VERSION}_solr_v${SOLR_VERSION}.tgz -C ${TARGET}/m5nr_${M5NR_VERSION}/data/index/ .
 exit 0;
