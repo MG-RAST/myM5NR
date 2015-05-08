@@ -13,7 +13,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 
 
 # install solr
-RUN cd / && \
+RUN rm /bin/sh && \
+  ln -s /bin/bash /bin/sh && \
+  cd / && \
   git clone https://github.com/MG-RAST/myM5NR.git && \
   source /myM5NR/solr/deployment.cfg && \
   mkdir -p /opt && \
