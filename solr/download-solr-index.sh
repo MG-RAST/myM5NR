@@ -46,6 +46,6 @@ echo "URL = $URL";
 export INDEX_DIR=${TARGET}/m5nr_${M5NR_VERSION}/data/index/
 if [ ! -d ${INDEX_DIR} ]; then
   mkdir -p ${INDEX_DIR}
-  curl -s "${URL}" | tar -zcvf - -C ${INDEX_DIR}
+  curl -s "${URL}" | tar -zxvf - -C ${INDEX_DIR}
 fi
 exit 0;
