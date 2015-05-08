@@ -43,6 +43,9 @@ if [ $HELP -eq 1 ]; then
     exit 0;
 fi
 
+set -e
+set -x
+
 # binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
@@ -81,6 +84,6 @@ echo "URL = $URL";
 export INDEX_DIR=${TARGET}/m5nr_${M5NR_VERSION}/data/index/
 if [ ! -d ${INDEX_DIR} ]; then
   mkdir -p ${INDEX_DIR}
-  curl -s ${URL} | tar -zcvf - -C ${INDEX_DIR}
+  curl -s "${URL}" | tar -zcvf - -C ${INDEX_DIR}
 fi
 exit 0;
