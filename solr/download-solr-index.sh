@@ -26,7 +26,6 @@ echo "SOLR_VERSION = $SOLR_VERSION"
 echo "TARGET = $TARGET"
 echo ""
 
-set -e
 
 URL=''
 #if [[ $M5NR_VERSION -eq '10' ]] && [[ $SOLR_VERSION -eq '5.0.0' ]]; then
