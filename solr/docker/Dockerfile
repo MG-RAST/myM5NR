@@ -12,8 +12,6 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 		bc
 
 
-RUN 
-
 # install solr
 RUN rm /bin/sh && \
   ln -s /bin/bash /bin/sh && \
