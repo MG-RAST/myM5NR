@@ -34,7 +34,7 @@ fi
 # binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-DEP_CONFIG=${BIN}/../deployment.cfg
+DEP_CONFIG=${BIN}/deployment.cfg
 
 if [ ! -e ${DEP_CONFIG} ]; then
     echo "source config file ${DEP_CONFIG} not found"
