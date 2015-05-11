@@ -8,7 +8,7 @@ use Getopt::Long;
 my @files ; # source files for import
 my %hash  ; # DB Hash
 
-my $filename = "myM5NR.SEED.berkeleyDB" ;
+my $filename = "myM5NR.tmp.berkeleyDB" ;
  
  
 my $verbose = 0 ;
@@ -16,6 +16,7 @@ my $debug 	= 0 ;
 
 GetOptions ( 
 	"load=s" => \@files , 
+	"dbname=s" => \$filename ,
 	'verbose+' => \$verbose ,
 	'debug+'   => \$debug   ,
 	);
