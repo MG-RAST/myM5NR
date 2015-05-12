@@ -28,10 +28,7 @@ unlink $filename ;
 my $db = tie %hash, 'DB_File', $filename, O_CREAT|O_RDWR, 0666, $DB_HASH or die "Cannot open $filename: $!\n" ;
 
 # Install DBM Filters
-$db->filter_fetch_key  ( sub { s/\0$//    } ) ;
-$db->filter_store_key  ( sub { $_ .= "\0" } ) ;
-$db->filter_fetch_value( sub { s/\0$//    } ) ;
-$db->filter_store_value( sub { $_ .= "\0" } ) ;
+
 
 $hash{"abc"} = "def" ;
 my $a = $hash{"ABC"} ;
