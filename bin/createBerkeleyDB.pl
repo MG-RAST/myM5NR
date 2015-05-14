@@ -50,13 +50,17 @@ foreach my $f (@files) {
 				print STDERR $md5 , "\n";
 				next;
 			}
-			
+
+			my $value = join "\t" ,  $id , $func , $org , $source ;
+			$value .= "\n" ;
+
 			if ($hash{$md5}){	
-				$hash{$md5} = join "\n" , $hash{$md5} , ( join "\t" ,  $id , $func , $org , $source ) ;
-				# print STDERR "YEAH\n" ;
+				$hash{$md5} = $hash{$md5} . $value  ;
+				print STDERR $hash{$md5} if ($debug);
 			}
 			else{
-				$hash{$md5} = join "\t" ,  $id , $func , $org , $source ;
+				$hash{$md5} = $value ;
+				print STDERR $hash{$md5} if ($debug) ;
 				
 			} 
 		}
