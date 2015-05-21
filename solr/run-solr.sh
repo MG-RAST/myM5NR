@@ -16,4 +16,4 @@ set -e
 set -x
 source ${DEP_CONFIG}
 
-/opt/solr/bin/solr start -p $SOLR_PORT -a "-XX:OnOutOfMemoryError=bash $BIN/kill_solr_by_port.sh $SOLR_PORT" -f
+/opt/solr/bin/solr start -p $SOLR_PORT -a \'-XX:OnOutOfMemoryError=bash $BIN/kill_solr_by_port.sh $SOLR_PORT\' -f
