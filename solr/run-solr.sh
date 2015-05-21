@@ -2,33 +2,18 @@
 
 # this script runs solr in foreground
 
+# binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+DEP_CONFIG=${BIN}/deployment.cfg
+
+if [ ! -e ${DEP_CONFIG} ]; then
+    echo "source config file ${DEP_CONFIG} not found"
+    exit 1
+fi
 
 set -e
 set -x
+source ${DEP_CONFIG}
 
-export PIDFILE="/var/run/solr.pid"
-export SOLR_INCLUDE="/opt/solr/bin/solr.in.sh"
-
-/opt/solr/bin/solr start -f
-
-# max Java memory is 80% of system memory
-
-#NAME="solr"
-#PIDFILE="/var/run/${NAME}.pid"
-#SOLR_DIR="/kb/runtime/solr/example"
-#TOT_MEM=`free -m | awk '/Mem:/ { print $2 }'`
-#JAVA_MEM=`echo "${TOT_MEM} * 0.8" | bc | cut -f1 -d"."`
-#JAVA_OPTIONS="-Xms1024M -Xmx${JAVA_MEM}M -DSTOP.PORT=8079 -DSTOP.KEY=stopkey -jar start.jar"
-#JAVA=`which java`
-
-
-#echo -n "Starting $NAME... "
-#if [ -f $PIDFILE ]; then
-#	echo "is already running!"
-#else
-#	cd $SOLR_DIR
-#	$JAVA $JAVA_OPTIONS
-#	echo "(Done)"
-#fi
-
+/opt/solr/bin/solr start -p $SOLR_PORT -a '-XX:OnOutOfMemoryError="bash $BIN/oom_solr.sh $SOLR_PORT"' -f
