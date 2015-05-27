@@ -142,9 +142,13 @@ function source2ach_IMG {
 }
 
 function source2ach_SEED {
-	#mkdir parsed/SEED
 	#gunzip raw/SEED/subsystems2role.gz  ?????
+	cp ${1}/SEED.md52id2func2org ${2}/ || return $?
 	$BIN/source2ach.py -v -a seed -f fasta -p 1 -d ${2} SEED ${1}/all.faa.gz || return $?
+}
+
+function source2ach_Subsystems {
+	cp ${1}/Subsystems.subsystem2role2seq ${2}/ || return $?
 }
 
 function source2ach_Phantome {
