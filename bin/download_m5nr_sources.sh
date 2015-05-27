@@ -119,15 +119,16 @@ function download_COGs {
 
 function download_FungiDB {
 	# use old version, does not seem to be updated anymore
-	echo "Please use archvied version for FungiDB."
+	echo "Please use archived version for FungiDB."
 	return 1
 	#wget -v -N -P ${1} 'http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz' || return $?
 }
 
 function download_IMG {
-	echo ftp path is missing
+	echo "Please use archived version for IMG.
+	#echo "ftp path is missing (copy archived version)"
 	#time lftp -c "open -e 'mirror -v --no-recursion -I img_core_v400.tar /pub/IMG/ ${1}' ftp://ftp.jgi-psf.org"
-	exit 1
+	return 1
 }
 
 function download_InterPro {
