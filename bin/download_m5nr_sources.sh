@@ -175,7 +175,9 @@ function download_SEED {
 	# TODO use current
 	#CURRENT="ProblemSets.current"
 	CURRENT="ProblemSets.2015.01"
-	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/${CURRENT}/ ${1}' ftp://ftp.theseed.org"
+
+	time ${BIN}/querySAS.pl -source SEED  1> ${1}/SEED.md52id2func2org || return $?
+	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/${CURRENT}/ ${1}' ftp://ftp.theseed.org" || return $?
 
 	#old:
 	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ ${1}' ftp://ftp.theseed.org"
@@ -183,6 +185,9 @@ function download_SEED {
 }
 
 
+function download_Subsystems {
+	time ${BIN}/querySAS.pl -source Subsystems  1> ${1}/Subsystems.subsystem2role2seq || return $?
+}
 
 function download_UniProt {
 	time lftp -c "open -e 'mirror -v -e --delete-first -I reldate.txt  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
