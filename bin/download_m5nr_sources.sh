@@ -200,7 +200,7 @@ function download_UniProt {
 #### RNA
 
 function download_SILVA {
-	time lftp -c "open -e 'mirror -v --no-recursion --no-symlinks /current/Exports/ ${1}' ftp://ftp.arb-silva.de" || return $?
+	time lftp -c "open -e 'mirror -v --no-recursion --dereference /current/Exports/ ${1}' ftp://ftp.arb-silva.de" || return $?
 	mdir -p ${1}/rast
 	time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/rast ${1}/rast' ftp://ftp.arb-silva.de" || return $?
 }
