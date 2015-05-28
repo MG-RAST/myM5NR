@@ -45,6 +45,7 @@ if [ ! -e ${SOURCE_CONFIG} ]; then
 	exit 1
 fi
 
+source ${SOURCE_CONFIG} # this defines ${SOURCES}
 
 
 OUTPUT_EXIST=""
