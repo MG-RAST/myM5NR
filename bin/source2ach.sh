@@ -34,20 +34,9 @@ if [ ! -d "$OUTPUT_DIRECTORY" ]; then
 	exit 1
 fi
 
-# binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
-BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-
-
-SOURCE_CONFIG=${BIN}/../sources.cfg
-
-if [ ! -e ${SOURCE_CONFIG} ] ; then
-echo "source config file ${SOURCE_CONFIG} not found"
-exit 1
+if [ -z "${SOURCES}" ]; then
+	echo "Variable SOURCES empty, please source sources.cfg"
 fi
-
-source ${SOURCE_CONFIG} # this defines ${SOURCES}
-
-
 
 
 
