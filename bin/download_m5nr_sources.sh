@@ -125,7 +125,7 @@ function download_FungiDB {
 }
 
 function download_IMG {
-	echo "Please use archived version for IMG.
+	echo "Please use archived version for IMG."
 	#echo "ftp path is missing (copy archived version)"
 	#time lftp -c "open -e 'mirror -v --no-recursion -I img_core_v400.tar /pub/IMG/ ${1}' ftp://ftp.jgi-psf.org"
 	return 1
