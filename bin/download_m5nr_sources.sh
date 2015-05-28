@@ -47,7 +47,7 @@ BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 SOURCE_CONFIG=${BIN}/../sources.cfg
 
-if [ ! -e ${SOURCE_CONFIG}]; then
+if [ ! -e ${SOURCE_CONFIG} ]; then
 	echo "source config file ${SOURCE_CONFIG} not found"
 	exit 1
 fi
