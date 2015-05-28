@@ -46,6 +46,8 @@ if [ -z "${SOURCES}" ]; then
 fi
 
 
+BIN=$(dirname $0)
+
 
 DOWNLOADS_EXIST=""
 DOWNLOADS_GOOD=""
