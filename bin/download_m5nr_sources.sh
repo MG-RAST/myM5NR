@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # DOCUMENTATION
 #
@@ -41,10 +41,18 @@ if [ ! -d "$DOWNLOAD_DIR" ]; then
 	exit 1
 fi
 
-if [ -z "${SOURCES}" ]; then
-	echo "Variable SOURCES empty, please source sources.cfg"
+# binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+
+SOURCE_CONFIG=${BIN}/../sources.cfg
+
+if [ ! -e ${SOURCE_CONFIG} ]; then
+	echo "source config file ${SOURCE_CONFIG} not found"
+	exit 1
 fi
 
+source ${SOURCE_CONFIG} # this defines ${SOURCES}
 
 
 DOWNLOADS_EXIST=""
@@ -117,7 +125,7 @@ function download_FungiDB {
 }
 
 function download_IMG {
-	echo "Please use archived version for IMG.
+	echo "Please use archived version for IMG."
 	#echo "ftp path is missing (copy archived version)"
 	#time lftp -c "open -e 'mirror -v --no-recursion -I img_core_v400.tar /pub/IMG/ ${1}' ftp://ftp.jgi-psf.org"
 	return 1
