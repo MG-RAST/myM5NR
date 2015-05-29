@@ -38,13 +38,18 @@ fi
 BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 
-SOURCE_CONFIG=${BIN}/../sources.cfg
+if [ -z ${SOURCES+x} ]; then
 
-if [ ! -e ${SOURCE_CONFIG} ]; then
-	echo "source config file ${SOURCE_CONFIG} not found"
-	exit 1
+	SOURCE_CONFIG=${BIN}/../sources.cfg
+
+	if [ ! -e ${SOURCE_CONFIG} ]; then
+		echo "source config file ${SOURCE_CONFIG} not found"
+		exit 1
+	fi
+
+	source ${SOURCE_CONFIG} # this defines ${SOURCES}
+
 fi
-
 
 
 OUTPUT_EXIST=""
