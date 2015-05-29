@@ -3,10 +3,10 @@
 FROM ubuntu:15.04
 
 RUN apt-get update && apt-get install -y \
-  git-core
-  lftp
-  python-biopython 
-  libdbi-perl 
+  git-core \
+  lftp \
+  python-biopython  \
+  libdbi-perl  \
   libdbd-pg-perl wget
 
 
