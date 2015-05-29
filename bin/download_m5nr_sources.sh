@@ -44,15 +44,18 @@ fi
 # binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+if [ -z ${SOURCES+x} ]; then
 
-SOURCE_CONFIG=${BIN}/../sources.cfg
+	SOURCE_CONFIG=${BIN}/../sources.cfg
 
-if [ ! -e ${SOURCE_CONFIG} ]; then
-	echo "source config file ${SOURCE_CONFIG} not found"
-	exit 1
+	if [ ! -e ${SOURCE_CONFIG} ]; then
+		echo "source config file ${SOURCE_CONFIG} not found"
+		exit 1
+	fi
+
+	source ${SOURCE_CONFIG} # this defines ${SOURCES}
+
 fi
-
-source ${SOURCE_CONFIG} # this defines ${SOURCES}
 
 
 DOWNLOADS_EXIST=""
