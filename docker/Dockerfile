@@ -21,3 +21,5 @@ RUN apt-get install -y make && \
 
 ENV PERL5LIB $PERL5LIB:/sas/lib:/sas/modules/lib
 ENV PATH $PATH:/sas/bin
+
+RUN cd / && git clone https://github.com/MG-RAST/myM5NR.git
