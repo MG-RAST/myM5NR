@@ -92,7 +92,7 @@ foreach my $source (@sources){
 					close($ss_fh);
 					$success = 1;
 					
-				}
+				};
 				if $@ {
 					print STDERR "Processing Subsystem $ss failed [$current/$total]\n";
 					$success = 0;
