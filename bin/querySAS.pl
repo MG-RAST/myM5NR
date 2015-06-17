@@ -61,8 +61,8 @@ foreach my $source (@sources){
 			my $start = time ;
 			print STDERR "Processing Genome $g [$current/$total]\n" if($verbose > 1);
 			
-			# Get sequences and annotations 
-			process_genomes( 'peg' , [$g] , $genomes );
+			# Get sequences and annotations
+			process_genomes($out_fh, 'peg' , [$g] , $genomes );
 			
 			my $stop = time ;
 			print STDERR "Time for Genome $g = " . ($stop - $start ) . " seconds.\n" if ($verbose > 1);
@@ -216,15 +216,15 @@ sub process_subsystem{
 
 
 sub process_genomes{
-	my($type, $gids , $genomes) = @_;
+	my($out_fh, $type, $gids , $genomes) = @_;
 
     # print STDERR "Request @$genomes\n";
     my $fidHash = $sapObject->all_features(-ids => $gids, -type => $type);
 
     foreach my $gid (@$gids){
-		foreach my $fid ( @{$fidHash->{$gid}} ){
+		#foreach my $fid ( @{$fidHash->{$gid}} ){
 				# print "$fid\n";
-		}
+		#}
 		
 		# list of feature IDs for genome
 		my $ids = $fidHash->{$gid} ;
@@ -246,7 +246,7 @@ sub process_genomes{
 	           my $role = $results->{$gene};
 	           if (defined $role) {
 	               # Yes, print it.
-	               print join ("\t" , seq2hexdigest($id2seq->{$gene}) , $gene , $role , $genomes->{$gid} , 'SEED' ,$id2seq->{$gene} ) , "\n" ;
+	               print $out_fh join ("\t" , seq2hexdigest($id2seq->{$gene}) , $gene , $role , $genomes->{$gid} , 'SEED' ,$id2seq->{$gene} ) , "\n" ;
 	           } else {
 	               # No, emit a warning.
 	               print STDERR "$gene was not found.\n";
