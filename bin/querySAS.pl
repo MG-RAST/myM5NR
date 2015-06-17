@@ -59,13 +59,13 @@ foreach my $source (@sources){
 		foreach my $ss (keys %$subsystems){
 			$current++;
 			print STDERR "$current :  $ss \n";
-			my ($ss_filename) = $ss =~ s/[^A-Za-z0-9\-\.]//g;
-
+			my ($ss_filename) = $ss =~ s/[^A-Za-z0-9\-\.]/_/g;
+print STDERR "$ss -> ".$ss_filename."\n";
 			if (-e $ss_filename) {
 				print STDERR "Skip $ss , file ".$ss_filename." already exists\n";
 				next;
 			}
-
+exit(0)
 
 			my $ss_filename_part = $ss_filename.".part";
 			unlink ($ss_filename_part) if (-e $ss_filename_part);
