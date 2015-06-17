@@ -8,6 +8,7 @@ use Digest::MD5 qw(md5 md5_hex md5_base64);
 use Getopt::Long;
 
 my @sources ;
+my $output_filename;
 my $verbose = 0;
 my $debug   = 0;
 
@@ -16,14 +17,32 @@ my $md5 		= Digest::MD5->new;
 my $sapObject 	= SAPserver->new();
 
 GetOptions ( 
-	"source=s" => \@sources , 
+	"source=s" => \@sources ,
+	'output=s' => \$output_filename,
 	'verbose+' => \$verbose ,
 	'debug+'   => \$debug   ,
 	);
 	
 @sources = split(/,/,join(',',@sources));
 
-# id2genome_name mapping used globally 
+
+unless (defined $output_filename) {
+	die "output_filename not defined.\n";
+}
+
+if ($output_filename eq "") {
+	die "output_filename not defined.\n";
+}
+
+if (-e $output_filename) {
+	die "file ".$output_filename." already exists.\n";
+}
+
+open my $out_fh, '>>', $output_filename
+	or die "Couldn't open ".$output_filename." for appending: $!\n";
+
+
+# id2genome_name mapping used globally
 my $genomes 	= $sapObject->all_genomes();
 
 foreach my $source (@sources){
@@ -65,6 +84,7 @@ foreach my $source (@sources){
 			print STDERR "$ss -> ".$ss_filename."\n";
 			if (-e $ss_filename) {
 				print STDERR "Skip $ss , file ".$ss_filename." already exists\n";
+				paste_file($out_fh, $ss_filename);
 				next;
 			}
 			
@@ -108,9 +128,13 @@ foreach my $source (@sources){
 				};
 			}
 			
-				# file written sucessfully, rename it:
+			
 				if ( $success == 1 ) {
+					# file written sucessfully, rename it:
 					rename($ss_filename_part, $ss_filename);
+					
+					paste_file($out_fh, $ss_filename);
+					
 				} else {
 					die $@;
 				}
@@ -122,13 +146,29 @@ foreach my $source (@sources){
 	
 }
 
+close($out_fh);
 
 
 exit;
 
 
 
-
+sub paste_file {
+	
+	my ($out_fh, $ss_filename) = @_;
+	
+	# copy content to result file
+	open my $in_fh, '<', $ss_filename
+	or die "Couldn't open ".$ss_filename." for reading: $!\n";
+	
+	{
+		local $/ = \65536; # read 64kb chunks
+		while ( my $chunk = <$in_fh> ) { print $out_fh $chunk; }
+	}
+	close($in_fh);
+	
+	
+}
 
 
 
