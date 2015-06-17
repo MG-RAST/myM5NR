@@ -65,7 +65,7 @@ print STDERR "$ss -> ".$ss_filename."\n";
 				print STDERR "Skip $ss , file ".$ss_filename." already exists\n";
 				next;
 			}
-exit(0)
+			exit(0);
 
 			my $ss_filename_part = $ss_filename.".part";
 			unlink ($ss_filename_part) if (-e $ss_filename_part);
