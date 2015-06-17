@@ -70,20 +70,39 @@ foreach my $source (@sources){
 			
 
 			my $ss_filename_part = $ss_filename.".part";
-			unlink ($ss_filename_part) if (-e $ss_filename_part);
-
-			open(my $ss_fh, '>', $ss_filename_part) or die "Could not open file '$ss_filename_part' $!";
-
-			my $start = time ;
-			print STDERR "Processing Subsystem $ss [$current/$total]\n" if($verbose > 1);
-			print Dumper $ss , $subsystems->{$ss} if ($debug);
 			
-			process_subsystem($ss_fh, $ss , $subsystems) ;
-			my $stop = time ;
-			print STDERR "Time for Subsystem $ss = " . ($stop - $start ) . " seconds.\n" if ($verbose > 1);
-			close($ss_fh);
-			# file written sucessfully, rename it:
-			rename($ss_filename_part, $ss_filename);
+			my $retry = 0;
+			my $success = 0;
+			while ($retry < 5 && $success==0) {
+				$retry++;
+				
+				unlink ($ss_filename_part) if (-e $ss_filename_part);
+	
+				
+				open(my $ss_fh, '>', $ss_filename_part) or die "Could not open file '$ss_filename_part' $!";
+				eval {
+					
+					my $start = time ;
+					print STDERR "Processing Subsystem $ss [$current/$total]\n" if($verbose > 1);
+					print Dumper $ss , $subsystems->{$ss} if ($debug);
+			
+					process_subsystem($ss_fh, $ss , $subsystems) ;
+					my $stop = time ;
+					print STDERR "Time for Subsystem $ss = " . ($stop - $start ) . " seconds.\n" if ($verbose > 1);
+					close($ss_fh);
+					$success = 1;
+					
+				}
+				if $@ {
+					print STDERR "Processing Subsystem $ss failed [$current/$total]\n";
+					$success = 0;
+				}
+				# file written sucessfully, rename it:
+				if ( $success == 1 ) {
+					rename($ss_filename_part, $ss_filename);
+				} else {
+					die $@;
+				}
 	
 		}
 		#TODO: loop to merge files ?
