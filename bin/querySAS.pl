@@ -58,16 +58,34 @@ foreach my $source (@sources){
 		my $current = 0;
 		foreach my $ss (keys %$subsystems){
 			$current++;
+			print STDERR "$current :  $ss \n";
+			my ($ss_filename) = $ss =~ s/[^A-Za-z0-9\-\.]//g;
+
+			if (-e $ss_filename) {
+				print STDERR "Skip $ss , file ".$ss_filename." already exists\n";
+				next;
+			}
+
+
+			my $ss_filename_part = $ss_filename.".part";
+			unlink ($ss_filename_part) of (-e $ss_filename_part);
+
+			open(my $ss_fh, '>', $ss_filename_part) or die "Could not open file '$ss_filename_part' $!";
+
 			my $start = time ;
 			print STDERR "Processing Subsystem $ss [$current/$total]\n" if($verbose > 1);
 			print Dumper $ss , $subsystems->{$ss} if ($debug);
 			
-			process_subsystem($ss , $subsystems) ;
+			process_subsystem($ss_fh, $ss , $subsystems) ;
 			my $stop = time ;
 			print STDERR "Time for Subsystem $ss = " . ($stop - $start ) . " seconds.\n" if ($verbose > 1);
+			close($ss_fh);
+			# file written sucessfully, rename it:
+			rename($ss_filename_part, $ss_filename);
 	
 		}
-		
+		//TODO: loop to merge files ?
+
 	}
 	
 }
@@ -84,7 +102,7 @@ exit;
 
 
 sub process_subsystem{
-	my ($ss , $subsystems) = @_ ;
+	my ($ss_fh, $ss , $subsystems) = @_ ;
 	
 	
 	# For subsystem classification ; level 1 and 2
@@ -112,7 +130,7 @@ sub process_subsystem{
 			
 			my $organism_id = $fid =~ /fig\|(\d+\.\d)/ ; 
 			
-			print join ("\t" , seq2hexdigest( $id2seq->{$fid}) , $fid , $role , $genomes->{$fid} , 'Subsystems' , @mapping , $ss , $role , $id2seq->{$fid} ), "\n" ;
+			print $ss_fh join ("\t" , seq2hexdigest( $id2seq->{$fid}) , $fid , $role , $genomes->{$fid} , 'Subsystems' , @mapping , $ss , $role , $id2seq->{$fid} ), "\n" ;
 		}
 	}				
 }
