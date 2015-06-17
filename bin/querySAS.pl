@@ -80,7 +80,7 @@ foreach my $source (@sources){
 	
 				
 				open(my $ss_fh, '>', $ss_filename_part) or die "Could not open file '$ss_filename_part' $!";
-				#eval {
+				eval {
 					
 					my $start = time ;
 					print STDERR "Processing Subsystem $ss [$current/$total]\n" if($verbose > 1);
@@ -92,7 +92,7 @@ foreach my $source (@sources){
 					close($ss_fh);
 					$success = 1;
 					
-				#};
+				};
 				if ($@) {
 					print STDERR "Processing Subsystem $ss failed [$current/$total]\n";
 					$success = 0;
@@ -103,7 +103,7 @@ foreach my $source (@sources){
 				} else {
 					die $@;
 				}
-	
+			}
 		}
 		#TODO: loop to merge files ?
 
