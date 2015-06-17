@@ -142,7 +142,7 @@ sub process_subsystem{
 		-subsystems => [$ss],
 		-roleForm => 'full',
 	};
-	print STDERR "ids_in_subsystems_args: ".Dumper($ids_in_subsystems_args)."\n"
+	print STDERR "ids_in_subsystems_args: ".Dumper($ids_in_subsystems_args)."\n";
     my $subsysHash = $sapObject->ids_in_subsystems($ids_in_subsystems_args);
 	
 
@@ -152,7 +152,7 @@ sub process_subsystem{
 			-ids => $subsysHash->{$ss}->{$role},
 			-protein => 1,
 		};
-		print STDERR "ids_to_sequences_args: ".Dumper($ids_to_sequences_args)."\n"
+		print STDERR "ids_to_sequences_args: ".Dumper($ids_to_sequences_args)."\n";
 		my $id2seq =  $sapObject->ids_to_sequences($ids_to_sequences_args);
 		
 		foreach my $fid (@{$subsysHash->{$ss}->{$role}}){
