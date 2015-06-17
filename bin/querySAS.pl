@@ -96,14 +96,18 @@ foreach my $source (@sources){
 				if ($@) {
 					print STDERR "Processing Subsystem $ss failed [$current/$total]\n";
 					$success = 0;
+					sleep 10;
+					
 				};
+			}
+			
 				# file written sucessfully, rename it:
 				if ( $success == 1 ) {
 					rename($ss_filename_part, $ss_filename);
 				} else {
 					die $@;
 				}
-			}
+			
 		}
 		#TODO: loop to merge files ?
 
