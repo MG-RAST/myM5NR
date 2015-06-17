@@ -58,7 +58,7 @@ foreach my $source (@sources){
 		my $current = 0;
 		foreach my $ss (keys %$subsystems){
 			$current++;
-			print STDERR "$current :  $ss \n";
+			print STDERR "$current/$total :  $ss \n";
 			my $ss_filename = $ss;
 			$ss_filename =~ s/[^A-Za-z0-9\-\.]/_/g;
 			$ss_filename = "subsystems_".$ss_filename;
