@@ -73,7 +73,7 @@ foreach my $source (@sources){
 			
 			my $retry = 0;
 			my $success = 0;
-			while ($retry < 5 && $success==0) {
+			while (($retry < 5) && ($success==0)) {
 				$retry++;
 				
 				unlink ($ss_filename_part) if (-e $ss_filename_part);
