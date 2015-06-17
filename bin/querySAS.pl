@@ -68,7 +68,7 @@ foreach my $source (@sources){
 
 
 			my $ss_filename_part = $ss_filename.".part";
-			unlink ($ss_filename_part) of (-e $ss_filename_part);
+			unlink ($ss_filename_part) if (-e $ss_filename_part);
 
 			open(my $ss_fh, '>', $ss_filename_part) or die "Could not open file '$ss_filename_part' $!";
 
