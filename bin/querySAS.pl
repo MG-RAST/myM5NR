@@ -73,8 +73,14 @@ foreach my $source (@sources){
 			
 			my $retry = 0;
 			my $success = 0;
+			my $debug = 0;
 			while (($retry < 5) && ($success==0)) {
 				$retry++;
+				
+				if ($retry > 1) {
+					$debug = 1;
+				}
+				
 				
 				unlink ($ss_filename_part) if (-e $ss_filename_part);
 	
@@ -86,7 +92,7 @@ foreach my $source (@sources){
 					print STDERR "Processing Subsystem $ss [$current/$total]\n" if($verbose > 1);
 					print Dumper $ss , $subsystems->{$ss} if ($debug);
 			
-					process_subsystem($ss_fh, $ss , $subsystems) ;
+					process_subsystem($ss_fh, $ss , $subsystems, $debug) ;
 					my $stop = time ;
 					print STDERR "Time for Subsystem $ss = " . ($stop - $start ) . " seconds.\n" if ($verbose > 1);
 					close($ss_fh);
@@ -128,7 +134,7 @@ exit;
 
 
 sub process_subsystem{
-	my ($ss_fh, $ss , $subsystems) = @_ ;
+	my ($ss_fh, $ss , $subsystems, $debug) = @_ ;
 	
 	
 	# For subsystem classification ; level 1 and 2
@@ -142,7 +148,9 @@ sub process_subsystem{
 		-subsystems => [$ss],
 		-roleForm => 'full',
 	};
-	print STDERR "ids_in_subsystems_args: ".Dumper($ids_in_subsystems_args)."\n";
+	if ($debug > 0) {
+		print STDERR "ids_in_subsystems_args: ".Dumper($ids_in_subsystems_args)."\n";
+	}
     my $subsysHash = $sapObject->ids_in_subsystems($ids_in_subsystems_args);
 	
 
@@ -152,7 +160,9 @@ sub process_subsystem{
 			-ids => $subsysHash->{$ss}->{$role},
 			-protein => 1,
 		};
-		print STDERR "ids_to_sequences_args: ".Dumper($ids_to_sequences_args)."\n";
+		if ($debug > 0) {
+			print STDERR "ids_to_sequences_args: ".Dumper($ids_to_sequences_args)."\n";
+		}
 		my $id2seq =  $sapObject->ids_to_sequences($ids_to_sequences_args);
 		
 		foreach my $fid (@{$subsysHash->{$ss}->{$role}}){
