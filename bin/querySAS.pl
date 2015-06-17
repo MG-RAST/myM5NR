@@ -95,6 +95,7 @@ foreach my $source (@sources){
 				};
 				if ($@) {
 					print STDERR "Processing Subsystem $ss failed [$current/$total]\n";
+					print STDERR $@."\n"
 					$success = 0;
 					sleep 10;
 					
@@ -137,19 +138,22 @@ sub process_subsystem{
 	$mapping[1] = ($subsystems->{$ss}->[1]->[1] | '' ) ;
 	
 	
-	
-    my $subsysHash = $sapObject->ids_in_subsystems({ 
+	my $ids_in_subsystems_args = {
 		-subsystems => [$ss],
 		-roleForm => 'full',
-	   });
+	};
+	print STDERR "ids_in_subsystems_args: " Dumper($ids_in_subsystems_args)."\n"
+    my $subsysHash = $sapObject->ids_in_subsystems($ids_in_subsystems_args);
 	
 
 	foreach my $role (keys %{$subsysHash->{$ss}}){
 		
-		my $id2seq =  $sapObject->ids_to_sequences({
-                            -ids => $subsysHash->{$ss}->{$role},
-                            -protein => 1,
-						});
+		my $ids_to_sequences_args = {
+			-ids => $subsysHash->{$ss}->{$role},
+			-protein => 1,
+		};
+		print STDERR "ids_to_sequences_args: " Dumper($ids_to_sequences_args)."\n"
+		my $id2seq =  $sapObject->ids_to_sequences($ids_to_sequences_args);
 		
 		foreach my $fid (@{$subsysHash->{$ss}->{$role}}){
 			
