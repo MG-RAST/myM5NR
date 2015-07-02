@@ -190,7 +190,7 @@ function download_SEED {
 
 
 function download_Subsystems {
-	time ${BIN}/querySAS.pl -source Subsystems  1> ${1}/Subsystems.subsystem2role2seq || return $?
+	time ${BIN}/querySAS.pl --source=Subsystems --output=${1}/Subsystems.subsystem2role2seq || return $?
 }
 
 function download_UniProt {

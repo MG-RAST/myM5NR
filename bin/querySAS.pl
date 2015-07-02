@@ -8,6 +8,7 @@ use Digest::MD5 qw(md5 md5_hex md5_base64);
 use Getopt::Long;
 
 my @sources ;
+my $output_filename;
 my $verbose = 0;
 my $debug   = 0;
 
@@ -16,14 +17,32 @@ my $md5 		= Digest::MD5->new;
 my $sapObject 	= SAPserver->new();
 
 GetOptions ( 
-	"source=s" => \@sources , 
+	"source=s" => \@sources ,
+	'output=s' => \$output_filename,
 	'verbose+' => \$verbose ,
 	'debug+'   => \$debug   ,
 	);
 	
 @sources = split(/,/,join(',',@sources));
 
-# id2genome_name mapping used globally 
+
+unless (defined $output_filename) {
+	die "output_filename not defined.\n";
+}
+
+if ($output_filename eq "") {
+	die "output_filename not defined.\n";
+}
+
+if (-e $output_filename) {
+	die "file ".$output_filename." already exists.\n";
+}
+
+open my $out_fh, '>>', $output_filename
+	or die "Couldn't open ".$output_filename." for appending: $!\n";
+
+
+# id2genome_name mapping used globally
 my $genomes 	= $sapObject->all_genomes();
 
 foreach my $source (@sources){
@@ -42,8 +61,8 @@ foreach my $source (@sources){
 			my $start = time ;
 			print STDERR "Processing Genome $g [$current/$total]\n" if($verbose > 1);
 			
-			# Get sequences and annotations 
-			process_genomes( 'peg' , [$g] , $genomes );
+			# Get sequences and annotations
+			process_genomes($out_fh, 'peg' , [$g] , $genomes );
 			
 			my $stop = time ;
 			print STDERR "Time for Genome $g = " . ($stop - $start ) . " seconds.\n" if ($verbose > 1);
@@ -58,33 +77,104 @@ foreach my $source (@sources){
 		my $current = 0;
 		foreach my $ss (keys %$subsystems){
 			$current++;
-			my $start = time ;
-			print STDERR "Processing Subsystem $ss [$current/$total]\n" if($verbose > 1);
-			print Dumper $ss , $subsystems->{$ss} if ($debug);
+			print STDERR "$current/$total :  $ss \n";
+			my $ss_filename = $ss;
+			$ss_filename =~ s/[^A-Za-z0-9\-\.]/_/g;
+			$ss_filename = "subsystems_".$ss_filename;
+			print STDERR "$ss -> ".$ss_filename."\n";
+			if (-e $ss_filename) {
+				print STDERR "Skip $ss , file ".$ss_filename." already exists\n";
+				paste_file($out_fh, $ss_filename);
+				next;
+			}
 			
-			process_subsystem($ss , $subsystems) ;
-			my $stop = time ;
-			print STDERR "Time for Subsystem $ss = " . ($stop - $start ) . " seconds.\n" if ($verbose > 1);
+
+			my $ss_filename_part = $ss_filename.".part";
+			
+			my $retry = 0;
+			my $success = 0;
+			my $debug = 0;
+			while (($retry < 5) && ($success==0)) {
+				$retry++;
+				
+				if ($retry > 1) {
+					$debug = 1;
+				}
+				
+				
+				unlink ($ss_filename_part) if (-e $ss_filename_part);
 	
+				
+				open(my $ss_fh, '>', $ss_filename_part) or die "Could not open file '$ss_filename_part' $!";
+				eval {
+					
+					my $start = time ;
+					print STDERR "Processing Subsystem $ss [$current/$total]\n" if($verbose > 1);
+					print Dumper $ss , $subsystems->{$ss} if ($debug);
+			
+					process_subsystem($ss_fh, $ss , $subsystems, $debug) ;
+					my $stop = time ;
+					print STDERR "Time for Subsystem $ss = " . ($stop - $start ) . " seconds.\n" if ($verbose > 1);
+					close($ss_fh);
+					$success = 1;
+					
+				};
+				if ($@) {
+					print STDERR "Processing Subsystem $ss failed [$current/$total]\n";
+					print STDERR $@."\n";
+					$success = 0;
+					sleep 10;
+					
+				};
+			}
+			
+			
+				if ( $success == 1 ) {
+					# file written sucessfully, rename it:
+					rename($ss_filename_part, $ss_filename);
+					
+					paste_file($out_fh, $ss_filename);
+					
+				} else {
+					die $@;
+				}
+			
 		}
-		
+		#TODO: loop to merge files ?
+
 	}
 	
 }
 
+close($out_fh);
 
 
 exit;
 
 
 
-
+sub paste_file {
+	
+	my ($out_fh, $ss_filename) = @_;
+	
+	# copy content to result file
+	open my $in_fh, '<', $ss_filename
+	or die "Couldn't open ".$ss_filename." for reading: $!\n";
+	
+	{
+		local $/ = \65536; # read 64kb chunks
+		while ( my $chunk = <$in_fh> ) { print $out_fh $chunk; }
+	}
+	close($in_fh);
+	
+	
+}
 
 
 
 
 sub process_subsystem{
-	my ($ss , $subsystems) = @_ ;
+	my ($ss_fh, $ss , $subsystems, $debug) = @_ ;
 	
 	
 	# For subsystem classification ; level 1 and 2
@@ -94,40 +184,47 @@ sub process_subsystem{
 	$mapping[1] = ($subsystems->{$ss}->[1]->[1] | '' ) ;
 	
 	
-	
-    my $subsysHash = $sapObject->ids_in_subsystems({ 
+	my $ids_in_subsystems_args = {
 		-subsystems => [$ss],
 		-roleForm => 'full',
-	   });
+	};
+	if ($debug > 0) {
+		print STDERR "ids_in_subsystems_args: ".Dumper($ids_in_subsystems_args)."\n";
+	}
+    my $subsysHash = $sapObject->ids_in_subsystems($ids_in_subsystems_args);
 	
 
 	foreach my $role (keys %{$subsysHash->{$ss}}){
 		
-		my $id2seq =  $sapObject->ids_to_sequences({
-                            -ids => $subsysHash->{$ss}->{$role},
-                            -protein => 1,
-						});
+		my $ids_to_sequences_args = {
+			-ids => $subsysHash->{$ss}->{$role},
+			-protein => 1,
+		};
+		if ($debug > 0) {
+			print STDERR "ids_to_sequences_args: ".Dumper($ids_to_sequences_args)."\n";
+		}
+		my $id2seq =  $sapObject->ids_to_sequences($ids_to_sequences_args);
 		
 		foreach my $fid (@{$subsysHash->{$ss}->{$role}}){
 			
 			my $organism_id = $fid =~ /fig\|(\d+\.\d)/ ; 
 			
-			print join ("\t" , seq2hexdigest( $id2seq->{$fid}) , $fid , $role , $genomes->{$fid} , 'Subsystems' , @mapping , $ss , $role , $id2seq->{$fid} ), "\n" ;
+			print $ss_fh join ("\t" , seq2hexdigest( $id2seq->{$fid}) , $fid , $role , $genomes->{$fid} , 'Subsystems' , @mapping , $ss , $role , $id2seq->{$fid} ), "\n" ;
 		}
 	}				
 }
 
 
 sub process_genomes{
-	my($type, $gids , $genomes) = @_;
+	my($out_fh, $type, $gids , $genomes) = @_;
 
     # print STDERR "Request @$genomes\n";
     my $fidHash = $sapObject->all_features(-ids => $gids, -type => $type);
 
     foreach my $gid (@$gids){
-		foreach my $fid ( @{$fidHash->{$gid}} ){
+		#foreach my $fid ( @{$fidHash->{$gid}} ){
 				# print "$fid\n";
-		}
+		#}
 		
 		# list of feature IDs for genome
 		my $ids = $fidHash->{$gid} ;
@@ -149,7 +246,7 @@ sub process_genomes{
 	           my $role = $results->{$gene};
 	           if (defined $role) {
 	               # Yes, print it.
-	               print join ("\t" , seq2hexdigest($id2seq->{$gene}) , $gene , $role , $genomes->{$gid} , 'SEED' ,$id2seq->{$gene} ) , "\n" ;
+	               print $out_fh join ("\t" , seq2hexdigest($id2seq->{$gene}) , $gene , $role , $genomes->{$gid} , 'SEED' ,$id2seq->{$gene} ) , "\n" ;
 	           } else {
 	               # No, emit a warning.
 	               print STDERR "$gene was not found.\n";
