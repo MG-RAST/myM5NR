@@ -157,6 +157,7 @@ function download_MO {
 
 function download_GenBankNR {
 	time lftp -c "open -e 'mirror -v -e --no-recursion -I nr.gz /blast/db/FASTA/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
+	echo `date +"%Y%m%d"` > ${1}/timestamp.txt
 }
 
 function download_PATRIC {
