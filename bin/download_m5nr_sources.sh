@@ -75,7 +75,6 @@ set -x
 
 function download_CAZy {
 	${BIN}/get_cazy_table.pl ${1}/cazy_all_v042314.txt || return $?
-	echo `date +"%Y%m%d"` > ${1}/timestamp.txt
 }
 
 
@@ -137,6 +136,7 @@ function download_IMG {
 function download_InterPro {
 	# see release_notes.txt for version
 	time lftp -c "open -e 'mirror -v --no-recursion /pub/databases/interpro/Current/ ${1}' ftp://ftp.ebi.ac.uk" || return $?
+	cat ${1}/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > ${1}/version.txt
 }
 
 function download_KEGG {
@@ -157,32 +157,58 @@ function download_MO {
 
 function download_GenBankNR {
 	time lftp -c "open -e 'mirror -v -e --no-recursion -I nr.gz /blast/db/FASTA/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
-	echo `date +"%Y%m%d"` > ${1}/timestamp.txt
+	stat -c '%y' ${1}/nr.gz | cut -c 1-4,6,7,9,10 > ${1}/version.txt
 }
 
 function download_PATRIC {
 	time lftp -c "open -e 'mirror -v --parallel=2 -I *.PATRIC.gbf /patric2/genomes/ ${1}' http://brcdownloads.vbi.vt.edu" || return $?
+	# use one of the directories time stamp
+	stat -c '%y' ${1}/1000561.3 | cut -c 1-4,6,7,9,10 > ${1}/version.txt
+}
+
+
+function version_Phantome {
+	export TIMESTAMP=`curl http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[0-9]*"`
+	export VERSION=`date -d @${TIMESTAMP} +"%Y%m%d"`
 }
 
 function download_Phantome {
-	wget -v -O ${1}/phage_proteins.fasta.gz 'http://www.phantome.org/Downloads/proteins/all_sequences/current'  || return $?
+	
+	version_Phantome
+	
+	#find node
+	#curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome"
+	SOURCE=`basename ${1}`
+	OLD_NODE=`curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_${SOURCE}&version=20150403" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
+	
+	if [ ${OLD_NODE} ne "" ] ; then
+		#download from shock?
+		echo found shock node
+		return
+	fi
+	
+	wget -v -N -P ${1} "http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz"  || return $?
+	echo "$VERSION" > ${1}/version.txt
+	
 }
 
 function download_RefSeq {
 	time lftp -c "open -e 'mirror -v -e --delete-first -I RELEASE_NUMBER /refseq/release/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I *.genomic.gbff.gz /refseq/release/complete/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
+	cp ${1}/RELEASE_NUMBER ${1}/version.txt
 }
 
 
 
 function download_SEED {
 
-	# TODO use current
-	#CURRENT="ProblemSets.current"
-	CURRENT="ProblemSets.2015.01"
+
+	CURRENT_VERSION=`curl ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"`
 
 	time ${BIN}/querySAS.pl -source SEED  1> ${1}/SEED.md52id2func2org || return $?
-	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/${CURRENT}/ ${1}' ftp://ftp.theseed.org" || return $?
+	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/ProblemSets.${CURRENT_VERSION}/ ${1}' ftp://ftp.theseed.org" || return $?
+
+	echo ${CURRENT_VERSION} > ${1}/version.txt
 
 	#old:
 	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ ${1}' ftp://ftp.theseed.org"
@@ -198,6 +224,7 @@ function download_UniProt {
 	time lftp -c "open -e 'mirror -v -e --delete-first -I reldate.txt  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_sprot.dat.gz  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_trembl.dat.gz /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
+	head -n1 ${1}/reldate.txt | grep -o "[0-9]\{4\}_[0-9]*" > ${1}/version.txt
 }
 
 
@@ -205,8 +232,9 @@ function download_UniProt {
 
 function download_SILVA {
 	time lftp -c "open -e 'mirror -v --no-recursion --dereference /current/Exports/ ${1}' ftp://ftp.arb-silva.de" || return $?
-	mdir -p ${1}/rast
+	mkdir -p ${1}/rast
 	time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/rast ${1}/rast' ftp://ftp.arb-silva.de" || return $?
+	head -n 1 ${1}/README.txt | grep -o "[0-9]\{3\}\.[0-9]*" > ${1}/version.txt
 }
 
 function download_RDP {
@@ -217,12 +245,15 @@ function download_RDP {
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz' || return $?
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz' || return $?
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz' || return $?
+	
+	cp ${1}/releaseREADME.txt ${1}/version.txt
 }
 
 function download_Greengenes {
 	# from 2011 ?
 	wget -v -N -P ${1} 'http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz' || return $?
-	echo `date +"%Y%m%d"` > ${1}/timestamp.txt
+	# use filedata as version
+	stat -c '%y' current_GREENGENES_gg16S_unaligned.fasta.gz | cut -c 1-4,6,7,9,10 > ${1}/version.txt
 }
 
 set +x
@@ -247,6 +278,7 @@ do
 		set -x
 		# this is the function call. It will (should) stop the script if download fails.
 		download_${i} ${SOURCE_DIR_PART}
+		echo `date +"%Y%m%d"` > ${SOURCE_DIR_PART}/timestamp.txt
 		DOWNLOAD_RESULT=$?
 		set +x
 		if [ ${DOWNLOAD_RESULT} -ne 0 ] ; then
