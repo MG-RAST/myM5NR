@@ -4,26 +4,38 @@
 # read ${BIN}/../sources.cfg
 
 
+use Data::Dumper;
+
+
+
+my @sources_protein=('SEED', 'Subsystems', 'InterPro', 'UniProt', 'RefSeq', 'GenBankNR', 'PATRIC', 'Phantome', 'CAZy', 'KEGG', 'eggNOG'); #'IMG'
+
+my @sources_rna=('SILVA', 'Greengenes', 'RDP', 'FungiDB');
+
+my @sources=(@sources_protein, @sources_rna);
+
+
+
 sub systemp {
-	
 	my $cmd = join(' ', @_);
 	print $cmd."\n";
 	my $ret=system(@_);
 	if ($ret != 0) {
-		$ret >> 8
+		$ret >> 8;
 		print "Command \"$cmd\" failed with an exit code of $ret.\n";
-		return 1
+		return 1;
 	}
-	return 0
+	return 0;
 }
 
 
 # empty string is an error
 sub systemc {
-	
+	print "xxxxxxxx: ".$_[0]."\n";
+
 	my $cmd = join(' ', @_);
 	
-	print $cmd."\n";
+	print "cmd: ".$cmd."\n";
 
 	local $/ = undef;
 	open(my $COMMAND, "-|", $cmd)
@@ -31,13 +43,21 @@ sub systemc {
 
 	my $result = <$COMMAND>;
 	
-	unless close($COMMAND) {
-		print STDERR "returned with error:\n";
+	unless (close($COMMAND)) {
+		print STDERR "returned with error.\n";
 		if (defined $result) {
-			print STDERR "$result\n";
+			print STDERR "result: \"$result\"\n";
 		}
 		return "";
 	};
+	
+	# remove trailing newlines
+	$result =~ s/\R*$//g;
+	
+	if ($result eq "") {
+		print STDERR "result empty !?\n";
+	}
+	
 	return $result;
 }
 
@@ -50,28 +70,40 @@ sub systemc {
 ###########################################################
 # download functions
 
-# $dir is the "..._part" download directory, specific to individual source
+# $outdir is the "..._part" download directory, specific to individual source
 
 
 
 
 #### proteins
 
+$f->{'CAZy'}->{'version'} = sub {
+	return "NA";
+};
 
 
-
-f->{'CAZy'}->{'download'} = sub {
-	my $dir = shift(@_);
+$f->{'CAZy'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
 	
 	systemp("${BIN}/get_cazy_table.pl ${dir}/cazy_all_v042314.txt") == 0 || return;
 };
 
+$f->{'eggNOG'}->{'version'} = sub {
+	return "v3.0";
+};
 
-f->{'eggNOG'}->{'download'} = sub {
-	my $dir = shift(@_);
+
+$f->{'eggNOG'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
 	
 	# version 4 available, but different format, thus we use old version for now.
-	echo "Using v3 not v4 yet"
+	#echo "Using v3 not v4 yet"
 
 	########## v4.0 (COG stuff seems to be missing, UniProtAC2eggNOG changed)
 	# former fun.txt.gz
@@ -101,165 +133,415 @@ f->{'eggNOG'}->{'download'} = sub {
 		-I COG.description.txt.gz \\
 		-I NOG.description.txt.gz \\
 		-I sequences.v3.tar.gz \\
-		/eggNOG/3.0/ $dir' ftp://eggnog.embl.de" ])== 0 || return;
+		/eggNOG/3.0/ $outdir' ftp://eggnog.embl.de"])== 0 || return 1;
 
 
 
 };
 
 
-f->{'COGs'}->{'download'} = sub {
-	my $dir = shift(@_);
-	systemp(qq[time lftp -c "open -e 'mirror -v --no-recursion /pub/COG/COG2014/data/ $dir' ftp://ftp.ncbi.nih.gov"]);
+$f->{'COGs'}->{'download'} = sub {
+	
+	### not used.
+	
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
+	systemp(qq[time lftp -c "open -e 'mirror -v --no-recursion /pub/COG/COG2014/data/ $outdir' ftp://ftp.ncbi.nih.gov"])== 0 || return 1;
 };
-		
-f->{'FungiDB'}->{'download'} = sub {
-	my $dir = shift(@_);
+
+$f->{'FungiDB'}->{'download'} = sub {
+	return "20111019"
+};
+
+$f->{'FungiDB'}->{'download'} = sub {
+	
+	### new FungiDB ? http://fungidb.org/common/downloads/release-24/
+	
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
 	# use old version, does not seem to be updated anymore
-	printf "Please use archived version for FungiDB.\n";
+	print "Please use archived version for FungiDB.\n";
 	#return 1
-	#wget -v -N -P $dir 'http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz' || return $?
+	#wget -v -N -P $outdir 'http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz' || return $?
 };
 
-f->{'IMG'}->{'download'} = sub {
-	my $dir = shift(@_);
-	printf "Please use archived version for IMG.\n";
+
+$f->{'IMG'}->{'download'} = sub {
+	
+	# ignoring at the moment
+	
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
+	print "Please use archived version for IMG.\n";
 	#echo "ftp path is missing (copy archived version)"
-	#time lftp -c "open -e 'mirror -v --no-recursion -I img_core_v400.tar /pub/IMG/ $dir' ftp://ftp.jgi-psf.org"
+	#time lftp -c "open -e 'mirror -v --no-recursion -I img_core_v400.tar /pub/IMG/ $outdir' ftp://ftp.jgi-psf.org"
 };
-		
-f->{'InterPro'}->{'download'} = sub {
-	my $dir = shift(@_);
+
+$f->{'InterPro'}->{'version'} = sub {
+
+	return systemc('curl --silent ftp://ftp.ebi.ac.uk//pub/databases/interpro/Current/release_notes.txt | grep "Release [0-9]\+" | grep -o "[0-9]\+\.[0-9]\+"');
+	
+};
+
+$f->{'InterPro'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
 
 	# see release_notes.txt for version
-	systemp(qq[time lftp -c "open -e 'mirror -v --no-recursion /pub/databases/interpro/Current/ $dir' ftp://ftp.ebi.ac.uk"])== 0 || return;
-	systemp(qq[cat $dir/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > $dir/version.txt]) == 0 || return;
+	systemp(qq[time lftp -c "open -e 'mirror -v --no-recursion /pub/databases/interpro/Current/ $outdir' ftp://ftp.ebi.ac.uk"])== 0 || return 1;
+	systemp(qq[cat $outdir/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > $outdir/version.txt])== 0 || return 1;
 };
 
-f->{'KEGG'}->{'download'} = sub {
-	my $dir = shift(@_);
+$f->{'KEGG'}->{'version'} = sub {
+	return "56";
+};
+
+$f->{'KEGG'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
 	die("KEGG is no longer available.");
 	return 1
-	#time lftp -c "open -e 'mirror -v --no-recursion -I genome /pub/kegg/genes/ $dir' ftp://ftp.genome.ad.jp"
-	#time lftp -c "open -e 'mirror -v --no-recursion -I genes.tar.gz /pub/kegg/release/current/ $dir' ftp://ftp.genome.ad.jp"
+	#time lftp -c "open -e 'mirror -v --no-recursion -I genome /pub/kegg/genes/ $outdir' ftp://ftp.genome.ad.jp"
+	#time lftp -c "open -e 'mirror -v --no-recursion -I genes.tar.gz /pub/kegg/release/current/ $outdir' ftp://ftp.genome.ad.jp"
 	#time lftp -c "open -e 'mirror -v --no-recursion -I ko /pub/kegg/genes/ ${DOWNLOAD_DIR}/KO' ftp://ftp.genome.ad.jp"
 	#time lftp -c "open -e 'mirror -v --parallel=2 -I *.keg /pub/kegg/brite/ko/ ${DOWNLOAD_DIR}/KO' ftp://ftp.genome.ad.jp"
 };
 
-f->{'MO'}->{'download'} = sub {
-	my $dir = shift(@_);
+$f->{'MO'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
 	# we are not using this MG right now.
 	# issue with recursive wget and links on page, this hack works
-	#for i in `seq 1 907348`; do wget -N -P $dir http://www.microbesonline.org/genbank/${i}.gbk.gz 2> /dev/null; done
-	#wget -v -N -P $dir http://www.microbesonline.org/genbank/10000550.gbk.gz
+	#for i in `seq 1 907348`; do wget -N -P $outdir http://www.microbesonline.org/genbank/${i}.gbk.gz 2> /dev/null; done
+	#wget -v -N -P $outdir http://www.microbesonline.org/genbank/10000550.gbk.gz
 };
 
-f->{'GenBankNR'}->{'download'} = sub {
-	my $dir = shift(@_);
-	systemp(qq[time lftp -c "open -e 'mirror -v -e --no-recursion -I nr.gz /blast/db/FASTA/ $dir' ftp://ftp.ncbi.nih.gov"]) == 0 || return;
-	systemp(qq[stat -c '%y' $dir/nr.gz | cut -c 1-4,6,7,9,10 > $dir/version.txt ]) == 0 || return;
-};
 
-f->{'PATRIC'}->{'download'} = sub {
-	my $dir = shift(@_);
-	systemp(qq[time lftp -c "open -e 'mirror -v --parallel=2 -I *.PATRIC.gbf /patric2/genomes/ $dir' http://brcdownloads.vbi.vt.edu" ]) == 0 || return;
-	# use one of the directories time stamp
-	systemp(qq[stat -c '%y' $dir/1000561.3 | cut -c 1-4,6,7,9,10 > $dir/version.txt]) == 0 || return;
-};
-
-f->{'Phantome'}->{'version'} = sub {
-
-	my $timestamp=systemc(qq(curl http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[0-9]*"));
+$f->{'GenBankNR'}->{'version'} = sub {
+	# ugly: reads date from file
 	
-	my $version = systemc(qq[date -d @$timestamp +"%Y%m%d"]);
+	print "OS: $^O\n";
+	my $flag = '-d';
+	if ($^O eq "darwin") {
+		$flag = '-v ';
+	}
+	
+	
+	my $line = systemc('curl --silent ftp://ftp.ncbi.nih.gov/blast/db/FASTA/ | grep " nr.gz$"'); #
+	if ( $line eq "" ) {
+		print STDERR "Could not curl GenBankNR website\n";
+		return "";
+	}
+	
+	# example: -r--r--r--   1 ftp      anonymous 17023852553 Jul  6 05:36 nr.gz
+	my ($timestring) = $line =~ /anonymous\s+\d+\s+(.*)\s+nr\.gz/;
+	unless (defined $timestring) {
+		print STDERR "Could not parse line \"$line\"\n";
+		return "";
+	}
+	
+	if ( $timestring eq "" ) {
+		print STDERR "Could not parse line \"$line\"\n";
+		return "";
+	}
+	
+	
+	return systemc(qq[date $flag "$timestring" '+%Y%m%d']);
+};
+
+
+
+
+$f->{'GenBankNR'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
+	systemp(qq[time lftp -c "open -e 'mirror -v -e --no-recursion -I nr.gz /blast/db/FASTA/ $outdir' ftp://ftp.ncbi.nih.gov"])== 0 || return 1;
+	systemp(qq[stat -c '%y' $outdir/nr.gz | cut -c 1-4,6,7,9,10 > $outdir/version.txt ])== 0 || return 1;
+};
+
+
+$f->{'PATRIC'}->{'version'} = sub {
+	# ugly: reads date from file
+	
+	%mon2num = qw(
+	jan 01  feb 02  mar 03  apr 04  may 05  jun 06
+	jul 07  aug 08  sep 09  oct 10 nov 11 dec 12
+	);
+	
+	# example: <a href="1000561.3.PATRIC.gbf">1000561.3.PATRIC.gbf</a>     21-Apr-2015 16:16      13503111
+	my $line  = systemc('curl --silent http://brcdownloads.vbi.vt.edu/patric2/genomes/1000561.3/ | grep PATRIC.gbf');
+	
+	
+	if ($line eq "" ) {
+		return "";
+	}
+	
+	my ($day, $month_str, $year) = $line =~ /(\d+)\-(\S+)\-(\d\d\d\d)/;
+	
+	
+	unless (defined $year) {
+		print STDERR "Error: Could not parse date from line ".$line."\n";
+		return "";
+	}
+	
+	my $month = $mon2num{lc($month_str)};
+	
+	unless (defined $month) {
+		print STDERR "Error: Could not map month ".$month_str."\n";
+		return "";
+	}
+	
+	return $year.$month.$day;
+};
+	
+$f->{'PATRIC'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
+	systemp(qq[time lftp -c "open -e 'mirror -v --parallel=2 -I *.PATRIC.gbf /patric2/genomes/ $outdir' http://brcdownloads.vbi.vt.edu" ])== 0 || return 1;
+	# use one of the directories time stamp
+	systemp(qq[stat -c '%y' $outdir/1000561.3 | cut -c 1-4,6,7,9,10 > $outdir/version.txt])== 0 || return 1;
+};
+
+$f->{'Phantome'}->{'version'} = sub {
+
+	my $timestamp=systemc(qq(curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[[:digit:]]\\+"));
+	
+	if ($timestamp eq "") {
+		return "";
+	}
+	print "timestamp: \"$timestamp\"\n";
+	
+	print "OS: $^O\n";
+	my $flag = '-d @';
+	if ($^O eq "darwin") {
+		$flag = '-r ';
+	}
+	
+	my $teststr =qq[date $flag$timestamp +"%Y%m%d"] ; # -d -r
+	print "test: $teststr\n";
+	my $version = systemc($teststr);
 	
 	return $version;
 };
 
-f->{'Phantome'}->{'download'} = sub {
-	my $dir = shift(@_);
+$f->{'Phantome'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
 	
 	#find node
 	#curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome"
-	SOURCE=`basename $dir`
-	OLD_NODE=`curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_${SOURCE}&version=20150403" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
+	#SOURCE=`basename $outdir`
+	#OLD_NODE=`curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_${SOURCE}&version=20150403" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
 	
-	if [ ${OLD_NODE} ne "" ] ; then
+	#if [ ${OLD_NODE} ne "" ] ; then
 		#download from shock?
-		echo found shock node
-		return
-	fi
+	#	echo found shock node
+	#	return
+	#fi
 	
-	wget -v -N -P $dir "http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz"  || return $?
-	echo "$VERSION" > $dir/version.txt
+	systemp(qq[wget -v -N -P $outdir "http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz"])== 0 || return 1;
+	systemp(qq[echo "$VERSION" > $outdir/version.txt])== 0 || return 1;
 	
 };
 
-f->{'RefSeq'}->{'download'} = sub {
-	my $dir = shift(@_);
-	time lftp -c "open -e 'mirror -v -e --delete-first -I RELEASE_NUMBER /refseq/release/ $dir' ftp://ftp.ncbi.nih.gov" || return $?
-	time lftp -c "open -e 'mirror -v -e --delete-first -I *.genomic.gbff.gz /refseq/release/complete/ $dir' ftp://ftp.ncbi.nih.gov" || return $?
-	cp $dir/RELEASE_NUMBER $dir/version.txt
+$f->{'RefSeq'}->{'version'} = sub {
+	return systemc('curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/RELEASE_NUMBER');
+};
+
+$f->{'RefSeq'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
+	systemp(qq[time lftp -c "open -e 'mirror -v -e --delete-first -I RELEASE_NUMBER /refseq/release/ $outdir' ftp://ftp.ncbi.nih.gov"])== 0 || return 1;
+	systemp(qq[time lftp -c "open -e 'mirror -v -e --delete-first -I *.genomic.gbff.gz /refseq/release/complete/ $outdir' ftp://ftp.ncbi.nih.gov"])== 0 || return 1;
+	systemp(qq[cp $outdir/RELEASE_NUMBER $outdir/version.txt])== 0 || return 1;
 };
 
 
-f->{'SEED'}->{'download'} = sub {
-	my $dir = shift(@_);
 
+$f->{'SEED'}->{'version'} = sub {
+	# detectd symlink pointing to version
+	# example: lrwxrwxrwx   1 ftp      ftp            19 Dec  9  2014 ProblemSets.current -> ProblemSets.2014.12
+	return systemc(q(curl --silent ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"))
+};
+	
+	
+$f->{'SEED'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $bindir = $h->{'bindir'};
+	my $version = $h->{'version'};
 
-	CURRENT_VERSION=`curl ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"`
+	systemp(qq[time ${BIN}/querySAS.pl -source SEED  1> $outdir/SEED.md52id2func2org])== 0 || return 1;
+	systemp(qq[time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/ProblemSets.$version/ $outdir' ftp://ftp.theseed.org"])== 0 || return 1;
 
-	time ${BIN}/querySAS.pl -source SEED  1> $dir/SEED.md52id2func2org || return $?
-	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/ProblemSets.${CURRENT_VERSION}/ $dir' ftp://ftp.theseed.org" || return $?
-
-	echo ${CURRENT_VERSION} > $dir/version.txt
+	systemp(qq[echo $version > $outdir/version.txt])== 0 || return 1;
 
 	#old:
-	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ $dir' ftp://ftp.theseed.org"
-	#time lftp -c "open -e 'mirror -v --no-recursion -I subsystems2role.gz /subsystems/ $dir' ftp://ftp.theseed.org"
+	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ $outdir' ftp://ftp.theseed.org"
+	#time lftp -c "open -e 'mirror -v --no-recursion -I subsystems2role.gz /subsystems/ $outdir' ftp://ftp.theseed.org"
 };
 
-f->{'Subsystems'}->{'download'} = sub {
-	my $dir = shift(@_);
-	time ${BIN}/querySAS.pl --source=Subsystems --output=$dir/Subsystems.subsystem2role2seq || return $?
+
+
+$f->{'Subsystems'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $version = $h->{'version'};
+	
+	systemp(qq[${BIN}/querySAS.pl --source=Subsystems --output=$outdir/Subsystems.subsystem2role2seq])== 0 || return 1;
+	
 };
-f->{'UniProt'}->{'download'} = sub {
-	my $dir = shift(@_);
-	time lftp -c "open -e 'mirror -v -e --delete-first -I reldate.txt  /pub/databases/uniprot/current_release/knowledgebase/complete/ $dir' ftp.uniprot.org" || return $?
-	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_sprot.dat.gz  /pub/databases/uniprot/current_release/knowledgebase/complete/ $dir' ftp.uniprot.org" || return $?
-	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_trembl.dat.gz /pub/databases/uniprot/current_release/knowledgebase/complete/ $dir' ftp.uniprot.org" || return $?
-	head -n1 $dir/reldate.txt | grep -o "[0-9]\{4\}_[0-9]*" > $dir/version.txt
+
+
+$f->{'UniProt'}->{'version'} = sub {
+
+	#example reldate.txt:
+	#UniProt Knowledgebase Release 2015_07 consists of:
+	#UniProtKB/Swiss-Prot Release 2015_07 of 24-Jun-2015
+	#UniProtKB/TrEMBL Release 2015_07 of 24-Jun-2015
+	
+	return systemc('curl --silent ftp://ftp.uniprot.org//pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | head -n 1 | grep -o "[0-9]\{4\}_[0-9]\+"')
+
+
+};
+
+$f->{'UniProt'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $version = $h->{'version'};
+	systemp(qq[time lftp -c "open -e 'mirror -v -e --delete-first -I reldate.txt  /pub/databases/uniprot/current_release/knowledgebase/complete/ $outdir' ftp.uniprot.org"])== 0 || return 1;
+	systemp(qq[time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_sprot.dat.gz  /pub/databases/uniprot/current_release/knowledgebase/complete/ $outdir' ftp.uniprot.org"])== 0 || return 1;
+	systemp(qq[time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_trembl.dat.gz /pub/databases/uniprot/current_release/knowledgebase/complete/ $outdir' ftp.uniprot.org"])== 0 || return 1;
+	systemp(qq[head -n1 $outdir/reldate.txt | grep -o "[0-9]\{4\}_[0-9]*" > $outdir/version.txt])== 0 || return 1;
 };
 
 
 #### RNA
-f->{'SILVA'}->{'download'} = sub {
-	my $dir = shift(@_);
-	time lftp -c "open -e 'mirror -v --no-recursion --dereference /current/Exports/ $dir' ftp://ftp.arb-silva.de" || return $?
-	mkdir -p $dir/rast
-	time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/rast $dir/rast' ftp://ftp.arb-silva.de" || return $?
-	head -n 1 $dir/README.txt | grep -o "[0-9]\{3\}\.[0-9]*" > $dir/version.txt
+
+$f->{'SILVA'}->{'version'} = sub {
+
+	# example: README for SILVA 119.1 export files
+	my $line = systemc('curl --silent ftp://ftp.arb-silva.de//current/Exports/README.txt | head -n 1');
+
+	if ($line eq "") {
+		return "";
+	}
+	
+	my ($version) = $line =~ /(\d+\.\d+)/;
+	
+	unless (defined $version) {
+		print STDERR "error: could not parse line $line\n";
+		return "";
+	}
+	
+	return $version;
 };
-f->{'RDP'}->{'download'} = sub {
-	my $dir = shift(@_);
+
+
+$f->{'SILVA'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $version = $h->{'version'};
+	systemp(qq[time lftp -c "open -e 'mirror -v --no-recursion --dereference /current/Exports/ $outdir' ftp://ftp.arb-silva.de" ])== 0 || return 1;
+	systemp(qq[mkdir -p $outdir/rast])== 0 || return 1;
+	systemp(qq[time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/rast $outdir/rast' ftp://ftp.arb-silva.de"])== 0 || return 1;
+	systemp(qq[head -n 1 $outdir/README.txt | grep -o "[0-9]\{3\}\.[0-9]*" > $outdir/version.txt])== 0 || return 1;
+};
+
+
+$f->{'RDP'}->{'version'} = sub {
+
+	return systemc('curl --silent http://rdp.cme.msu.edu/download/releaseREADME.txt');
+
+};
+
+$f->{'RDP'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $version = $h->{'version'};
 
 	# version number
-	wget -v -N -P $dir 'http://rdp.cme.msu.edu/download/releaseREADME.txt' || return $?
+	systemp(qq[wget -v -N -P $outdir 'http://rdp.cme.msu.edu/download/releaseREADME.txt'])== 0 || return 1;
 
-	wget -v -N -P $dir 'http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz' || return $?
-	wget -v -N -P $dir 'http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz' || return $?
-	wget -v -N -P $dir 'http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz' || return $?
+	systemp(qq[wget -v -N -P $outdir 'http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz'])== 0 || return 1;
+	systemp(qq[wget -v -N -P $outdir 'http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz'])== 0 || return 1;
+	systemp(qq[wget -v -N -P $outdir 'http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz'])== 0 || return 1;
 	
-	cp $dir/releaseREADME.txt $dir/version.txt
+	systemp(qq[cp $outdir/releaseREADME.txt $outdir/version.txt])== 0 || return 1;
 };
-f->{'Greengenes'}->{'download'} = sub {
-	my $dir = shift(@_);
+$f->{'Greengenes'}->{'download'} = sub {
+	my $h = shift(@_);
+	my $outdir = $h->{'outdir'};
+	my $version = $h->{'version'};
 	# from 2011 ?
-	wget -v -N -P $dir 'http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz' || return $?
+	systemp(qq[wget -v -N -P $outdir 'http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz'])== 0 || return 1;
 	# use filedata as version
-	stat -c '%y' current_GREENGENES_gg16S_unaligned.fasta.gz | cut -c 1-4,6,7,9,10 > $dir/version.txt
+	systemp(qq[stat -c '%y' current_GREENGENES_gg16S_unaligned.fasta.gz | cut -c 1-4,6,7,9,10 > $outdir/version.txt])== 0 || return 1;
 };
 
+
+
+
+require Text::TabularDisplay;
+
+my $table = Text::TabularDisplay->new("source", "version");
+
+my $versions={};
+
+foreach my $s (@sources) {
+	my $v = '';
+	
+	print "+++++ $s ++++++\n";
+	if (defined $f->{$s}->{'version'}) {
+	
+		$v = &{$f->{$s}->{'version'}};
+		if ($v eq "") {
+			$v = 'ERROR';
+		}
+		
+		
+	} else {
+		
+		$v = 'undef'
+	}
+	print "$s: 	$v\n";
+	$versions->{$s}=$v;
+	$table->add( $s, $v );
+	
+}
+
+
+print "-------------\n";
+
+foreach my $s (keys %$versions) {
+	print "$s: ".$versions->{$s}."\n";
+}
+
+
+
+
+
+ print $table->render."\n";
 
 
 ###########################################################
