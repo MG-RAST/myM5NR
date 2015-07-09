@@ -3,7 +3,8 @@
 
 # read ${BIN}/../sources.cfg
 
-
+use Getopt::Long ;
+use SHOCK::Client;
 use Data::Dumper;
 
 
@@ -13,6 +14,18 @@ my @sources_protein=('SEED', 'Subsystems', 'InterPro', 'UniProt', 'RefSeq', 'Gen
 my @sources_rna=('SILVA', 'Greengenes', 'RDP', 'FungiDB');
 
 my @sources=(@sources_protein, @sources_rna);
+
+
+
+
+
+my $sc = new SHOCK::Client('http://shock.metagenomics.anl.gov', '', 0);
+
+
+
+
+
+
 
 
 
@@ -76,9 +89,10 @@ sub systemc {
 
 
 #### proteins
+$f->{'CAZy'}->{'online'} = 1;
 
 $f->{'CAZy'}->{'version'} = sub {
-	return "NA";
+	return "daily";
 };
 
 
@@ -91,8 +105,9 @@ $f->{'CAZy'}->{'download'} = sub {
 	systemp("${BIN}/get_cazy_table.pl ${dir}/cazy_all_v042314.txt") == 0 || return;
 };
 
+$f->{'eggNOG'}->{'online'} = 0;
 $f->{'eggNOG'}->{'version'} = sub {
-	return "v3.0";
+	return "3.0";
 };
 
 
@@ -139,7 +154,7 @@ $f->{'eggNOG'}->{'download'} = sub {
 
 };
 
-
+$f->{'COGs'}->{'online'} = 0;
 $f->{'COGs'}->{'download'} = sub {
 	
 	### not used.
@@ -151,7 +166,8 @@ $f->{'COGs'}->{'download'} = sub {
 	systemp(qq[time lftp -c "open -e 'mirror -v --no-recursion /pub/COG/COG2014/data/ $outdir' ftp://ftp.ncbi.nih.gov"])== 0 || return 1;
 };
 
-$f->{'FungiDB'}->{'download'} = sub {
+$f->{'FungiDB'}->{'online'} = 0;
+$f->{'FungiDB'}->{'version'} = sub {
 	return "20111019"
 };
 
@@ -183,6 +199,7 @@ $f->{'IMG'}->{'download'} = sub {
 	#time lftp -c "open -e 'mirror -v --no-recursion -I img_core_v400.tar /pub/IMG/ $outdir' ftp://ftp.jgi-psf.org"
 };
 
+$f->{'Interpro'}->{'online'} = 1;
 $f->{'InterPro'}->{'version'} = sub {
 
 	return systemc('curl --silent ftp://ftp.ebi.ac.uk//pub/databases/interpro/Current/release_notes.txt | grep "Release [0-9]\+" | grep -o "[0-9]\+\.[0-9]\+"');
@@ -200,6 +217,7 @@ $f->{'InterPro'}->{'download'} = sub {
 	systemp(qq[cat $outdir/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > $outdir/version.txt])== 0 || return 1;
 };
 
+$f->{'KEGG'}->{'online'} = 0;
 $f->{'KEGG'}->{'version'} = sub {
 	return "56";
 };
@@ -228,7 +246,7 @@ $f->{'MO'}->{'download'} = sub {
 	#wget -v -N -P $outdir http://www.microbesonline.org/genbank/10000550.gbk.gz
 };
 
-
+$f->{'GenBankNR'}->{'online'} = 1;
 $f->{'GenBankNR'}->{'version'} = sub {
 	# ugly: reads date from file
 	
@@ -273,7 +291,7 @@ $f->{'GenBankNR'}->{'download'} = sub {
 	systemp(qq[stat -c '%y' $outdir/nr.gz | cut -c 1-4,6,7,9,10 > $outdir/version.txt ])== 0 || return 1;
 };
 
-
+$f->{'PATRIC'}->{'online'} = 1;
 $f->{'PATRIC'}->{'version'} = sub {
 	# ugly: reads date from file
 	
@@ -318,6 +336,7 @@ $f->{'PATRIC'}->{'download'} = sub {
 	systemp(qq[stat -c '%y' $outdir/1000561.3 | cut -c 1-4,6,7,9,10 > $outdir/version.txt])== 0 || return 1;
 };
 
+$f->{'Phantome'}->{'online'} = 1;
 $f->{'Phantome'}->{'version'} = sub {
 
 	my $timestamp=systemc(qq(curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[[:digit:]]\\+"));
@@ -362,6 +381,7 @@ $f->{'Phantome'}->{'download'} = sub {
 	
 };
 
+$f->{'RefSeq'}->{'online'} = 1;
 $f->{'RefSeq'}->{'version'} = sub {
 	return systemc('curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/RELEASE_NUMBER');
 };
@@ -377,7 +397,7 @@ $f->{'RefSeq'}->{'download'} = sub {
 };
 
 
-
+$f->{'SEED'}->{'online'} = 1;
 $f->{'SEED'}->{'version'} = sub {
 	# detectd symlink pointing to version
 	# example: lrwxrwxrwx   1 ftp      ftp            19 Dec  9  2014 ProblemSets.current -> ProblemSets.2014.12
@@ -402,6 +422,11 @@ $f->{'SEED'}->{'download'} = sub {
 };
 
 
+$f->{'Subsystems'}->{'online'} = 1;
+
+$f->{'Subsystems'}->{'version'} = sub {
+	return "daily";
+};
 
 $f->{'Subsystems'}->{'download'} = sub {
 	my $h = shift(@_);
@@ -413,6 +438,7 @@ $f->{'Subsystems'}->{'download'} = sub {
 };
 
 
+$f->{'UniProt'}->{'online'} = 1;
 $f->{'UniProt'}->{'version'} = sub {
 
 	#example reldate.txt:
@@ -437,7 +463,7 @@ $f->{'UniProt'}->{'download'} = sub {
 
 
 #### RNA
-
+$f->{'SILVA'}->{'online'} = 1;
 $f->{'SILVA'}->{'version'} = sub {
 
 	# example: README for SILVA 119.1 export files
@@ -469,6 +495,7 @@ $f->{'SILVA'}->{'download'} = sub {
 };
 
 
+$f->{'RDP'}->{'online'} = 1;
 $f->{'RDP'}->{'version'} = sub {
 
 	return systemc('curl --silent http://rdp.cme.msu.edu/download/releaseREADME.txt');
@@ -489,6 +516,42 @@ $f->{'RDP'}->{'download'} = sub {
 	
 	systemp(qq[cp $outdir/releaseREADME.txt $outdir/version.txt])== 0 || return 1;
 };
+
+$f->{'Greengenes'}->{'online'} = 1;
+$f->{'Greengenes'}->{'version'} = sub {
+
+	%mon2num = qw(
+	jan 01  feb 02  mar 03  apr 04  may 05  jun 06
+	jul 07  aug 08  sep 09  oct 10 nov 11 dec 12
+	);
+	
+	# example: 09-May-2011
+	my $line  = systemc('curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep "current_GREENGENES_gg16S_unaligned.fasta.gz"');
+
+	if ($line eq "") {
+		return ""
+	}
+	
+	my ($day, $month_str, $year) = $line =~ /(\d+)\-(\S+)\-(\d\d\d\d)/;
+	
+	
+	unless (defined $year) {
+		print STDERR "Error: Could not parse date from line ".$line."\n";
+		return "";
+	}
+	
+	my $month = $mon2num{lc($month_str)};
+	
+	unless (defined $month) {
+		print STDERR "Error: Could not map month ".$month_str."\n";
+		return "";
+	}
+	
+	return $year.$month.$day;
+	
+};
+
+
 $f->{'Greengenes'}->{'download'} = sub {
 	my $h = shift(@_);
 	my $outdir = $h->{'outdir'};
@@ -502,46 +565,142 @@ $f->{'Greengenes'}->{'download'} = sub {
 
 
 
-require Text::TabularDisplay;
 
-my $table = Text::TabularDisplay->new("source", "version");
+my %h = ();
 
-my $versions={};
+GetOptions (\%h, 'latest=s', 'compare=s');
 
-foreach my $s (@sources) {
-	my $v = '';
+
+
+if (defined $h{'latest'}) {
 	
-	print "+++++ $s ++++++\n";
-	if (defined $f->{$s}->{'version'}) {
+	require Text::TabularDisplay;
 	
-		$v = &{$f->{$s}->{'version'}};
-		if ($v eq "") {
-			$v = 'ERROR';
+	open(my $fh, '>', $h{'latest'}) or die "Could not open file '".$h{'latest'}."' $!";
+
+
+	
+
+	my $table_static = Text::TabularDisplay->new("source", "version");
+	my $table_online = Text::TabularDisplay->new("source", "version");
+
+	my $versions={};
+
+	foreach my $s (@sources) {
+		my $v = '';
+		
+		print "+++++ $s ++++++\n";
+		if (defined $f->{$s}->{'version'}) {
+		
+			$v = &{$f->{$s}->{'version'}};
+			if ($v eq "") {
+				$v = 'ERROR';
+			}
+			
+			
+		} else {
+			
+			$v = 'undef'
+		}
+		print $fh "$s\t$v\n";
+
+		if (defined $f->{$s}->{'online'} && $f->{$s}->{'online'}==1) {
+			$table_online->add( $s, $v );
+		} else {
+			$table_static->add( $s, $v );
+		}
+	}
+		close($fh);
+
+	print "------------- static\n";
+
+	print $table_static->render."\n";
+
+	print "------------- online \n";
+
+	 print $table_online->render."\n";
+
+	
+	print "Version written to file ".$h{'latest'}."\n";
+	
+}
+
+
+if (defined $h{'compare'}) {
+	require Text::TabularDisplay;
+	
+	my $table_compare = Text::TabularDisplay->new("source", "latest", "in-shock", "existing versions");
+	
+	my $filename = $h{'compare'};
+	
+	my $file_versions = {};
+	
+	open(my $data, '<', $filename) or die "Could not open '$filename' $!\n";
+ 
+	while (my $line = <$data>) {
+ 		chomp $line;
+		
+		my ($s, $v) = split(/\s/, $line);
+		unless (defined $v) {
+			die;
+		}
+		$file_versions->{$s}->{'latest'}=$v;
+	}
+	print Dumper($file_versions);
+	
+	
+	print "------------- Compare with Shock \n";
+
+	foreach my $s (@sources) {
+		my $v = $file_versions->{$s}->{'latest'};
+		
+		print "+++++ $s ++++++\n";
+		if (defined $v) {
+			
+			my $nodes_match =  $sc->query('type' => 'data-library', 'project' => 'M5NR', 'data-library-name' => 'M5NR_source_'.$s);
+			
+			print Dumper($nodes_match);
+			$file_versions->{'shock'}->{$s}=0;
+			my $version_matches=0;
+			my @versions=();
+			foreach my $i (@{$nodes_match->{'data'}}) {
+				my $attr =$i->{'attributes'};
+				my $version=$attr->{'version'};
+				
+				if (lc($version) eq lc($v)) {
+					$file_versions->{'shock'}->{$s}=1;
+					$version_matches++;
+				}
+				
+				push(@versions, $version);
+			}
+			
+			
+			if ($file_versions->{'shock'}->{$s} == 1) {
+				$table_compare->add( $s, $v, "yes" , join(' ', @versions));
+			} else {
+				$table_compare->add( $s, $v, "no" , join(' ', @versions) );
+			}
+			
+			
+			my $matches  = ($nodes_match->{'total_count'}) || 0;
+			
+			
+			
+			
+			#print "Found ".$matches." versions in total and ".$version_matches." version in Shock matches the latest version.\n";
+			
+			
+			
+			
 		}
 		
-		
-	} else {
-		
-		$v = 'undef'
 	}
-	print "$s: 	$v\n";
-	$versions->{$s}=$v;
-	$table->add( $s, $v );
+
+	print $table_compare->render."\n";
 	
 }
 
-
-print "-------------\n";
-
-foreach my $s (keys %$versions) {
-	print "$s: ".$versions->{$s}."\n";
-}
-
-
-
-
-
- print $table->render."\n";
 
 
 ###########################################################
