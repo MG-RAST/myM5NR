@@ -19,7 +19,11 @@ RUN apt-get install -y make && \
   cd modules && \
   ./BUILD_MODULES
 
-ENV PERL5LIB $PERL5LIB:/sas/lib:/sas/modules/lib
+
+#Shock perl
+RUN cd / ; git clone https://github.com/MG-RAST/Shock.git
+
+ENV PERL5LIB $PERL5LIB:/sas/lib:/sas/modules/lib:/Shock/libs
 ENV PATH $PATH:/sas/bin
 
 RUN cd / && git clone https://github.com/MG-RAST/myM5NR.git
