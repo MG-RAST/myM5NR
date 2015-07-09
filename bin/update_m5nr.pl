@@ -6,7 +6,7 @@
 use Getopt::Long ;
 use SHOCK::Client;
 use Data::Dumper;
-
+use Cwd;
 
 
 my @sources_protein=('SEED', 'Subsystems', 'InterPro', 'UniProt', 'RefSeq', 'GenBankNR', 'PATRIC', 'Phantome', 'CAZy', 'KEGG', 'eggNOG'); #'IMG'
@@ -629,7 +629,10 @@ if (defined $h{'latest'}) {
 if (defined $h{'compare'}) {
 	require Text::TabularDisplay;
 	
-	my $table_compare = Text::TabularDisplay->new("source", "latest", "in-shock", "existing versions");
+	
+	my $workdir = getcwd;
+	
+	my $table_compare = Text::TabularDisplay->new("source", "latest", "in-shock", "on-disk", "existing versions");
 	
 	my $filename = $h{'compare'};
 	
@@ -675,11 +678,18 @@ if (defined $h{'compare'}) {
 				push(@versions, $version);
 			}
 			
+			my $version_txt = $workdir."/$s/version.txt";
+			my $version_txt_value = "";
+			if (-e $version_txt) {
+				$version_txt_value = `cat $version_txt`;
+				chomp($version_txt_value);
+			}
+			
 			
 			if ($file_versions->{'shock'}->{$s} == 1) {
-				$table_compare->add( $s, $v, "yes" , join(' ', @versions));
+				$table_compare->add( $s, $v, "yes" , $version_txt_value, join(' ', @versions));
 			} else {
-				$table_compare->add( $s, $v, "no" , join(' ', @versions) );
+				$table_compare->add( $s, $v, "no" , $version_txt_value, join(' ', @versions) );
 			}
 			
 			
