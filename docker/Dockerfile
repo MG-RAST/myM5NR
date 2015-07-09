@@ -7,7 +7,10 @@ RUN apt-get update && apt-get install -y \
   lftp \
   python-biopython  \
   libdbi-perl  \
-  libdbd-pg-perl wget
+  libdbd-pg-perl \
+  libjson-perl \
+  libtext-tabulardisplay-perl \
+  wget
 
 
 #SEED environment
