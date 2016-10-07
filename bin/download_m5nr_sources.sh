@@ -41,22 +41,11 @@ if [ ! -d "$DOWNLOAD_DIR" ]; then
 	exit 1
 fi
 
-# binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
-BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# configure sources right here
 
-if [ -z ${SOURCES+x} ]; then
-
-	SOURCE_CONFIG=${BIN}/../sources.cfg
-
-	if [ ! -e ${SOURCE_CONFIG} ]; then
-		echo "source config file ${SOURCE_CONFIG} not found"
-		exit 1
-	fi
-
-	source ${SOURCE_CONFIG} # this defines ${SOURCES}
-
-fi
-
+export SOURCES_PROTEIN="SEED Subsystems InterPro UniProt RefSeq GenBankNR PATRIC Phantome CAZy KEGG eggNOG IMG"
+export SOURCES_RNA="SILVA Greengenes RDP FungiDB"
+export SOURCES="${SOURCES_RNA} ${SOURCES_PROTEIN}"
 
 DOWNLOADS_EXIST=""
 DOWNLOADS_GOOD=""
@@ -74,7 +63,7 @@ set -x
 #### proteins
 
 function download_CAZy {
-	${BIN}/get_cazy_table.pl ${1}/cazy_all_v042314.txt || return $?
+#	${BIN}/get_cazy_table.pl ${1}/cazy_all_v042314.txt || return $?
 	echo `date +"%Y%m%d"` > ${1}/timestamp.txt
 }
 
