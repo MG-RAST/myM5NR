@@ -21,10 +21,12 @@ docker build -t mgrast/myM5NR .
 
 Example for manual invocation:
 ```bash
-docker run -ti -name m5nr -v/var/tmp/m5nr:/m5nr_data/mym5nr m5nr-build
+docker run -ti -name m5nr -v/var/tmp/m5nr:/m5nr_data mgrast/myM5NR
 ```
 
-Inside the container
+From now steps execute inside the container
+
+Set up some environment bits
 ```bash
 mkdir -p /m5nr_data/Sources
 mkdir -p /m5nr_data/Parsed
