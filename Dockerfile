@@ -6,10 +6,12 @@ RUN apt-get update && apt-get install -y \
   git-core \
   lftp \
   libdbi-perl  \
-  libdbd-pg-perl wget\
+  libdbd-pg-perl \
+  wget\
   make \
   python-biopython  \
-  vim 
+  vim \
+  curl 
 
 # install the SEED environment for Subsystem data download
 RUN mkdir -p /sas/ && \
@@ -23,7 +25,7 @@ ENV PERL5LIB $PERL5LIB:/sas/lib:/sas/modules/lib
 ENV PATH $PATH:/sas/bin
 
 # copy stuff from the repo into the /root (note the .dockerignore file)
-COPY . /root
+COPY . /myM5NR
 ENV PATH $PATH:/root/bin
 
 
