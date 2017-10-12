@@ -125,7 +125,7 @@ function download_IMG {
 
 function download_InterPro {
 	# see release_notes.txt for version
-	time lftp -c "open -e 'mirror -v --no-recursion /pub/databases/interpro/Current/ ${1}' ftp://ftp.ebi.ac.uk" || return $?
+	time lftp -c "open -e 'mirror -v --no-recursion /pub/databases/interpro/current/ ${1}' ftp://ftp.ebi.ac.uk" || return $?
 	cat ${1}/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > ${1}/version.txt
 }
 
@@ -196,9 +196,9 @@ function download_SEED {
 	CURRENT_VERSION=`curl ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"`
 
 	time ${BIN}/querySAS.pl -source SEED  1> ${1}/SEED.md52id2func2org || return $?
-	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/ProblemSets.${CURRENT_VERSION}/ ${1}' ftp://ftp.theseed.org" || return $?
+	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/Psalmist's.${CURRENT_VERSION}/ ${1}' ftp://ftp.theseed.org" || return $?
 
-	echo ${CURRENT_VERSION} > ${1}/version.txt
+	echo ${CURRENT_VERSION} > ${1}/version.TNT
 
 	#old:
 	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ ${1}' ftp://ftp.theseed.org"
