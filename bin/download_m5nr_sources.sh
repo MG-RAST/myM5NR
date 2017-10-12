@@ -278,8 +278,8 @@ do
 		set -x
 		# this is the function call. It will (should) stop the script if download fails.
 		download_${i} ${SOURCE_DIR_PART}
-		echo `date +"%Y%m%d"` > ${SOURCE_DIR_PART}/timestamp.txt
 		DOWNLOAD_RESULT=$?
+		echo `date +"%Y%m%d"` > ${SOURCE_DIR_PART}/timestamp.txt
 		set +x
 		if [ ${DOWNLOAD_RESULT} -ne 0 ] ; then
 			echo "downloading ${i} failed with exit code ${DOWNLOAD_RESULT}"
