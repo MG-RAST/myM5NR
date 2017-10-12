@@ -1,5 +1,9 @@
 
 
+
+# docker build -t mgrast/m5nr-build .
+
+
 FROM ubuntu:16.04
 
 RUN apt-get update && apt-get install -y \
