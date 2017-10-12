@@ -234,7 +234,7 @@ function download_SILVA {
 	time lftp -c "open -e 'mirror -v --no-recursion --dereference /current/Exports/ ${1}' ftp://ftp.arb-silva.de" || return $?
 	mkdir -p ${1}/rast
 	time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/rast ${1}/rast' ftp://ftp.arb-silva.de" || return $?
-	head -n 1 ${1}/README.txt | grep -o "[0-9]\{3\}\.[0-9]*" > ${1}/version.txt
+	head -n1 ${1}/README.txt  | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2 > ${1}/version.txt
 }
 
 function download_RDP {
