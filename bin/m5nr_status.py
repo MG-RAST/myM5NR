@@ -24,6 +24,12 @@ for dir in sources:
     #print(dir)
     timestamp="NA"
     version="NA"
+    state = "NA"
+    if os.path.isfile(sources_dir+dir+"_part"):
+        state="incomplete"
+    if os.path.isfile(sources_dir+dir):
+        state="complete"
+        
     time_file = sources_dir+dir+"/timestamp.txt"
     if os.path.isfile(time_file):
         with open(time_file, 'r') as myfile:
@@ -35,6 +41,6 @@ for dir in sources:
             version=myfile.read().replace('\n', '')
             #print("version: "+version)
     
-    data.append([dir, version, timestamp])
+    data.append([dir, state, version, timestamp])
 
-print(tabulate(data, headers=['Source', 'version', 'timestamp']))
+print(tabulate(data, headers=['Source', 'state', 'version', 'timestamp']))
