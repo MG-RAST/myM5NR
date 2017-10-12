@@ -25,9 +25,9 @@ for dir in sources:
     timestamp="NA"
     version="NA"
     state = "NA"
-    if os.path.isfile(sources_dir+dir+"_part"):
+    if os.path.isdir(sources_dir+dir+"_part"):
         state="incomplete"
-    if os.path.isfile(sources_dir+dir):
+    if os.path.isdir(sources_dir+dir):
         state="complete"
         
     time_file = sources_dir+dir+"/timestamp.txt"
