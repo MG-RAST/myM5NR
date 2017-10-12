@@ -41,11 +41,21 @@ if [ ! -d "$DOWNLOAD_DIR" ]; then
 	exit 1
 fi
 
-# configure sources right here
+# binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-export SOURCES_PROTEIN="SEED Subsystems InterPro UniProt RefSeq GenBankNR PATRIC Phantome CAZy KEGG eggNOG IMG"
-export SOURCES_RNA="SILVA Greengenes RDP FungiDB"
-export SOURCES="${SOURCES_RNA} ${SOURCES_PROTEIN}"
+if [ -z ${SOURCES+x} ]; then
+
+	SOURCE_CONFIG=${BIN}/../sources.cfg
+
+	if [ ! -e ${SOURCE_CONFIG} ]; then
+		echo "source config file ${SOURCE_CONFIG} not found"
+		exit 1
+	fi
+
+	source ${SOURCE_CONFIG} # this defines ${SOURCES}
+
+fi
 
 DOWNLOADS_EXIST=""
 DOWNLOADS_GOOD=""
