@@ -240,20 +240,22 @@ function download_SILVA {
 function download_RDP {
 
 	# version number
-	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/releaseREADME.txt' || return $?
+	curl --silent 'http://rdp.cme.msu.edu/download/releaseREADME.txt' > version.txt || return $?
 
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz' || return $?
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz' || return $?
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz' || return $?
-	
-	cp ${1}/releaseREADME.txt ${1}/version.txt
+	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/releaseREADME.txt' || return $?
+			
 }
 
 function download_Greengenes {
 	# from 2011 ?
+
+	curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]" > version.txt || return $?
 	wget -v -N -P ${1} 'http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz' || return $?
 	# use filedata as version
-	stat -c '%y' current_GREENGENES_gg16S_unaligned.fasta.gz | cut -c 1-4,6,7,9,10 > ${1}/version.txt
+	#stat -c '%y' current_GREENGENES_gg16S_unaligned.fasta.gz | cut -c 1-4,6,7,9,10 > ${1}/version.txt
 }
 
 set +x
