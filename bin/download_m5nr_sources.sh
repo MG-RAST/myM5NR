@@ -168,7 +168,7 @@ function download_PATRIC {
 
 
 function version_Phantome {
-	export TIMESTAMP=`curl http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[0-9]*"`
+	export TIMESTAMP=`curl http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[0-9]*"` || return $?
 	export VERSION=`date -d @${TIMESTAMP} +"%Y%m%d"`
 }
 
@@ -179,7 +179,7 @@ function download_Phantome {
 	#find node
 	#curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome"
 	SOURCE=`basename ${1}`
-	OLD_NODE=`curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_${SOURCE}&version=20150403" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
+	OLD_NODE=`curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_${SOURCE}&version=20150403" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"` || return $?
 	
 	if [ ${OLD_NODE} ne "" ] ; then
 		#download from shock?
@@ -203,7 +203,7 @@ function download_RefSeq {
 function download_SEED {
 
 
-	CURRENT_VERSION=`curl ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"`
+	CURRENT_VERSION=`curl ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"` || return $?
 
 	time ${BIN}/querySAS.pl -source SEED  1> ${1}/SEED.md52id2func2org || return $?
 	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/ProblemSets.${CURRENT_VERSION}/ ${1}' ftp://ftp.theseed.org" || return $?
