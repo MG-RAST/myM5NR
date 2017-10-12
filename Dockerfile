@@ -15,7 +15,14 @@ RUN apt-get update && apt-get install -y \
   make \
   python-biopython  \
   vim \
-  curl 
+  curl \
+  python3 \ 
+  python3-pip
+
+
+RUN pip3 install --upgrade pip && pip3 install \
+ tabulate
+
 
 # install the SEED environment for Subsystem data download
 RUN mkdir -p /sas/ && \
@@ -32,10 +39,6 @@ ENV PATH $PATH:/sas/bin
 COPY . /myM5NR
 ENV PATH $PATH:/root/bin
 
-
-# create working directoris 
-RUN mkdir -p /root/mym5nr/Sources \
-	&& mkdir -p /root/mym5nr/Parsed
 
 # download_m5nr_sources.sh
 
