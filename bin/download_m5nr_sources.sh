@@ -256,9 +256,9 @@ function download_RefSeq {
 
 function download_SEED {
 
-
-	time ${BIN}/querySAS.pl -source SEED  1> ${1}/SEED.md52id2func2org || return $?
-	
+	CURRENT_VERSION=$(echo `date +"%Y%m%d"`) 
+	time ${BIN}/querySAS.pl --source=SEED  --output=${1}/SEED.md52id2func2org || return $?
+	echo ${CURRENT_VERSION} > ${1}/version.txt
 	#old:
 	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ ${1}' ftp://ftp.theseed.org"
 	#time lftp -c "open -e 'mirror -v --no-recursion -I subsystems2role.gz /subsystems/ ${1}' ftp://ftp.theseed.org"
