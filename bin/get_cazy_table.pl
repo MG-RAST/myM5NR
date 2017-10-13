@@ -1,3 +1,4 @@
+#!/usr/bin/perl -w
 #######################################################################################################
 #
 # This script fetch and parse CAZy enzyme web pages to extract CAZy proteins 
@@ -8,7 +9,6 @@
 # Note: This script extract data from CAZy web pages and author bears no legal reponsibility
 #
 #######################################################################################################
-#!/usr/bin/perl -w
 use LWP::Simple;
 use LWP::UserAgent;
 
