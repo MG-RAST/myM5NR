@@ -4,19 +4,19 @@
 Uniprot:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/{reldate.txt, uniprot_sprot.dat.gz, uniprot_trembl.dat.gz}
   version: head -n1 reldate.txt | grep -o "[0-9]\{4\}_[0-9]*"
   version_lastest: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | head -n1 | grep -o "[0-9]\{4\}_[0-9]*"
 Swissprot:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
 TrEmble:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz 
 PIR:
   category: protein
@@ -24,24 +24,24 @@ PIR:
 Interpro:
   category: protein
   type: Hierarchical functional annotation
-  URLs:
+  download:
     - ftp://ftp.ebi.ac.uk/pub/databases/interpro/Current/
 IMG:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - ftp://ftp.jgi-psf.org/pub/IMG/img_core_v400.tar 
 PFAM:
   type: Hierarchical functional annotation?
 Genbank:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/*
 RefSeq:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.genomic.gbff.gz
 SEED-Subsystems:
   category: protein
@@ -54,16 +54,16 @@ SEED-Annotations:
 Cazy:
   category: protein
   type: Hierarchical functional annotation
-  URLs:
+  download:
     - www.cazy.org bin/get_cazy_table.pl
 FungiDB:
   category: protein
-  URLs:
+  download:
     - http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz
 COG:
   category: protein
   type: Hierarchical functional annotation
-  URLs:
+  download:
     - ftp://ftp.ncbi.nih.gov/pub/COG/COG2014/data/ 
 KEgg:
   category: protein
@@ -71,38 +71,38 @@ KEgg:
 NOG:
   category: protein
   type: Hierarchical functional annotation
-  URLs:
+  download:
     - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
   comment: https://github.com/jhcepas/eggnog-mapper/blob/master/eggnogmapper/common.py
 CARD:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - https://card.mcmaster.ca
 BacMet:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - http://bacmet.biomedicine.gu.se/
 ACLAME:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - http://aclame.ulb.ac.be/
 ARDB:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - https://ardb.cbcb.umd.edu/
 PhAnToMe:
   category: protein
   type: Functional annotation
-  URLs:
+  download:
     - http://www.phantome.org/Downloads/proteins/all_sequences/
 goslim:
   category: protein
   type: Hierarchical functional annotation
-  URLs:
+  download:
     - http://www.geneontology.org/ontology/subsets/goslim_metagenomics.obo
 bactNOG:
   category: protein
@@ -119,7 +119,7 @@ HITdb:
 motuDB:
   category: protein
   type: Filter set
-  URLs: 
+  download: 
     - http://www.nature.com/nmeth/journal/v10/n12/full/nmeth.2693.html
 singlecopygenes:
   category: protein
@@ -129,7 +129,7 @@ singlecopygenes:
 Silva-LSU:
   category: rRNA
   type: SSU
-  URLs: 
+  download: 
     - ftp://ftp.arb-silva.de/current/Exports/rast
 Silva-SSU:
   category: rRNA
@@ -137,25 +137,25 @@ Silva-SSU:
 Greengenes:
   category: rRNA
   type: SSU?
-  URLs: 
+  download: 
     - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
 FungiDB:
   category: rRNA
   type: ITS
-  URLs: 
+  download: 
     - http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz
 RDP:
   category: rRNA
   type: SSU
-  URLs:
+  download:
     - http://rdp.cme.msu.edu/download/releaseREADME.txt'
     - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
     - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
     - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
- MITOZOA:
-   category: rRNA
-   type: mtRNA
-   URLS:
+MITOZOA:
+  category: rRNA
+  type: mtRNA
+  download:
     - http://srv00.recas.ba.infn.it/mitozoa/ftp/dbMZ_v10.0.zip
 
 
