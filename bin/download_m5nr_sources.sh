@@ -142,16 +142,11 @@ function download_eggNOG {
 
 
 	# v3.0
-	time lftp -c "open -e 'mirror -v -e --no-recursion \\
-		-I fun.txt.gz \\
-		-I UniProtAC2eggNOG.3.0.tsv.gz \\
-		-I COG.funccat.txt.gz \\
-		-I NOG.funccat.txt.gz \\
-		-I COG.description.txt.gz \\
-		-I NOG.description.txt.gz \\
-		-I sequences.v3.tar.gz \\
-		/eggNOG/3.0/ ${1}' ftp://eggnog.embl.de" || return $?
 
+  for file in fun.txt.gz UniProtAC2eggNOG.3.0.tsv.gz COG.funccat.txt.gz NOG.funccat.txt.gz COG.description.txt.gz NOG.description.txt.gz sequences.v3.tar.gz ; do
+    wget http://eggnogdb.embl.de/download/eggnog_3.0/${file} || return $?
+  done
+  echo "3.0" > version.txt
 
 }
 
