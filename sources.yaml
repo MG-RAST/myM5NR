@@ -152,6 +152,11 @@ RDP:
     - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
     - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
     - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
+ MITOZOA:
+   category: rRNA
+   type: mtRNA
+   URLS:
+    - http://srv00.recas.ba.infn.it/mitozoa/ftp/dbMZ_v10.0.zip
 
 
 
