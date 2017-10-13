@@ -121,6 +121,11 @@ motuDB:
   type: Filter set
   download: 
     - http://www.nature.com/nmeth/journal/v10/n12/full/nmeth.2693.html
+FOAM:
+  category: protein
+  type: Hierarchical functional annotation
+  download: 
+    - http://cbb.pnnl.gov/portal/software/FOAM.html
 singlecopygenes:
   category: protein
   type: Filter set
