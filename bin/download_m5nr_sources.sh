@@ -134,9 +134,23 @@ function download_IMG {
 }
 
 function download_InterPro {
-	# see release_notes.txt for version
-	time lftp -c "open -e 'mirror -v --no-recursion /pub/databases/interpro/Current/ ${1}' ftp://ftp.ebi.ac.uk" || return $?
-	cat ${1}/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > ${1}/version.txt
+	DIR="${1}/"
+	export VERSION_REMOTE=`curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"`
+	echo "remote version: ${VERSION_REMOTE}"
+	if [ "${VERSION_REMOTE}_" == "_" ] ; then
+		echo "VERSION_REMOTE missing"
+		return 1
+	fi
+
+	wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE} || return $?
+
+	mv ${DIR}ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}/* .
+	rm -rf ${DIR}ftp.ebi.ac.uk
+
+	# write version
+	cat ${DIR}release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > ${DIR}version.txt
+
+
 }
 
 function download_KEGG {
@@ -168,27 +182,33 @@ function download_PATRIC {
 
 
 function version_Phantome {
-	export TIMESTAMP=`curl http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[0-9]*"` || return $?
+	export TIMESTAMP=`curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[0-9]*"` || return $?
 	export VERSION=`date -d @${TIMESTAMP} +"%Y%m%d"`
 }
 
 function download_Phantome {
 	
 	version_Phantome
-	
+
+	echo "$VERSION" > ${1}/version.txt
+
+	# 20150403 is in shock
+
 	#find node
 	#curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome"
 	SOURCE=`basename ${1}`
-	OLD_NODE=`curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_${SOURCE}&version=20150403" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"` || return $?
+	OLD_NODE=`curl --silent "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_${SOURCE}&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"` || return $?
 	
-	if [ ${OLD_NODE} ne "" ] ; then
+	if [ "${OLD_NODE}_" != "_" ] ; then
 		#download from shock?
-		echo found shock node
+		echo "found shock node"
 		return
+        else
+                echo "Phantome ${VERSION} not found in shock"
 	fi
 	
 	wget -v -N -P ${1} "http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz"  || return $?
-	echo "$VERSION" > ${1}/version.txt
+	
 	
 }
 
