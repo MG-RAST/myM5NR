@@ -41,11 +41,21 @@ if [ ! -d "$DOWNLOAD_DIR" ]; then
 	exit 1
 fi
 
-# configure sources right here
+# binary location from http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+BIN=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-export SOURCES_PROTEIN="SEED Subsystems InterPro UniProt RefSeq GenBankNR PATRIC Phantome CAZy KEGG eggNOG IMG"
-export SOURCES_RNA="SILVA Greengenes RDP FungiDB"
-export SOURCES="${SOURCES_RNA} ${SOURCES_PROTEIN}"
+if [ -z ${SOURCES+x} ]; then
+
+	SOURCE_CONFIG=${BIN}/../sources.cfg
+
+	if [ ! -e ${SOURCE_CONFIG} ]; then
+		echo "source config file ${SOURCE_CONFIG} not found"
+		exit 1
+	fi
+
+	source ${SOURCE_CONFIG} # this defines ${SOURCES}
+
+fi
 
 DOWNLOADS_EXIST=""
 DOWNLOADS_GOOD=""
@@ -165,9 +175,22 @@ function download_IMG {
 }
 
 function download_InterPro {
-	# see release_notes.txt for version
-	time lftp -c "open -e 'mirror -v --no-recursion /pub/databases/interpro/current/ ${1}' ftp://ftp.ebi.ac.uk" || return $?
-	cat ${1}/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > ${1}/version.txt
+
+	DIR="${1}/"
+	export VERSION_REMOTE=`curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"`
+	echo "remote version: ${VERSION_REMOTE}"
+	if [ "${VERSION_REMOTE}_" == "_" ] ; then
+		echo "VERSION_REMOTE missing"
+		return 1
+	fi
+
+	wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE} || return $?
+
+	mv ${DIR}ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}/* .
+	rm -rf ${DIR}ftp.ebi.ac.uk
+
+	# write version
+	cat ${DIR}release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > ${DIR}version.txt
 }
 
 function download_KEGG {
@@ -199,27 +222,33 @@ function download_PATRIC {
 
 
 function version_Phantome {
-	export TIMESTAMP=`curl http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[0-9]*"`
+	export TIMESTAMP=`curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[0-9]*"` || return $?
 	export VERSION=`date -d @${TIMESTAMP} +"%Y%m%d"`
 }
 
 function download_Phantome {
 	
 	version_Phantome
-	
+
+	echo "$VERSION" > ${1}/version.txt
+
+	# 20150403 is in shock
+
 	#find node
 	#curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome"
 	SOURCE=`basename ${1}`
-	OLD_NODE=`curl "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_${SOURCE}&version=20150403" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
+	OLD_NODE=`curl --silent "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_${SOURCE}&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"` || return $?
 	
-	if [ ${OLD_NODE} ne "" ] ; then
+	if [ "${OLD_NODE}_" != "_" ] ; then
 		#download from shock?
-		echo found shock node
+		echo "found shock node"
 		return
+        else
+                echo "Phantome ${VERSION} not found in shock"
 	fi
 	
 	wget -v -N -P ${1} "http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz"  || return $?
-	echo "$VERSION" > ${1}/version.txt
+	
 	
 }
 
@@ -234,7 +263,7 @@ function download_RefSeq {
 function download_SEED {
 
 
-	CURRENT_VERSION=`curl ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"`
+	CURRENT_VERSION=`curl ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"` || return $?
 
 	time ${BIN}/querySAS.pl -source SEED  1> ${1}/SEED.md52id2func2org || return $?
 	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/Psalmist's.${CURRENT_VERSION}/ ${1}' ftp://ftp.theseed.org" || return $?
@@ -265,26 +294,28 @@ function download_SILVA {
 	time lftp -c "open -e 'mirror -v --no-recursion --dereference /current/Exports/ ${1}' ftp://ftp.arb-silva.de" || return $?
 	mkdir -p ${1}/rast
 	time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/rast ${1}/rast' ftp://ftp.arb-silva.de" || return $?
-	head -n 1 ${1}/README.txt | grep -o "[0-9]\{3\}\.[0-9]*" > ${1}/version.txt
+	head -n1 ${1}/README.txt  | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2 > ${1}/version.txt
 }
 
 function download_RDP {
 
 	# version number
-	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/releaseREADME.txt' || return $?
+	curl --silent 'http://rdp.cme.msu.edu/download/releaseREADME.txt' > version.txt || return $?
 
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz' || return $?
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz' || return $?
 	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz' || return $?
-	
-	cp ${1}/releaseREADME.txt ${1}/version.txt
+	wget -v -N -P ${1} 'http://rdp.cme.msu.edu/download/releaseREADME.txt' || return $?
+			
 }
 
 function download_Greengenes {
 	# from 2011 ?
+
+	curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]" > version.txt || return $?
 	wget -v -N -P ${1} 'http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz' || return $?
 	# use filedata as version
-	stat -c '%y' current_GREENGENES_gg16S_unaligned.fasta.gz | cut -c 1-4,6,7,9,10 > ${1}/version.txt
+	#stat -c '%y' current_GREENGENES_gg16S_unaligned.fasta.gz | cut -c 1-4,6,7,9,10 > ${1}/version.txt
 }
 
 set +x
@@ -309,8 +340,8 @@ do
 		set -x
 		# this is the function call. It will (should) stop the script if download fails.
 		download_${i} ${SOURCE_DIR_PART}
-		echo `date +"%Y%m%d"` > ${SOURCE_DIR_PART}/timestamp.txt
 		DOWNLOAD_RESULT=$?
+		echo `date +"%Y%m%d"` > ${SOURCE_DIR_PART}/timestamp.txt
 		set +x
 		if [ ${DOWNLOAD_RESULT} -ne 0 ] ; then
 			echo "downloading ${i} failed with exit code ${DOWNLOAD_RESULT}"

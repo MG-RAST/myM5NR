@@ -1,15 +1,28 @@
 
 
-FROM ubuntu
+
+# docker build -t mgrast/m5nr-build .
+
+
+FROM ubuntu:16.04
 
 RUN apt-get update && apt-get install -y \
   git-core \
   lftp \
   libdbi-perl  \
-  libdbd-pg-perl wget\
+  libdbd-pg-perl \
+  wget\
   make \
   python-biopython  \
-  vim 
+  vim \
+  curl \
+  python3 \ 
+  python3-pip
+
+
+RUN pip3 install --upgrade pip && pip3 install \
+ tabulate
+
 
 # install the SEED environment for Subsystem data download
 RUN mkdir -p /sas/ && \
@@ -23,13 +36,9 @@ ENV PERL5LIB $PERL5LIB:/sas/lib:/sas/modules/lib
 ENV PATH $PATH:/sas/bin
 
 # copy stuff from the repo into the /root (note the .dockerignore file)
-COPY . /root
+COPY . /myM5NR
 ENV PATH $PATH:/root/bin
 
-
-# create working directoris 
-RUN mkdir -p /root/mym5nr/Sources \
-	&& mkdir -p /root/mym5nr/Parsed
 
 # download_m5nr_sources.sh
 

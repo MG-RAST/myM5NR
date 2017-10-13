@@ -16,12 +16,12 @@ git clone --recursive https://github.com/MG-RAST/myM5NR.git
 To build the image either download the Docker file into an empty directory of provide the url to Dockerfile as in this example:
 
 ```bash
-docker build -t mgrast/myM5NR .
+docker build -t mgrast/m5nr-build .
 ```
 
 Example for manual invocation:
 ```bash
-docker run -ti -name m5nr -v/var/tmp/m5nr:/m5nr_data mgrast/myM5NR
+docker run -ti --name m5nr -v/var/tmp/m5nr:/m5nr_data mgrast/m5nr-build
 ```
 
 From now steps execute inside the container
