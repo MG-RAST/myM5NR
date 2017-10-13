@@ -115,7 +115,6 @@ set -x
 
 function download_CAZy {
 	${BIN}/get_cazy_table.pl ${1}/cazy_all_v042314.txt || return $?
-	echo `date +"%Y%m%d"` > ${1}/timestamp.txt
 }
 
 
@@ -184,7 +183,7 @@ function download_InterPro {
 		return 1
 	fi
 
-	wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE} || return $?
+	wget -P ${DIR} --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE} || return $?
 
 	mv ${DIR}ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}/* .
 	rm -rf ${DIR}ftp.ebi.ac.uk
