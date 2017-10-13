@@ -275,7 +275,7 @@ function download_SEED {
 }
 
 
-function download_Subsystems {
+function download_Subsystems {  
 	time ${BIN}/querySAS.pl --source=Subsystems --output=${1}/Subsystems.subsystem2role2seq || return $?
 }
 
@@ -335,11 +335,12 @@ do
 		mkdir -m 775 ${SOURCE_DIR_PART}
 
 		echo "Downloading ${i} to ${SOURCE_DIR_PART}"
-
+    pushd ${SOURCE_DIR_PART}
 		set -x
 		# this is the function call. It will (should) stop the script if download fails.
 		download_${i} ${SOURCE_DIR_PART}
 		DOWNLOAD_RESULT=$?
+    popd
 		echo `date +"%Y%m%d"` > ${SOURCE_DIR_PART}/timestamp.txt
 		set +x
 		if [ ${DOWNLOAD_RESULT} -ne 0 ] ; then
