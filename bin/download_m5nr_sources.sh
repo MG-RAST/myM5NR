@@ -115,7 +115,6 @@ set -x
 
 function download_CAZy {
 	${BIN}/get_cazy_table.pl ${1}/cazy_all_v042314.txt || return $?
-	echo `date +"%Y%m%d"` > ${1}/timestamp.txt
 }
 
 
@@ -143,16 +142,11 @@ function download_eggNOG {
 
 
 	# v3.0
-	time lftp -c "open -e 'mirror -v -e --no-recursion \\
-		-I fun.txt.gz \\
-		-I UniProtAC2eggNOG.3.0.tsv.gz \\
-		-I COG.funccat.txt.gz \\
-		-I NOG.funccat.txt.gz \\
-		-I COG.description.txt.gz \\
-		-I NOG.description.txt.gz \\
-		-I sequences.v3.tar.gz \\
-		/eggNOG/3.0/ ${1}' ftp://eggnog.embl.de" || return $?
 
+  for file in fun.txt.gz UniProtAC2eggNOG.3.0.tsv.gz COG.funccat.txt.gz NOG.funccat.txt.gz COG.description.txt.gz NOG.description.txt.gz sequences.v3.tar.gz ; do
+    wget http://eggnogdb.embl.de/download/eggnog_3.0/${file} || return $?
+  done
+  echo "3.0" > version.txt
 
 }
 
@@ -184,7 +178,7 @@ function download_InterPro {
 		return 1
 	fi
 
-	wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE} || return $?
+	wget -P ${DIR} --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE} || return $?
 
 	mv ${DIR}ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}/* .
 	rm -rf ${DIR}ftp.ebi.ac.uk
@@ -262,21 +256,16 @@ function download_RefSeq {
 
 function download_SEED {
 
-
-	CURRENT_VERSION=`curl ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"` || return $?
-
-	time ${BIN}/querySAS.pl -source SEED  1> ${1}/SEED.md52id2func2org || return $?
-	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/ProblemSets.${CURRENT_VERSION}/ ${1}' ftp://ftp.theseed.org" || return $?
-
+	CURRENT_VERSION=$(echo `date +"%Y%m%d"`) 
+	time ${BIN}/querySAS.pl --source=SEED  --output=${1}/SEED.md52id2func2org || return $?
 	echo ${CURRENT_VERSION} > ${1}/version.txt
-
 	#old:
 	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ ${1}' ftp://ftp.theseed.org"
 	#time lftp -c "open -e 'mirror -v --no-recursion -I subsystems2role.gz /subsystems/ ${1}' ftp://ftp.theseed.org"
 }
 
 
-function download_Subsystems {
+function download_Subsystems {  
 	time ${BIN}/querySAS.pl --source=Subsystems --output=${1}/Subsystems.subsystem2role2seq || return $?
 }
 
@@ -336,11 +325,12 @@ do
 		mkdir -m 775 ${SOURCE_DIR_PART}
 
 		echo "Downloading ${i} to ${SOURCE_DIR_PART}"
-
+    pushd ${SOURCE_DIR_PART}
 		set -x
 		# this is the function call. It will (should) stop the script if download fails.
 		download_${i} ${SOURCE_DIR_PART}
 		DOWNLOAD_RESULT=$?
+    popd
 		echo `date +"%Y%m%d"` > ${SOURCE_DIR_PART}/timestamp.txt
 		set +x
 		if [ ${DOWNLOAD_RESULT} -ne 0 ] ; then

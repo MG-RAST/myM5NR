@@ -6,8 +6,8 @@ Uniprot:
   type: Functional annotation
   download:
     - ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/{reldate.txt, uniprot_sprot.dat.gz, uniprot_trembl.dat.gz}
-  version: head -n1 reldate.txt | grep -o "[0-9]\{4\}_[0-9]*"
-  version_lastest: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | head -n1 | grep -o "[0-9]\{4\}_[0-9]*"
+  version_local: head -n1 reldate.txt | grep -o "[0-9]\{4\}_[0-9]*"
+  version_remote: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | head -n1 | grep -o "[0-9]\{4\}_[0-9]*"
 Swissprot:
   category: protein
   type: Functional annotation
