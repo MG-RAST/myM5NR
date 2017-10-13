@@ -29,7 +29,7 @@
 
 if [ $# -ne 1 ]
 then
-	echo "USAGE: download_ach_sources.sh <download dir> 2>&1 | tee logfile1.txt"
+	echo "USAGE: download_m5nr_sources.sh <download dir> 2>&1 | tee logfile1.txt"
 	echo "<download dir> will contain the individual source download directories"
 	exit 1
 fi
@@ -60,6 +60,47 @@ fi
 DOWNLOADS_EXIST=""
 DOWNLOADS_GOOD=""
 DOWNLOADS_BAD=""
+
+###########################################################
+# Check that our kit is ok: 
+if ! wget -h  > /dev/null 2>&1
+then
+echo ERROR:  Command wget not found in PATH.  Install wget to continue.
+DEPEND_FAIL=1
+fi
+
+if ! curl -h  > /dev/null 2>&1
+then
+echo ERROR:  Command curl not found in PATH.  Install curl to continue.
+DEPEND_FAIL=1
+fi
+
+if ! lftp -h  > /dev/null 2>&1
+then
+echo ERROR:  Command lftp not found in PATH.  Install lftp to continue.
+DEPEND_FAIL=1
+fi
+
+if ! perl -e 'use DB_File'  > /dev/null 2>&1
+then
+echo ERROR: Perl module DB_File, needed by SEED API not found.  
+echo        Try  perl -MCPAN -e 'install DB_File'  to install
+DEPEND_FAIL=1
+fi
+
+if ! perl -e 'use SeedEnv' > /dev/null  2>&1
+then
+echo ERROR: Perl SEED API distribution package not found.  Follow instructions at 
+echo       http://blog.theseed.org/servers/installation/distribution-of-the-seed-server-packages.html 
+echo       to install the SEED API perl package.
+DEPEND_FAIL=1
+fi
+
+if [[ "$DEPEND_FAIL" == "1" ]]
+then
+echo Aborting, some dependencies not met.
+exit 1
+fi
 
 
 ###########################################################
@@ -134,6 +175,7 @@ function download_IMG {
 }
 
 function download_InterPro {
+
 	DIR="${1}/"
 	export VERSION_REMOTE=`curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"`
 	echo "remote version: ${VERSION_REMOTE}"
@@ -149,8 +191,6 @@ function download_InterPro {
 
 	# write version
 	cat ${DIR}release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > ${DIR}version.txt
-
-
 }
 
 function download_KEGG {
@@ -226,9 +266,9 @@ function download_SEED {
 	CURRENT_VERSION=`curl ftp://ftp.theseed.org//SeedProjectionRepository/Releases/ | grep "\.current" | grep -o "[0-9]\{4\}\.[0-9]*"` || return $?
 
 	time ${BIN}/querySAS.pl -source SEED  1> ${1}/SEED.md52id2func2org || return $?
-	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/ProblemSets.${CURRENT_VERSION}/ ${1}' ftp://ftp.theseed.org" || return $?
+	time lftp -c "open -e 'mirror -v /SeedProjectionRepository/Releases/Psalmist's.${CURRENT_VERSION}/ ${1}' ftp://ftp.theseed.org" || return $?
 
-	echo ${CURRENT_VERSION} > ${1}/version.txt
+	echo ${CURRENT_VERSION} > ${1}/version.TNT
 
 	#old:
 	#time lftp -c "open -e 'mirror -v --no-recursion -I SEED.fasta /misc/Data/idmapping/ ${1}' ftp://ftp.theseed.org"
