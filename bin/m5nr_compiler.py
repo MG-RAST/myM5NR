@@ -6,7 +6,7 @@ import yaml
 import sys
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
-
+import os
 
 debug = 0
 
@@ -38,7 +38,7 @@ def execute_command(command):
     return fixed
 
 
-def download_source(source_name):
+def download_source(directory, source_name):
     print(source_name)
     
     
@@ -53,26 +53,41 @@ def download_source(source_name):
     
     
     
-    if 'version_remote' in source_obj:
-        
+    version_remote = 'NA'
+    if 'version_remote' in source_obj:    
         command  = source_obj['version_remote']
-        
-        result = execute_command(command)
-        
-        print("  remote version: %s" % result)
-        
-        
-    else:
-        print("  remote version: NA")
+        version_remote = execute_command(command)
+    
+    
+    if 'version_local' in source_obj:    
+        command  = source_obj['version_local']
+        version_local = execute_command(command)
+    
+    
+    
+    
+    
+    
+    print("  remote version: %s" % version_remote)
     
     
 
-def download_sources(sources):
+
+
+
+def download_sources(sources_dir , sources):
+    
+    current_dir = os.getcwd()
     
     for source in sources:
-        download_source(source)
+        
+        source_dir = os.path.join(sources_dir , source)
+        if not os.path.isdir(source_dir):
+            os.makedirs(source_dir)
+        os.chdir(source_dir)
+        download_source(source_dir, source)
 
-
+    os.chdir(current_dir)
 
 
 
@@ -87,7 +102,7 @@ if len(sys.argv) > 1:
         old_list=["SEED-Annotations", "SEED-Subsystems", "PATRIC", "InterPro","UniProt","RefSeq","GenBank","PhAnToMe","CAZy","KEGG","EggNOG","IMG","SILVA-SSU", "SILVA-SSU","Greengenes","RDP","FungiDB"] 
         # all = config_sources.keys()
         
-        download_sources(old_list)
+        download_sources(os.path.join(os.getcwd(), "sources"), old_list)
        
 
 else:
