@@ -21,7 +21,7 @@ TrEmble:
 PIR:
   category: protein
   type: Functional annotation
-Interpro:
+InterPro:
   category: protein
   type: Hierarchical functional annotation
   download:
