@@ -37,7 +37,7 @@ PFAM:
   download: 
       -null
       # comes from Uniprot
-Genbank:
+GenBank:
   category: protein
   type: Functional annotation
   download:
@@ -59,7 +59,11 @@ SEED-Annotations:
   homepage: http://www.theseed.org
   type: Functional annotation
   comment: <special downloader>
-Cazy:
+PATRIC:
+  category: protein
+  homepage: https://www.patricbrc.org/
+  type: Functional annotation
+CAZy:
   category: protein
   homepage: http://www.cazy.org
   type: Hierarchical functional annotation
@@ -78,7 +82,7 @@ COG:
     - null
 #    - ftp://ftp.ncbi.nih.gov/pub/COG/COG2014/data/ 
 #    obtained via Eggnog v4.5
-Kegg:
+KEGG:
   category: protein
   homepage: http://www.genome.jp/kegg/
   type: Hierarchical functional annotation
@@ -86,7 +90,7 @@ Kegg:
     - null
   # kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
   # EC hierarchy from elsewhere    
-NOG:
+EggNOG:
   category: protein
   type: Hierarchical functional annotation
   homepage: http://eggnogdb.embl.de
@@ -166,13 +170,13 @@ singlecopygenes:
   type: Filter set
   comment: From Will
 # rRNA
-Silva-LSU:
+SILVA-LSU:
   homepage: http://www.arb-silva.de
   category: rRNA
   type: SSU
   download: 
     - ftp://ftp.arb-silva.de/current/Exports/rast
-Silva-SSU:
+SILVA-SSU:
   homepage: http://www.arb-silva.de
   category: rRNA
   type: LSU
