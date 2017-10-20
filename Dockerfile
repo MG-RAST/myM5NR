@@ -17,11 +17,12 @@ RUN apt-get update && apt-get install -y \
   vim \
   curl \
   python3 \ 
-  python3-pip
+  python3-pip 
 
 
 RUN pip3 install --upgrade pip && pip3 install \
- tabulate
+  tabulate \
+  pyyaml
 
 
 # install the SEED environment for Subsystem data download
@@ -39,6 +40,7 @@ ENV PATH $PATH:/sas/bin
 COPY . /myM5NR
 ENV PATH $PATH:/root/bin
 
+WORKDIR /myM5NR
 
 # download_m5nr_sources.sh
 
