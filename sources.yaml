@@ -5,7 +5,7 @@ UniProt:
   category: protein
   type: Functional annotation
   download:
-    - ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/{reldate.txt, uniprot_sprot.dat.gz, uniprot_trembl.dat.gz}
+    - ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/{reldate.txt,uniprot_sprot.dat.gz,uniprot_trembl.dat.gz}
   version_local: head -n1 reldate.txt | grep -o "[0-9]\{4\}_[0-9]*"
   version_remote: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | head -n1 | grep -o "[0-9]\{4\}_[0-9]*"
 Swissprot:
@@ -26,6 +26,8 @@ InterPro:
   type: Hierarchical functional annotation
   download:
     - null
+  download_command_disabled: wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}
+  version_remote: curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
 #    - ftp://ftp.ebi.ac.uk/pub/databases/interpro/Current/
 IMG:
   category: protein
@@ -41,34 +43,37 @@ GenBank:
   category: protein
   type: Functional annotation
   download:
-    - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/*
+    - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
+  version_remote: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
 RefSeq:
   category: protein
   type: Functional annotation
   download:
     - ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.genomic.gbff.gz
+  version_remote: curl --silent ftp://ftp.ncbi.nih.gov//refseq/release/RELEASE_NUMBER
 SEED-Subsystems:
   category: protein
   type: Hierarchical functional annotation
   homepage: http://www.theseed.org
   download:
       - null
-  comment: <special downloader>
+  download_command: ${BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq 
 SEED-Annotations:
   category: protein
   homepage: http://www.theseed.org
   type: Functional annotation
-  comment: <special downloader>
+  download_command: ${BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org 
 PATRIC:
   category: protein
+  download: 
+    - http://brcdownloads.vbi.vt.edu/patric2/genomes/*.PATRIC.gbf
   homepage: https://www.patricbrc.org/
   type: Functional annotation
 CAZy:
   category: protein
   homepage: http://www.cazy.org
   type: Hierarchical functional annotation
-  download:
-    - www.cazy.org bin/get_cazy_table.pl
+  download-command: ${BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
 FungiDB:
   category: protein
   homepage: http://fungalgenomes.org
@@ -80,8 +85,7 @@ COG:
   type: Hierarchical functional annotation
   download:
     - null
-#    - ftp://ftp.ncbi.nih.gov/pub/COG/COG2014/data/ 
-#    obtained via Eggnog v4.5
+  comment: obtained via Eggnog v4.5 (was ftp://ftp.ncbi.nih.gov/pub/COG/COG2014/data/) 
 KEGG:
   category: protein
   homepage: http://www.genome.jp/kegg/
@@ -97,6 +101,7 @@ EggNOG:
   download:
     - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
   comment: https://github.com/jhcepas/eggnog-mapper/blob/master/eggnogmapper/common.py
+  comment2: wget http://eggnogdb.embl.de/download/eggnog_3.0/{fun.txt.gz,UniProtAC2eggNOG.3.0.tsv.gz,COG.funccat.txt.gz,NOG.funccat.txt.gz,COG.description.txt.gz,NOG.description.txt.gz,sequences.v3.tar.gz}
 CARD:
   category: protein
   homepage: https://card.mcmaster.ca
@@ -127,8 +132,15 @@ PhAnToMe:
   category: protein
   homepage: http://www.phantome.org
   type: Functional annotation
+  env: 
+    TIMESTAMP: curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"`
+  version_remote: date -d @${TIMESTAMP} +"%Y%m%d"
   download:
-    - http://www.phantome.org/Downloads/proteins/all_sequences/
+    - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.asta.gz
+    
+  comment: curl --silent "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
+    
+    
 goslim:
   category: protein
   homepage: http://www.geneontology.org
@@ -165,27 +177,41 @@ motuDB:
 #  type: Hierarchical functional annotation
 #  download: 
 #    - http://cbb.pnnl.gov/portal/software/FOAM.html
+
+MicrobesOnline:
+  category: protein
+  homepage: http://www.microbesonline.org
+  type: x??
+  comment: unclear what to download
+
 singlecopygenes:
   category: protein
   type: Filter set
   comment: From Will
+  
+  
 # rRNA
 SILVA-LSU:
   homepage: http://www.arb-silva.de
   category: rRNA
   type: SSU
+  version_remote: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
   download: 
-    - ftp://ftp.arb-silva.de/current/Exports/rast
+    - ftp://ftp.arb-silva.de/current/Exports/rast/*
+    - ftp://ftp.arb-silva.de/current/Exports/*
+
 SILVA-SSU:
   homepage: http://www.arb-silva.de
   category: rRNA
   type: LSU
+  version_remote: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
   download:
       - null
 Greengenes:
   homepage: http://greengenes.lbl.gov/
   category: rRNA
   type: SSU?
+  version_remote: date --date="$(curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]")" '+%Y-%m-%d'
   download: 
     - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
 FungiDB:
@@ -198,8 +224,8 @@ RDP:
   category: rRNA
   homepage: http://rdp.cme.msu.edu
   type: SSU
+  version_remote: curl --silent 'http://rdp.cme.msu.edu/download/releaseREADME.txt'
   download:
-    - http://rdp.cme.msu.edu/download/releaseREADME.txt'
     - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
     - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
     - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
