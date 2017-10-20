@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#
+# this is deprecated
+#
+
+echo "this is deprecated"
+exit 1
+
 # DOCUMENTATION
 #
 # This script will try to download all sources specified in SOURCES. For each source it will create a directory within the
@@ -113,12 +120,12 @@ set -x
 
 #### proteins
 
-function download_CAZy {
+function download_CAZy_deprecated {
 	${BIN}/get_cazy_table.pl ${1}/cazy_all_v042314.txt || return $?
 }
 
 
-function download_eggNOG {
+function download_eggNOGs_deprecated {
 	# version 4 available, but different format, thus we use old version for now.
 	echo "Using v3 not v4 yet"
 
@@ -150,25 +157,25 @@ function download_eggNOG {
 
 }
 
-function download_COGs {
+function download_COGs_depreacted {
 	time lftp -c "open -e 'mirror -v --no-recursion /pub/COG/COG2014/data/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
 }
 
-function download_FungiDB {
+function download_FungiDB_depreacted {
 	# use old version, does not seem to be updated anymore
 	echo "Please use archived version for FungiDB."
 	return 1
 	#wget -v -N -P ${1} 'http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz' || return $?
 }
 
-function download_IMG {
+function download_IMG_depreacted {
 	echo "Please use archived version for IMG."
 	#echo "ftp path is missing (copy archived version)"
 	#time lftp -c "open -e 'mirror -v --no-recursion -I img_core_v400.tar /pub/IMG/ ${1}' ftp://ftp.jgi-psf.org"
 	return 1
 }
 
-function download_InterPro {
+function download_InterPro_deprecated {
 
 	DIR="${1}/"
 	export VERSION_REMOTE=`curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"`
@@ -187,7 +194,7 @@ function download_InterPro {
 	cat ${DIR}release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*" > ${DIR}version.txt
 }
 
-function download_KEGG {
+function download_KEGG_deprecated {
 	echo KEGG is no longer available.
 	return 1
 	#time lftp -c "open -e 'mirror -v --no-recursion -I genome /pub/kegg/genes/ ${1}' ftp://ftp.genome.ad.jp"
@@ -196,31 +203,31 @@ function download_KEGG {
 	#time lftp -c "open -e 'mirror -v --parallel=2 -I *.keg /pub/kegg/brite/ko/ ${DOWNLOAD_DIR}/KO' ftp://ftp.genome.ad.jp"
 }
 
-function download_MO {
+function download_MO_deprecated {
 	# we are not using this MG right now.
 	# issue with recursive wget and links on page, this hack works
 	for i in `seq 1 907348`; do wget -N -P ${1} http://www.microbesonline.org/genbank/${i}.gbk.gz 2> /dev/null; done
 	wget -v -N -P ${1} http://www.microbesonline.org/genbank/10000550.gbk.gz
 }
 
-function download_GenBankNR {
+function download_GenBankNR_deprecated {
 	time lftp -c "open -e 'mirror -v -e --no-recursion -I nr.gz /blast/db/FASTA/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
 	stat -c '%y' ${1}/nr.gz | cut -c 1-4,6,7,9,10 > ${1}/version.txt
 }
 
-function download_PATRIC {
+function download_PATRIC_deprecated {
 	time lftp -c "open -e 'mirror -v --parallel=2 -I *.PATRIC.gbf /patric2/genomes/ ${1}' http://brcdownloads.vbi.vt.edu" || return $?
 	# use one of the directories time stamp
 	stat -c '%y' ${1}/1000561.3 | cut -c 1-4,6,7,9,10 > ${1}/version.txt
 }
 
 
-function version_Phantome {
+function version_Phantome_deprecated {
 	export TIMESTAMP=`curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o phage_proteins_[0-9]*.fasta.gz | sort | tail -n 1 | grep -o "[0-9]*"` || return $?
 	export VERSION=`date -d @${TIMESTAMP} +"%Y%m%d"`
 }
 
-function download_Phantome {
+function download_Phantome_deprecated {
 	
 	version_Phantome
 
@@ -246,7 +253,7 @@ function download_Phantome {
 	
 }
 
-function download_RefSeq {
+function download_RefSeq_deprecated {
 	time lftp -c "open -e 'mirror -v -e --delete-first -I RELEASE_NUMBER /refseq/release/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I *.genomic.gbff.gz /refseq/release/complete/ ${1}' ftp://ftp.ncbi.nih.gov" || return $?
 	cp ${1}/RELEASE_NUMBER ${1}/version.txt
@@ -254,7 +261,7 @@ function download_RefSeq {
 
 
 
-function download_SEED {
+function download_SEED_deprecated {
 
 	CURRENT_VERSION=$(echo `date +"%Y%m%d"`) 
 	time ${BIN}/querySAS.pl --source=SEED  --output=${1}/SEED.md52id2func2org || return $?
@@ -265,11 +272,11 @@ function download_SEED {
 }
 
 
-function download_Subsystems {  
+function download_Subsystems_deprecated {  
 	time ${BIN}/querySAS.pl --source=Subsystems --output=${1}/Subsystems.subsystem2role2seq || return $?
 }
 
-function download_UniProt {
+function download_UniProt_deprecated {
 	time lftp -c "open -e 'mirror -v -e --delete-first -I reldate.txt  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_sprot.dat.gz  /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
 	time lftp -c "open -e 'mirror -v -e --delete-first -I uniprot_trembl.dat.gz /pub/databases/uniprot/current_release/knowledgebase/complete/ ${1}' ftp.uniprot.org" || return $?
@@ -279,14 +286,14 @@ function download_UniProt {
 
 #### RNA
 
-function download_SILVA {
+function download_SILVA_deprecated {
 	time lftp -c "open -e 'mirror -v --no-recursion --dereference /current/Exports/ ${1}' ftp://ftp.arb-silva.de" || return $?
 	mkdir -p ${1}/rast
 	time lftp -c "open -e 'mirror -v --no-recursion /current/Exports/rast ${1}/rast' ftp://ftp.arb-silva.de" || return $?
 	head -n1 ${1}/README.txt  | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2 > ${1}/version.txt
 }
 
-function download_RDP {
+function download_RDP_deprecated {
 
 	# version number
 	curl --silent 'http://rdp.cme.msu.edu/download/releaseREADME.txt' > version.txt || return $?
@@ -298,7 +305,7 @@ function download_RDP {
 			
 }
 
-function download_Greengenes {
+function download_Greengenes_deprecated {
 	# from 2011 ?
 
 	curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]" > version.txt || return $?
