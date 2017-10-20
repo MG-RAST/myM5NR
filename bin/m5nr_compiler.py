@@ -70,7 +70,7 @@ def download_source(directory, source_name):
     
     print("  remote version: %s" % version_remote)
     
-    
+    return 1
 
 
 
@@ -79,13 +79,31 @@ def download_sources(sources_dir , sources):
     
     current_dir = os.getcwd()
     
+    do_stop = 0
     for source in sources:
-        
+        source_dir_part = os.path.join(sources_dir , source+"_part")
+        if os.path.isdir(source_dir_part):
+            do_stop = 1
+            print("delete directory first: %s" % source_dir_part)
+            
+    if do_stop:
+        sys.exit(1)
+    
+    for source in sources:
+        source_dir_part = os.path.join(sources_dir , source+"_part")
         source_dir = os.path.join(sources_dir , source)
-        if not os.path.isdir(source_dir):
-            os.makedirs(source_dir)
-        os.chdir(source_dir)
-        download_source(source_dir, source)
+        
+        
+        if os.path.isdir(source_dir):
+            print("directory exists, skip it. (%s)" % source_dir)
+            continue
+        else:
+            os.makedirs(source_dir_part)
+            
+        os.chdir(source_dir_part)
+        success = download_source(source_dir_part, source)
+        if success:
+            os.rename(source_dir_part, source_dir)
 
     os.chdir(current_dir)
 
@@ -99,7 +117,7 @@ def usage():
 if len(sys.argv) > 1:
     if sys.argv[1] == "download":
         
-        old_list=["SEED-Annotations", "SEED-Subsystems", "PATRIC", "InterPro","UniProt","RefSeq","GenBank","PhAnToMe","CAZy","KEGG","EggNOG","IMG","SILVA-SSU", "SILVA-SSU","Greengenes","RDP","FungiDB"] 
+        old_list=["SEED-Annotations", "SEED-Subsystems", "PATRIC", "InterPro","UniProt","RefSeq","GenBank","PhAnToMe","CAZy","KEGG","EggNOG","IMG","SILVA-SSU", "SILVA-LSU","Greengenes","RDP","FungiDB"] 
         # all = config_sources.keys()
         
         download_sources(os.path.join(os.getcwd(), "sources"), old_list)
