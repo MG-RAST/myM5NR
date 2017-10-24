@@ -8,7 +8,7 @@ import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import os
 
-debug = 0
+debug = 1
 
 config_stream = open("../sources.yaml", "r")
 config_sources = yaml.load(config_stream)
@@ -26,11 +26,19 @@ print()
 
 
 
-def execute_command(command):
+def execute_command(command, env):
     if debug:
-       print(command)
+       print("exec: %s" % (command))
     
-    process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True)
+    if env:
+        #for key in env:
+        #    print("using environment: %s=%s" % (key, env[key]))
+            
+        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, env=env)
+    else:
+        #print("no special environment")
+        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True)
+        
     output = process.stdout.read()
     fixed = output.decode("utf-8").rstrip()
     if debug:
@@ -51,19 +59,36 @@ def download_source(directory, source_name):
     if debug:
         print(source_obj)
     
+    new_environment = None
+    if 'env' in source_obj:
+        new_environment = os.environ.copy()
+        env_obj = source_obj['env']
+        for key in env_obj:
+            value = env_obj[key]
+            value_evaluated  = execute_command(value, None)
+            new_environment[key]=value_evaluated
+            #print("%s=%s" % (key , value_evaluated))
+            
+        
+    
     
     
     version_remote = 'NA'
     if 'version_remote' in source_obj:    
         command  = source_obj['version_remote']
-        version_remote = execute_command(command)
+        version_remote = execute_command(command, new_environment)
     
     
     if 'version_local' in source_obj:    
         command  = source_obj['version_local']
-        version_local = execute_command(command)
+        version_local = execute_command(command, new_environment)
     
-    
+    if 'download' in source_obj:    
+        download_array  = source_obj['download']
+        for url in download_array:
+            if not url:
+                continue
+            blubb = execute_command("curl -O "+url, new_environment)
     
     
     
