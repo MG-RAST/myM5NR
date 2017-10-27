@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+
 # uniprot2many --  convert Uniprot flat files into as many MD5nr input files as possible
 # no parameters, expects to be run from directory with *.dat files.
 # all files created are two colum tables
@@ -15,6 +16,7 @@ use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 use strict;
 
+# the main trick is to read the document record by record
 $/='//';
 
 open my $fh1, '<', 'sprot_short.dat' or die;
@@ -67,9 +69,10 @@ my $cazy=''; my $ec=''; my $eggnog='';my $tax='';
     }
 
 # needs to push ids into an array
-     if  ($line =~ /^DR\W+CAZy;\W+(\w+);/) {
+  #  if  ($line =~ /^DR\W+CAZy;\W+(\w+);/) {
+     if  ($line =~ /^DR\W+CAZy;\W+\w+;(.*)./) {
              $cazy=$1;
-            print "CAZy: $cazy\n";
+      #      print "CAZy: $cazy\n";
         next;
     }
 
@@ -121,6 +124,7 @@ my $cazy=''; my $ec=''; my $eggnog='';my $tax='';
         next;
     }
 
+
 # parse sequence, generate md5 and write outfiles 
     if  ($line =~ /^SQ/) {
 
@@ -168,6 +172,10 @@ my $cazy=''; my $ec=''; my $eggnog='';my $tax='';
 	if ( $go ne "") {
           print $md5go "$md5s\t$go\n";
 	}
+	if ( $cazy ne "" ) {
+	  print $md5cazy "$md5s\t$cazy\n";
+	}
+  
 	next
     }
       # reset EOL
@@ -222,10 +230,19 @@ my $cazy=''; my $ec=''; my $eggnog=''; my $tax='';
         next;
     }
 
+
+#    DR   CAZy; GT4; Glycosyltransferase Family 4.
+#    DE   SubName: Full=CAZy families CE14 protein {ECO:0000313|EMBL:AIA83773.1};
+
+   # if  ($line =~ /^DR\W+CAZy;\W+(\w+);/) {
     if  ($line =~ /^DR\W+CAZy;\W+(\w+);/) {
         $cazy=$1;
         next;
     }
+    if  ($line =~ /^DE\W+SubName:\W+Full=CAZy\W+families\W+(\w+)/) {
+         $cazy=$1;
+         next;
+     }
 
 # needs to push ids into an array
     if  ($line =~ /^DR\W+Pfam;\W+PF(\w+)/) {
