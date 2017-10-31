@@ -7,10 +7,17 @@ import sys
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import os
+from tabulate import tabulate
+
 
 debug = 1
+simulate = 1
 
-config_stream = open("../sources.yaml", "r")
+
+script_location = os.path.dirname(os.path.realpath(__file__))
+
+config_path = os.path.normpath(os.path.join(script_location, "..", "sources.yaml"))
+config_stream = open(config_path, "r")
 config_sources = yaml.load(config_stream)
 
 
@@ -24,7 +31,10 @@ print()
 print("------------------------")
 print()
 
-
+class MyException(Exception):
+    pass
+    
+    
 
 def execute_command(command, env):
     if debug:
@@ -43,12 +53,17 @@ def execute_command(command, env):
     fixed = output.decode("utf-8").rstrip()
     if debug:
         print(fixed)
+        
+    if process.returncode:
+        raise MyException("Command failed (return code %d): %s" % (process.returncode, command))    
+        
     return fixed
 
 
 def download_source(directory, source_name):
+    print("\n")
     print(source_name)
-    
+    print("---------------------")
     
     if not source_name in config_sources:
         print("Error %s not found in config" % source_name)
@@ -56,8 +71,17 @@ def download_source(directory, source_name):
     
     source_obj = config_sources[source_name]
     
+    if "skip" in source_obj:
+        if source_obj["skip"]:
+            print("skip")
+            return "skipped"
+    
+    
     if debug:
         print(source_obj)
+    
+    
+    
     
     new_environment = None
     if 'env' in source_obj:
@@ -65,7 +89,11 @@ def download_source(directory, source_name):
         env_obj = source_obj['env']
         for key in env_obj:
             value = env_obj[key]
-            value_evaluated  = execute_command(value, None)
+            try:
+                value_evaluated  = execute_command(value, None)
+            except Exception as e:
+                print("command failed: %s" % (str(e)) , file=sys.stderr)
+                sys.exit(1)
             new_environment[key]=value_evaluated
             #print("%s=%s" % (key , value_evaluated))
             
@@ -74,28 +102,39 @@ def download_source(directory, source_name):
     
     
     version_remote = 'NA'
-    if 'version_remote' in source_obj:    
-        command  = source_obj['version_remote']
-        version_remote = execute_command(command, new_environment)
+    if not 'version' in source_obj: 
+        raise MyException("version is missing")
+        
+    command  = source_obj['version']
+    try:
+        version = execute_command(command, new_environment)
+    except Exception as e:
+        print("command failed: %s" % (e) , file=sys.stderr)
+        sys.exit(1)
     
+    print("remote version: %s" % version)
     
-    if 'version_local' in source_obj:    
-        command  = source_obj['version_local']
-        version_local = execute_command(command, new_environment)
+    #if 'version_local' in source_obj:    
+    #    command  = source_obj['version_local']
+    #    version_local = execute_command(command, new_environment)
     
     if 'download' in source_obj:    
         download_array  = source_obj['download']
         for url in download_array:
             if not url:
                 continue
+            if simulate:
+                print("SIMULATION MODE: curl -O "+url)
+                continue
             blubb = execute_command("curl -O "+url, new_environment)
+            
+    
+    if version != "":
+        with open('version.txt', 'wt') as f:
+            f.write(version)
     
     
-    
-    
-    print("  remote version: %s" % version_remote)
-    
-    return 1
+    return version
 
 
 
@@ -103,6 +142,9 @@ def download_source(directory, source_name):
 def download_sources(sources_dir , sources):
     
     current_dir = os.getcwd()
+    
+    summary = {}
+    
     
     do_stop = 0
     for source in sources:
@@ -115,24 +157,47 @@ def download_sources(sources_dir , sources):
         sys.exit(1)
     
     for source in sources:
+        success = True
+        version="undef"
         source_dir_part = os.path.join(sources_dir , source+"_part")
         source_dir = os.path.join(sources_dir , source)
         
         
         if os.path.isdir(source_dir):
             print("directory exists, skip it. (%s)" % source_dir)
-            continue
+            version_file = os.path.join(source_dir, "version.txt")
+            with open(version_file) as x: 
+                version = x.read()
+            
+            success = True
         else:
             os.makedirs(source_dir_part)
             
-        os.chdir(source_dir_part)
-        success = download_source(source_dir_part, source)
+            os.chdir(source_dir_part)
+            print("call download_source")
+            try:
+                version = download_source(source_dir_part, source)
+            except Exception as e:
+                print("download failed: %s" % (str(e)) , file=sys.stderr)
+                success = False
+       
+        summary[source]=[version, success]
         if success:
+            print("download success: %s" % (version))
             os.rename(source_dir_part, source_dir)
-
+        
+            
+            
     os.chdir(current_dir)
+    
+    summary_table = []
+    for key, value in summary.items(): 
+        
+        
+        summary_table.append([key]+value)
 
-
+    
+    print(tabulate(summary_table, headers=['Database', 'Version', 'Success']))
 
 def usage():
     print("usage... TODO")
@@ -142,10 +207,10 @@ def usage():
 if len(sys.argv) > 1:
     if sys.argv[1] == "download":
         
-        old_list=["SEED-Annotations", "SEED-Subsystems", "PATRIC", "InterPro","UniProt","RefSeq","GenBank","PhAnToMe","CAZy","KEGG","EggNOG","IMG","SILVA-SSU", "SILVA-LSU","Greengenes","RDP","FungiDB"] 
-        # all = config_sources.keys()
+        #old_list=["SEED-Annotations", "SEED-Subsystems", "PATRIC", "InterPro","UniProt","RefSeq","GenBank","PhAnToMe","CAZy","KEGG","EggNOG","IMG","SILVA-SSU", "SILVA-LSU","Greengenes","RDP","FungiDB"] 
+        all_source = config_sources.keys()
         
-        download_sources(os.path.join(os.getcwd(), "sources"), old_list)
+        download_sources(os.path.join(os.getcwd(), "sources"), all_source)
        
 
 else:
