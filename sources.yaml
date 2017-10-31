@@ -94,8 +94,8 @@ KEGG:
   type: Hierarchical functional annotation
   download: 
     - null
-   comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
-   comment2: EC hierarchy from elsewhere    
+  comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
+  comment2: EC hierarchy from elsewhere    
 EggNOG:
   category: protein
   type: Hierarchical functional annotation
