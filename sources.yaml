@@ -130,6 +130,7 @@ ARDB:
   category: protein
   homepage: https://ardb.cbcb.umd.edu/
   type: Functional annotation
+  version: curl --silent "https://ardb.cbcb.umd.edu/" | grep  "Version:" | grep -o "[0-9]*\.[0-9]*"
   download:
     - ftp://ftp.cbcb.umd.edu/pub/data/ARDB/ARDBflatFiles.tar.gz
 PhAnToMe:
