@@ -6,8 +6,7 @@ UniProt:
   type: Functional annotation
   download:
     - ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/{reldate.txt,uniprot_sprot.dat.gz,uniprot_trembl.dat.gz}
-  version_local: head -n1 reldate.txt | grep -o "[0-9]\{4\}_[0-9]*"
-  version_remote: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | head -n1 | grep -o "[0-9]\{4\}_[0-9]*"
+  version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | head -n1 | grep -o "[0-9]\{4\}_[0-9]*"
 Swissprot:
   category: protein
   type: Functional annotation
@@ -27,7 +26,7 @@ InterPro:
   download:
     - null
   download_command_disabled: wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}
-  version_remote: curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
+  version: curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
 #    - ftp://ftp.ebi.ac.uk/pub/databases/interpro/Current/
 IMG:
   category: protein
@@ -44,13 +43,13 @@ GenBank:
   type: Functional annotation
   download:
     - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
-  version_remote: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
+  version: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
 RefSeq:
   category: protein
   type: Functional annotation
   download:
     - ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.genomic.gbff.gz
-  version_remote: curl --silent ftp://ftp.ncbi.nih.gov//refseq/release/RELEASE_NUMBER
+  version: curl --silent ftp://ftp.ncbi.nih.gov//refseq/release/RELEASE_NUMBER
 SEED-Subsystems:
   category: protein
   type: Hierarchical functional annotation
@@ -134,7 +133,7 @@ PhAnToMe:
   type: Functional annotation
   env: 
     TIMESTAMP: curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
-  version_remote: date -d @${TIMESTAMP} +"%Y%m%d"
+  version: date -d @${TIMESTAMP} +"%Y%m%d"
   download:
     - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.asta.gz
     
@@ -195,7 +194,7 @@ SILVA-LSU:
   homepage: http://www.arb-silva.de
   category: rRNA
   type: SSU
-  version_remote: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
+  version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
   download: 
     - ftp://ftp.arb-silva.de/current/Exports/rast/*
     - ftp://ftp.arb-silva.de/current/Exports/*
@@ -204,27 +203,30 @@ SILVA-SSU:
   homepage: http://www.arb-silva.de
   category: rRNA
   type: LSU
-  version_remote: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
+  version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
   download:
       - null
 Greengenes:
   homepage: http://greengenes.lbl.gov/
   category: rRNA
   type: SSU?
-  version_remote: date --date="$(curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]")" '+%Y-%m-%d'
+  version: date --date="$(curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]")" '+%Y-%m-%d'
   download: 
     - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
 FungiDB:
+  skip: true
   category: rRNA
   homepage: http://fungalgenomes.org/
   type: ITS
+  version: curl --silent http://fungidb.org/common/downloads/Current_Release/Build_number
   download: 
     - http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz
+  comment: new version? http://fungidb.org/common/downloads/Current_Release/, where get proteins ?
 RDP:
   category: rRNA
   homepage: http://rdp.cme.msu.edu
   type: SSU
-  version_remote: curl --silent 'http://rdp.cme.msu.edu/download/releaseREADME.txt'
+  version: curl --silent 'http://rdp.cme.msu.edu/download/releaseREADME.txt'
   download:
     - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
     - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
