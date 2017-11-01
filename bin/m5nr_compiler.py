@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE, STDOUT
 import os
 from tabulate import tabulate
 import argparse
-
+import shutil
 
 script_location = os.path.dirname(os.path.realpath(__file__))
 
@@ -183,7 +183,8 @@ def download_sources(sources_dir , sources):
             print("delete directory first: %s" % source_dir_part)
             
     if do_stop:
-        sys.exit(1)
+        if not args.force
+            sys.exit(1)
     
     for source in sources:
         success = False
@@ -204,6 +205,11 @@ def download_sources(sources_dir , sources):
             
             success = True
         else:
+            
+            if args.force:
+                if os.path.isdir(source_dir_part):
+                    shutil.rmtree(source_dir_part) 
+            
             os.makedirs(source_dir_part)
             
             os.chdir(source_dir_part)
