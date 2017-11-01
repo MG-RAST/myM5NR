@@ -183,7 +183,7 @@ def download_sources(sources_dir , sources):
             print("delete directory first: %s" % source_dir_part)
             
     if do_stop:
-        if not args.force
+        if not args.force:
             sys.exit(1)
     
     for source in sources:
@@ -255,16 +255,16 @@ parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers(title='subcommands', help='sub-command help', dest='commands')
 
 
-parser.add_argument('--debug', action='store_true')
-#parser.add_argument("-d", ...)
+parser.add_argument('--debug', '-d', action='store_true')
+
 
 download_parser = subparsers.add_parser("download")
 status_parser = subparsers.add_parser("status")
 #b_parser = subparsers.add_parser("help")
 
-download_parser.add_argument('--force', action='store_true')
-download_parser.add_argument('--debug', action='store_true')
-status_parser.add_argument('--debug', action='store_true')
+download_parser.add_argument('--force', '-f', action='store_true')
+download_parser.add_argument('--debug', '-d', action='store_true')
+status_parser.add_argument('--debug', '-d', action='store_true')
 
 download_parser.add_argument('--simulate', action='store_true')
 
