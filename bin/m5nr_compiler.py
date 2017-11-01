@@ -256,7 +256,7 @@ download_parser = subparsers.add_parser("download")
 status_parser = subparsers.add_parser("status")
 #b_parser = subparsers.add_parser("help")
 
-download_parser.add_argument(('-f','--force'), action='store_true')
+download_parser.add_argument('--force', action='store_true')
 download_parser.add_argument('--debug', action='store_true')
 status_parser.add_argument('--debug', action='store_true')
 
@@ -267,12 +267,14 @@ download_parser.add_argument('--simulate', action='store_true')
 #args = parser.parse_args()
 try:
     args = parser.parse_args()
-except:
+except Exception as e:
+    print("Error: %s" % (str(e)))
     parser.print_help()
     sys.exit(0)
 
 
 if not args.commands:
+    print("No command provided")
     parser.print_help()
     sys.exit(0)
 
