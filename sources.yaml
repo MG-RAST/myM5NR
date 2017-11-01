@@ -26,8 +26,7 @@ PIR:
 InterPro:
   category: protein
   type: Hierarchical functional annotation
-  download:
-    - null
+  download: null
   download_command_disabled: wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}
   version: curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
 #    - ftp://ftp.ebi.ac.uk/pub/databases/interpro/Current/
@@ -38,8 +37,7 @@ IMG:
     - ftp://ftp.jgi-psf.org/pub/IMG/img_core_v400.tar 
 PFAM:
   type: Hierarchical functional annotation?
-  download: 
-      -null
+  download: null
       # comes from Uniprot
 GenBank:
   category: protein
@@ -57,8 +55,7 @@ SEED-Subsystems:
   category: protein
   type: Hierarchical functional annotation
   homepage: http://www.theseed.org
-  download:
-      - null
+  download: null
   download_command: ${BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq 
 SEED-Annotations:
   category: protein
@@ -85,8 +82,7 @@ FungiDB:
 COG:
   category: protein
   type: Hierarchical functional annotation
-  download:
-    - null
+  download: null
   comment: obtained via Eggnog v4.5 (was ftp://ftp.ncbi.nih.gov/pub/COG/COG2014/data/) 
 KEGG:
   category: protein
@@ -100,6 +96,7 @@ EggNOG:
   category: protein
   type: Hierarchical functional annotation
   homepage: http://eggnogdb.embl.de
+  version: curl --silent "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
   download:
     - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
   comment: https://github.com/jhcepas/eggnog-mapper/blob/master/eggnogmapper/common.py
@@ -108,6 +105,7 @@ CARD:
   category: protein
   homepage: https://card.mcmaster.ca
   type: Functional annotation
+  version: curl --silent "https://card.mcmaster.ca/download" | grep ">CARD<" | grep -o ">[0-9][0-9\.]*<" | head -n1 |  grep -o "[0-9\.]*"
   download:
     - https://card.mcmaster.ca/latest/data
   comment: double-check copyright conditions
@@ -150,8 +148,10 @@ goslim:
   category: protein
   homepage: http://www.geneontology.org
   type: Hierarchical functional annotation
+  version: curl --silent "http://archive.geneontology.org/full/DATESTAMP"
   download:
     - http://www.geneontology.org/ontology/subsets/goslim_metagenomics.obo
+  comment: version might be unrelated to goslim_metagenomics.obo?
 #bactNOG:
  # category: protein
 #  type: Hierarchical functional annotation
@@ -164,6 +164,7 @@ HITdb:
   category: protein
   homepage: https://github.com/microbiome/HITdb.git
   type: Functional annotation
+  version curl --silent "https://raw.githubusercontent.com/microbiome/HITdb/master/README.md" | grep -A 100 "Version history" | grep "^v." | head -n 1 | cut -d ',' -f 1 | cut -d ' ' -f 2
   download:
       - https://github.com/microbiome/HITdb/archive/master.zip
   comment: reduced 16s db for human microbiome
@@ -187,7 +188,7 @@ MicrobesOnline:
   category: protein
   homepage: http://www.microbesonline.org
   type: x??
-  comment: unclear what to download
+  comment: unclear what to download, use http://www.microbesonline.org/programmers.html
 
 singlecopygenes:
   category: protein
@@ -210,8 +211,7 @@ SILVA-SSU:
   category: rRNA
   type: LSU
   version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
-  download:
-      - null
+  download: null
 Greengenes:
   homepage: http://greengenes.lbl.gov/
   category: rRNA
@@ -241,8 +241,9 @@ MITOZOA:
   category: rRNA
   homepage: http://srv00.recas.ba.infn.it/mitozoa
   type: mtRNA
+  version: curl --silent "http://srv00.recas.ba.infn.it/mitozoa/ftp_download.php" | grep -o "Rel. [0-9\.]*" | tail -n 1 | cut -d ' ' -f 2
   download:
-    - http://srv00.recas.ba.infn.it/mitozoa/ftp/dbMZ_v10.0.zip
+    - http://srv00.recas.ba.infn.it/mitozoa/ftp/dbMZ_v${VERSION}.zip
 
 
 
