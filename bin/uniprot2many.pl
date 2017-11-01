@@ -15,16 +15,22 @@
 use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 use strict;
+use IO::Compress::Gzip qw(gzip $GzipError) ;
+use IO::File ;
+
 
 # the main trick is to read the document record by record
 $/='//';
 
-open my $fh1, '<', 'sprot_short.dat' or die;
+#open my $fh1, '<', 'sprot_short.dat' or die;
 #open my $fh1, '<', 'uniprot_sprot.dat' or die;
 
+my $fh1 = new IO::File "<uniprot_sprot.dat.gz"
+       or die "Cannot open 'uniprot_sprot.dat.gz': $!\n" ;
+
 open(my $md5uniprot, '>', 'md52id_uni.txt') or die ;
-open(my $uni2func, '>', 'uni2func.txt') or die ;
-open(my $md5uni_func, '>', 'md52func_uni.txt') or die ;
+open(my $uni2func, '>', 'id2func_uniprot.txt') or die ;
+open(my $md5uni_func, '>', 'md52func_uniprot.txt') or die ;
 open(my $md5seq, '>', 'md52seq_uniprot.txt') or die ;
 open(my $md5go, '>', 'md52id_go.txt') or die ;
 open(my $md5ipr, '>', 'md52id_ipr.txt') or die ;
@@ -186,11 +192,17 @@ my $cazy=''; my $ec=''; my $eggnog='';my $tax='';
 
 close ($fh1);
 
-
-print "Sprot done, moving on to TREMBL\n";
+####################################################
+####################################################
+####################################################
+#print "Sprot done, moving on to TREMBL\n";
 
 #open my $fh2, '<', 'uniprot_trembl.dat' or die;
-open my $fh2, '<', 'trembl_short.dat' or die;
+#open my $fh2, '<', 'trembl_short.dat' or die;
+
+my $fh2 = new IO::File "<uuniprot_trembl.dat.gz"
+       or die "Cannot open 'uniprot_trembl.dat.gz': $!\n" ;
+
 $/="\n//";  
 
 # now almost the same procedure for trembl
@@ -270,21 +282,21 @@ my $cazy=''; my $ec=''; my $eggnog=''; my $tax='';
         next;
     }
 
-# needs to push ids into an array
+  # needs to push ids into an array
     if  ($line =~ /^DR\W+GO;\W+GO:(\w+)/) {
 	$go=$1;
 	#print "GO:$go\n";
         next;
     }
 
-# parse sequence, generate md5 and write outfiles 
-    if  ($line =~ /^SQ/) {
+  # parse sequence, generate md5 and write outfiles 
+  if  ($line =~ /^SQ/) {
 
 	my @lines = split ('SQ ', $record);
-#	print Dumper(@lines);
-        my $sequence = @lines[1];
-
-
+  #	print Dumper(@lines);
+  # split the record at the correct position to catch the sequences
+  my $sequence = @lines[1];
+  # join lines, remove the first list as well as the record separator 
 	$sequence =~ s/^(.*\n)//;
 	$sequence =~ tr / \n\/\///ds;
 	
@@ -342,6 +354,7 @@ my $cazy=''; my $ec=''; my $eggnog=''; my $tax='';
 
 
 # be nice and close file handles
+close($fh2);
 close ($md5uniprot);
 close($md5go);
 close($md5ipr);
