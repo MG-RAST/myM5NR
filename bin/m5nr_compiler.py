@@ -295,7 +295,7 @@ if args.debug:
 all_source = config_sources.keys()
 sources = all_source # TODO make this an option
 
-sources_directory = os.path.join(os.getcwd(), "sources")
+sources_directory = os.getcwd() #os.path.join(os.getcwd(), "sources")
 
 if args.commands == "download":
     
