@@ -8,10 +8,10 @@ import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import os
 from tabulate import tabulate
+import argparse
 
-
-debug = 1
-simulate = 1
+#debug = False
+simulate = False
 
 
 script_location = os.path.dirname(os.path.realpath(__file__))
@@ -20,16 +20,8 @@ config_path = os.path.normpath(os.path.join(script_location, "..", "sources.yaml
 config_stream = open(config_path, "r")
 config_sources = yaml.load(config_stream)
 
+args = None
 
-if debug:
-    for source in config_sources:
-        print("\nsource: %s" % source)
-        print(config_sources[source])
-
-
-print()
-print("------------------------")
-print()
 
 class MyException(Exception):
     pass
@@ -37,7 +29,7 @@ class MyException(Exception):
     
 
 def execute_command(command, env):
-    if debug:
+    if args.debug:
        print("exec: %s" % (command))
     
     if env:
@@ -51,7 +43,7 @@ def execute_command(command, env):
         
     output = process.stdout.read()
     fixed = output.decode("utf-8").rstrip()
-    if debug:
+    if args.debug:
         print(fixed)
         
     if process.returncode:
@@ -59,6 +51,22 @@ def execute_command(command, env):
         
     return fixed
 
+
+def create_environment(source_obj):
+   
+    new_environment = os.environ.copy()
+    if 'env' in source_obj:
+        env_obj = source_obj['env']
+        for key in env_obj:
+            value = env_obj[key]
+            try:
+                value_evaluated  = execute_command(value, None)
+            except Exception as e:
+                print("command failed: %s" % (str(e)) , file=sys.stderr)
+                sys.exit(1)
+            new_environment[key]=value_evaluated
+        
+    return new_environment
 
 def download_source(directory, source_name):
     print("\n")
@@ -77,40 +85,30 @@ def download_source(directory, source_name):
             return "skipped"
     
     
-    if debug:
+    if args.debug:
         print(source_obj)
     
     
     
     
-    new_environment = None
-    if 'env' in source_obj:
-        new_environment = os.environ.copy()
-        env_obj = source_obj['env']
-        for key in env_obj:
-            value = env_obj[key]
-            try:
-                value_evaluated  = execute_command(value, None)
-            except Exception as e:
-                print("command failed: %s" % (str(e)) , file=sys.stderr)
-                sys.exit(1)
-            new_environment[key]=value_evaluated
-            #print("%s=%s" % (key , value_evaluated))
-            
-        
-    
+    try:
+        new_environment = create_environment(source_obj)
+    except Exception as e:
+        print("create_environment failed: %s" % (e) , file=sys.stderr)
+        raise e
     
     
     version_remote = 'NA'
-    if not 'version' in source_obj: 
+    if not 'VERSION_STRING' in source_obj: 
         raise MyException("version is missing")
         
-    command  = source_obj['version']
-    try:
-        version = execute_command(command, new_environment)
-    except Exception as e:
-        print("command failed: %s" % (e) , file=sys.stderr)
-        sys.exit(1)
+    version = source_obj['VERSION_STRING']
+    
+    # add VERSION to environment, often needed for download
+    new_environment['VERSION'] = version
+
+        
+    
     
     if version == "":
         raise MyException("version is empty")
@@ -142,6 +140,34 @@ def download_source(directory, source_name):
     return version
 
 
+def get_remote_versions(sources):
+
+    for source_name in sources:
+        
+        source_obj = config_sources[source_name]
+        
+        version_remote = 'NA'
+        if not 'version' in source_obj: 
+            continue
+        
+        try:
+            new_environment = create_environment(source_obj)
+        except Exception as e:
+            print("create_environment failed: %s" % (e) , file=sys.stderr)
+            raise e
+        
+        command  = source_obj['version']
+        try:
+            version = execute_command(command, new_environment)
+        except Exception as e:
+            print("command failed: %s" % (e) , file=sys.stderr)
+            sys.exit(1)
+            continue
+          
+        config_sources[source_name]["VERSION_STRING"] = version
+            
+    return
+
 
 
 def download_sources(sources_dir , sources):
@@ -150,6 +176,7 @@ def download_sources(sources_dir , sources):
     
     summary = {}
     
+    get_remote_versions(sources)
     
     do_stop = 0
     for source in sources:
@@ -164,7 +191,9 @@ def download_sources(sources_dir , sources):
     for source in sources:
         success = False
         success_after_download = False
-        version="undef"
+        remote_version="undef"
+        current_version=""
+        
         source_dir_part = os.path.join(sources_dir , source+"_part")
         source_dir = os.path.join(sources_dir , source)
         
@@ -174,7 +203,7 @@ def download_sources(sources_dir , sources):
             print("directory exists, skip it. (%s)" % source_dir)
             version_file = os.path.join(source_dir, "version.txt")
             with open(version_file) as x: 
-                version = x.read()
+                current_version = x.read()
             
             success = True
         else:
@@ -183,7 +212,7 @@ def download_sources(sources_dir , sources):
             os.chdir(source_dir_part)
             print("call download_source")
             try:
-                version = download_source(source_dir_part, source)
+                remote_version = download_source(source_dir_part, source)
                 success_after_download = True
             except Exception as e:
                 print("download failed: %s" % (str(e)) , file=sys.stderr)
@@ -192,14 +221,19 @@ def download_sources(sources_dir , sources):
         if success_after_download:
             success = True
         
-        summary[source]=[version, success, error_message]
+        summary[source]=[remote_version, current_version, success, error_message]
         if success_after_download:
-            print("download success: %s" % (version))
+            print("download success: %s" % (remote_version))
             os.rename(source_dir_part, source_dir)
         
             
             
     os.chdir(current_dir)
+    
+    status(summary)
+
+
+def status(summary):
     
     summary_table = []
     for key, value in summary.items(): 
@@ -208,21 +242,101 @@ def download_sources(sources_dir , sources):
         summary_table.append([key]+value)
 
     
-    print(tabulate(summary_table, headers=['Database', 'Remote Version', 'Success', 'Error Message']))
-
-def usage():
-    print("usage... TODO")
-    sys.exit(1)
+    print(tabulate(summary_table, headers=['Database', 'Remote Version', 'Local Version', 'Download Success', 'Error Message']))
 
 
-if len(sys.argv) > 1:
-    if sys.argv[1] == "download":
+
+################### main ######################
+
+parser = argparse.ArgumentParser()
+subparsers = parser.add_subparsers(title='subcommands', help='sub-command help', dest='commands')
+
+
+parser.add_argument('--debug', action='store_true')
+#parser.add_argument("-d", ...)
+
+download_parser = subparsers.add_parser("download")
+status_parser = subparsers.add_parser("status")
+#b_parser = subparsers.add_parser("help")
+
+download_parser.add_argument(('-f','--force'), action='store_true')
+download_parser.add_argument('--debug', action='store_true')
+status_parser.add_argument('--debug', action='store_true')
+#print(parser.parse_args(["download"]))
+
+#args = parser.parse_args()
+try:
+    args = parser.parse_args()
+except:
+    parser.print_help()
+    sys.exit(0)
+
+
+if not args.commands:
+    parser.print_help()
+    sys.exit(0)
+
+
+if args.debug:
+    for source in config_sources:
+        print("\nsource: %s" % source)
+        print(config_sources[source])
+    
+    print()
+    print("------------------------")
+    print()
+    
+
+
+
+    
+all_source = config_sources.keys()
+sources = all_source # TODO make this an option
+
+sources_directory = os.path.join(os.getcwd(), "sources")
+
+if args.commands == "download":
+    
+    #old_list=["SEED-Annotations", "SEED-Subsystems", "PATRIC", "InterPro","UniProt","RefSeq","GenBank","PhAnToMe","CAZy","KEGG","EggNOG","IMG","SILVA-SSU", "SILVA-LSU","Greengenes","RDP","FungiDB"] 
+    
+    
+    download_sources(sources_directory, sources)
+
+    sys.exit(0)
+
+if args.commands == "status":
+    
+    get_remote_versions(all_source)
+    summary = {}
+    
+    for source in sources:
         
-        #old_list=["SEED-Annotations", "SEED-Subsystems", "PATRIC", "InterPro","UniProt","RefSeq","GenBank","PhAnToMe","CAZy","KEGG","EggNOG","IMG","SILVA-SSU", "SILVA-LSU","Greengenes","RDP","FungiDB"] 
-        all_source = config_sources.keys()
+        source_obj = config_sources[source]
+        remote_version = ""
+        if "VERSION_STRING" in source_obj:
+            remote_version = source_obj["VERSION_STRING"]
         
-        download_sources(os.path.join(os.getcwd(), "sources"), all_source)
-       
+        source_dir = os.path.join(sources_directory , source)
+        version_file = os.path.join(source_dir, "version.txt")
+        current_version = ''
+        
+        success = os.path.exists(version_file)
+        
+        
+        if success:
+            with open(version_file) as x: 
+                current_version = x.read()
+        
+        summary[source]=[remote_version, current_version, success, ""]
+        
+        
+    
+    
+    
+    
+    status(summary)
+    
+    sys.exit(0)
 
-else:
-    usage()
+print("this should not happen")
+sys.exit(1)
