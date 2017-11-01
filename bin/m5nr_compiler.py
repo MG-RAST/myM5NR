@@ -112,6 +112,9 @@ def download_source(directory, source_name):
         print("command failed: %s" % (e) , file=sys.stderr)
         sys.exit(1)
     
+    if version == "":
+        raise MyException("version is empty")
+        
     print("remote version: %s" % version)
     
     #if 'version_local' in source_obj:    
@@ -120,18 +123,20 @@ def download_source(directory, source_name):
     
     if 'download' in source_obj:    
         download_array  = source_obj['download']
-        for url in download_array:
-            if not url:
-                continue
-            if simulate:
-                print("SIMULATION MODE: curl -O "+url)
-                continue
-            blubb = execute_command("curl -O "+url, new_environment)
+        if download_array != None:
+            for url in download_array:
+                if not url:
+                    continue
+                if simulate:
+                    print("SIMULATION MODE: curl -O "+url)
+                    continue
+                blubb = execute_command("curl -O "+url, new_environment)
             
     
-    if version != "":
-        with open('version.txt', 'wt') as f:
-            f.write(version)
+    
+    
+    with open('version.txt', 'wt') as f:
+        f.write(version)
     
     
     return version
@@ -157,11 +162,13 @@ def download_sources(sources_dir , sources):
         sys.exit(1)
     
     for source in sources:
-        success = True
+        success = False
+        success_after_download = False
         version="undef"
         source_dir_part = os.path.join(sources_dir , source+"_part")
         source_dir = os.path.join(sources_dir , source)
         
+        error_message= ""
         
         if os.path.isdir(source_dir):
             print("directory exists, skip it. (%s)" % source_dir)
@@ -177,12 +184,16 @@ def download_sources(sources_dir , sources):
             print("call download_source")
             try:
                 version = download_source(source_dir_part, source)
+                success_after_download = True
             except Exception as e:
                 print("download failed: %s" % (str(e)) , file=sys.stderr)
-                success = False
-       
-        summary[source]=[version, success]
-        if success:
+                error_message = str(e)
+        
+        if success_after_download:
+            success = True
+        
+        summary[source]=[version, success, error_message]
+        if success_after_download:
             print("download success: %s" % (version))
             os.rename(source_dir_part, source_dir)
         
@@ -197,7 +208,7 @@ def download_sources(sources_dir , sources):
         summary_table.append([key]+value)
 
     
-    print(tabulate(summary_table, headers=['Database', 'Version', 'Success']))
+    print(tabulate(summary_table, headers=['Database', 'Remote Version', 'Success', 'Error Message']))
 
 def usage():
     print("usage... TODO")
