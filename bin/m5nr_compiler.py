@@ -285,14 +285,14 @@ if not args.commands:
     sys.exit(0)
 
 
-if args.debug:
-    for source in config_sources:
-        print("\nsource: %s" % source)
-        print(config_sources[source])
-    
-    print()
-    print("------------------------")
-    print()
+#if args.debug:
+#    for source in config_sources:
+#        print("\nsource: %s" % source)
+#        print(config_sources[source])
+#    
+#    print()
+#    print("------------------------")
+#    print()
     
 
 
