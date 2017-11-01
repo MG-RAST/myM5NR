@@ -30,16 +30,15 @@ Set up some environment bits
 ```bash
 mkdir -p /m5nr_data/Sources
 mkdir -p /m5nr_data/Parsed
-
-source /myM5NR/sources.cfg
 ```
 
-To initiate the download
+To initiate the download (you can use --force to delete old _part directories)
 ```bash
-/myM5NR/bin/download_m5nr_sources.sh /m5nr_data/Sources 2>&1 | tee /m5nr_data/Sources/logfile.txt
+cd /m5nr_data/Sources/
+/myM5NR/bin/m5nr_compiler.py download --debug 2>&1 | tee /m5nr_data/Sources/logfile.txt
 ```
 
-To initiate the build
+To initiate the build (work in progress)
 ```bash
 /myM5NR/bin/source2ach.sh 4 /m5nr_data/Sources /m5nr_data/Parsed 2>&1 | tee /m5nr_data/Parsed/logfile.txt
 ```
