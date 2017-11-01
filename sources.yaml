@@ -26,7 +26,7 @@ PIR:
 InterPro:
   category: protein
   type: Hierarchical functional annotation
-  download: null
+  download: Null
   download_command_disabled: wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}
   version: curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
 #    - ftp://ftp.ebi.ac.uk/pub/databases/interpro/Current/
@@ -37,7 +37,7 @@ IMG:
     - ftp://ftp.jgi-psf.org/pub/IMG/img_core_v400.tar 
 PFAM:
   type: Hierarchical functional annotation?
-  download: null
+  download: Null
       # comes from Uniprot
 GenBank:
   category: protein
@@ -55,7 +55,7 @@ SEED-Subsystems:
   category: protein
   type: Hierarchical functional annotation
   homepage: http://www.theseed.org
-  download: null
+  download: Null
   download_command: ${BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq 
 SEED-Annotations:
   category: protein
@@ -64,7 +64,7 @@ SEED-Annotations:
   download_command: ${BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org 
 PATRIC:
   category: protein
-  download: 
+  download:
     - http://brcdownloads.vbi.vt.edu/patric2/genomes/*.PATRIC.gbf
   homepage: https://www.patricbrc.org/
   type: Functional annotation
@@ -82,14 +82,13 @@ FungiDB:
 COG:
   category: protein
   type: Hierarchical functional annotation
-  download: null
+  download: Null
   comment: obtained via Eggnog v4.5 (was ftp://ftp.ncbi.nih.gov/pub/COG/COG2014/data/) 
 KEGG:
   category: protein
   homepage: http://www.genome.jp/kegg/
   type: Hierarchical functional annotation
-  download: 
-    - null
+  download: Null
   comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
   comment2: EC hierarchy from elsewhere    
 EggNOG:
@@ -128,7 +127,7 @@ ARDB:
   category: protein
   homepage: https://ardb.cbcb.umd.edu/
   type: Functional annotation
-  version: curl --silent "https://ardb.cbcb.umd.edu/" | grep  "Version:" | grep -o "[0-9]*\.[0-9]*"
+  version: curl --silent -k "https://ardb.cbcb.umd.edu/" | grep  "Version:" | grep -o "[0-9]*\.[0-9]*"
   download:
     - ftp://ftp.cbcb.umd.edu/pub/data/ARDB/ARDBflatFiles.tar.gz
 PhAnToMe:
@@ -164,7 +163,7 @@ HITdb:
   category: protein
   homepage: https://github.com/microbiome/HITdb.git
   type: Functional annotation
-  version curl --silent "https://raw.githubusercontent.com/microbiome/HITdb/master/README.md" | grep -A 100 "Version history" | grep "^v." | head -n 1 | cut -d ',' -f 1 | cut -d ' ' -f 2
+  version: curl --silent "https://raw.githubusercontent.com/microbiome/HITdb/master/README.md" | grep -A 100 "Version history" | grep "^v." | head -n 1 | cut -d ',' -f 1 | cut -d ' ' -f 2
   download:
       - https://github.com/microbiome/HITdb/archive/master.zip
   comment: reduced 16s db for human microbiome
@@ -211,7 +210,7 @@ SILVA-SSU:
   category: rRNA
   type: LSU
   version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
-  download: null
+  download: Null
 Greengenes:
   homepage: http://greengenes.lbl.gov/
   category: rRNA
