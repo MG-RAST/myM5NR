@@ -10,9 +10,6 @@ import os
 from tabulate import tabulate
 import argparse
 
-#debug = False
-simulate = False
-
 
 script_location = os.path.dirname(os.path.realpath(__file__))
 
@@ -125,7 +122,7 @@ def download_source(directory, source_name):
             for url in download_array:
                 if not url:
                     continue
-                if simulate:
+                if args.simulate:
                     print("SIMULATION MODE: curl -O "+url)
                     continue
                 blubb = execute_command("curl -O "+url, new_environment)
@@ -262,6 +259,9 @@ status_parser = subparsers.add_parser("status")
 download_parser.add_argument(('-f','--force'), action='store_true')
 download_parser.add_argument('--debug', action='store_true')
 status_parser.add_argument('--debug', action='store_true')
+
+download_parser.add_argument('--simulate', action='store_true')
+
 #print(parser.parse_args(["download"]))
 
 #args = parser.parse_args()
