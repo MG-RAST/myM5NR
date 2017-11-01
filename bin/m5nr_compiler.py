@@ -326,6 +326,8 @@ if args.commands == "status":
         
         source_dir = os.path.join(sources_directory , source)
         version_file = os.path.join(source_dir, "version.txt")
+        if args.debug:
+            print("version_file: %s" % (version_file))
         current_version = ''
         
         success = os.path.exists(version_file)
