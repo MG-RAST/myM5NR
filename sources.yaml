@@ -13,6 +13,7 @@ TrEmble:
   download:
     -  ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
   version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
+  parser: bin/uniprot2many.pl -trembl ../../Sources/TrEmble/uniprot_trembl.dat.gz
 PIR:
   category: protein
   type: Functional annotation
