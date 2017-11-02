@@ -18,15 +18,15 @@ use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 use strict;
 use IO::Compress::Gzip qw(gzip $GzipError) ;
-use IO::File ;
+use IO::Uncompress::Gunzip;
 
 
 # the main trick is to read the document record by record
 
-my $filename="/tmp/phantome.data";
+my $filename="/tmp/phantome.data.gz";
 
-# assuming only one file is present
-my $fh1 = new IO::File "</$filename"
+
+my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
 
 open(my $md52idphantome, '>', 'md52id_phantome.txt') or die ;
