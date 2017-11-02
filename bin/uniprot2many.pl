@@ -15,40 +15,9 @@
 use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 use strict;
-<<<<<<< HEAD
 use IO::Compress::Gzip qw(gzip $GzipError) ;
 use IO::File ;
 
-
-# the main trick is to read the document record by record
-$/='//';
-
-#open my $fh1, '<', 'sprot_short.dat' or die;
-#open my $fh1, '<', 'uniprot_sprot.dat' or die;
-
-my $fh1 = new IO::File "<uniprot_sprot.dat.gz"
-       or die "Cannot open 'uniprot_sprot.dat.gz': $!\n" ;
-
-open(my $md5uniprot, '>', 'md52id_uni.txt') or die ;
-open(my $uni2func, '>', 'id2func_uniprot.txt') or die ;
-open(my $md5uni_func, '>', 'md52func_uniprot.txt') or die ;
-open(my $md5seq, '>', 'md52seq_uniprot.txt') or die ;
-open(my $md5go, '>', 'md52id_go.txt') or die ;
-open(my $md5ipr, '>', 'md52id_ipr.txt') or die ;
-open(my $md5pfam, '>', 'md52id_pfam.txt') or die ;
-open(my $md5kegg, '>', 'md52id_kegg.txt') or die ;
-open(my $md5cazy, '>', 'md52id_cazy.txt') or die ;
-open(my $md5ec, '>', 'md52id_ec.txt') or die ;
-open(my $md5eggnog, '>', 'md52id_eggnog.txt') or die ;
-open(my $md5tax, '>', 'md52taxid.txt') or die ;
-
-
-# ################
-while (my $record = <$fh1>) {
-
-my $id; my $go=''; my $kegg=''; my $md5s; my $pfam=''; my $ipr=''; my $func='';
-my $cazy=''; my $ec=''; my $eggnog='';my $tax='';
-=======
 use Getopt::Long;
 
 
@@ -64,12 +33,15 @@ sub parse_Swiss_prot{
     # the main trick is to read the document record by record
     $/='//';
 
+    my $fh1 = new IO::File "<uniprot_sprot.dat.gz"
+       or die "Cannot open 'uniprot_sprot.dat.gz': $!\n" ;
+    
     open my $fh1, '<', $input_file or die;
     #open my $fh1, '<', 'uniprot_sprot.dat' or die;
 
     open(my $md5uniprot, '>', 'md52id_uni.txt') or die ;
-    open(my $uni2func, '>', 'uni2func.txt') or die ;
-    open(my $md5uni_func, '>', 'md52func_uni.txt') or die ;
+    open(my $uni2func, '>', 'id2func_uniprot.txt') or die ;
+    open(my $md5uni_func, '>', 'md52func_uniprot.txt') or die ;
     open(my $md5seq, '>', 'md52seq_uniprot.txt') or die ;
     open(my $md5go, '>', 'md52id_go.txt') or die ;
     open(my $md5ipr, '>', 'md52id_ipr.txt') or die ;
@@ -175,7 +147,9 @@ sub parse_Swiss_prot{
 
     	my @lines = split ('SQ ', $record);
     	#print Dumper(@lines);
-            my $sequence = @lines[1];
+        # split the record at the correct position to catch the sequences
+        my $sequence = @lines[1];
+        # join lines, remove the first list as well as the record separator
     	$sequence =~ s/^(.*\n)//;
     	$sequence =~ tr / \n\/\///ds;
     #	print "ID: $id\n";
@@ -185,7 +159,14 @@ sub parse_Swiss_prot{
 	
 
             print $md5seq "$md5s\t$sequence\n";
->>>>>>> d0b76a6b2b1221e9174ac27eff6817b6605c6f71
+
+
+
+
+
+
+
+
 
             print $md5uniprot "$md5s\t$id\n";
 
@@ -253,8 +234,8 @@ sub parse_TrEmble {
     }
 
     open(my $md5uniprot, $write_flag, 'md52id_uni.txt') or die ;
-    open(my $uni2func, $write_flag, 'uni2func.txt') or die ;
-    open(my $md5uni_func, $write_flag, 'md52func_uni.txt') or die ;
+    open(my $uni2func, $write_flag, 'id2func_uniprot.txt') or die ;
+    open(my $md5uni_func, $write_flag, 'md52func_uniprot.txt') or die ;
     open(my $md5seq, $write_flag, 'md52seq_uniprot.txt') or die ;
     open(my $md5go, $write_flag, 'md52id_go.txt') or die ;
     open(my $md5ipr, $write_flag, 'md52id_ipr.txt') or die ;
@@ -267,7 +248,10 @@ sub parse_TrEmble {
     
 
     #open my $fh2, '<', 'uniprot_trembl.dat' or die;
-    open my $fh2, '<', $input_file or die;
+    #open my $fh2, '<', $input_file or die;
+    my $fh2 = new IO::File $input_file
+           or die "Cannot open $input_file: $!\n" ;
+    
     $/="\n//";  
 
     # now almost the same procedure for trembl
@@ -353,15 +337,18 @@ sub parse_TrEmble {
     	#print "GO:$go\n";
             next;
         }
-
+     
+              
+              
     # parse sequence, generate md5 and write outfiles 
         if  ($line =~ /^SQ/) {
 
     	my @lines = split ('SQ ', $record);
     #	print Dumper(@lines);
-            my $sequence = @lines[1];
-
-
+            
+        # split the record at the correct position to catch the sequences
+        my $sequence = @lines[1];
+        # join lines, remove the first list as well as the record separator
     	$sequence =~ s/^(.*\n)//;
     	$sequence =~ tr / \n\/\///ds;
 	
@@ -416,34 +403,10 @@ sub parse_TrEmble {
 
     } # while fh2
 
-<<<<<<< HEAD
-####################################################
-####################################################
-####################################################
-#print "Sprot done, moving on to TREMBL\n";
-
-#open my $fh2, '<', 'uniprot_trembl.dat' or die;
-#open my $fh2, '<', 'trembl_short.dat' or die;
-
-my $fh2 = new IO::File "<uuniprot_trembl.dat.gz"
-       or die "Cannot open 'uniprot_trembl.dat.gz': $!\n" ;
-
-$/="\n//";  
-
-# now almost the same procedure for trembl
-while (my $record = <$fh2>) {
-
-my $id; my $go=''; my $kegg=''; my $md5s; my $pfam=''; my $ipr=''; my $func=''; 
-my $cazy=''; my $ec=''; my $eggnog=''; my $tax='';
-
-#  print $record;
-
-  #unset EOL
-  $/='';
-=======
-
 
     # be nice and close file handles
+    close($fh2);
+    
     close ($md5uniprot);
     close($md5go);
     close($md5ipr);
@@ -452,7 +415,6 @@ my $cazy=''; my $ec=''; my $eggnog=''; my $tax='';
     close($md5uniprot);
     close($md5seq);
 }
->>>>>>> d0b76a6b2b1221e9174ac27eff6817b6605c6f71
 
 
 sub usage() {
@@ -478,105 +440,23 @@ if (defined($Swiss_prot_file)) {
     $did_something = 1;
 }
 
-<<<<<<< HEAD
-  # needs to push ids into an array
-    if  ($line =~ /^DR\W+GO;\W+GO:(\w+)/) {
-	$go=$1;
-	#print "GO:$go\n";
-        next;
-=======
+
 if (defined($TrEmble_file)) {
     print $TrEmble_file;
     
     my $append = 0;
     if (defined($Swiss_prot_file)) {
         $append = 1
->>>>>>> d0b76a6b2b1221e9174ac27eff6817b6605c6f71
     }
     
     parse_TrEmble($TrEmble_file, $append);
     $did_something = 1;
 }
 
-<<<<<<< HEAD
-  # parse sequence, generate md5 and write outfiles 
-  if  ($line =~ /^SQ/) {
 
-	my @lines = split ('SQ ', $record);
-  #	print Dumper(@lines);
-  # split the record at the correct position to catch the sequences
-  my $sequence = @lines[1];
-  # join lines, remove the first list as well as the record separator 
-	$sequence =~ s/^(.*\n)//;
-	$sequence =~ tr / \n\/\///ds;
-	
-#	print "SEQ: $sequence\n";
-	#print $sequence."\n\n\n";
-
-	$md5s = md5_hex($sequence);
-	#print "MD5 $md5\n";
-
-        print $md5seq "$md5s\t$sequence\n";
-
-	if ( $id ne "") {
-          print $md5uniprot "$md5s\t$id\n";
-	}
-	else  { print "Can't find ID for $md5s \t$id\n"; die ;}
-
-        print $md5uni_func "$md5s\t$func\n";
-	print $md5tax "$md5s\t$tax\n";
-
-	if ( $ipr ne "" ) {
-        print $md5ipr "$md5s\t$ipr\n"; 
-	}
-
-	if ( $eggnog ne "" ) {
-        print $md5eggnog "$md5s\t$eggnog\n"; 
-	}
-
-	if ( $pfam ne "" ) {
-        print $md5pfam "$md5s\t$pfam\n";
-	}
-	if ( $kegg ne "" ) {
-        print $md5kegg "$md5s\t$kegg\n";
-	}
-	if ( $go ne "") {
-        print $md5go "$md5s\t$go\n";
-	}
-
-	if ( $cazy ne "" ) {
-	  print $md5cazy "$md5s\t$cazy\n";
-	}
-	if ( $ec ne "" ) {
-	  print $md5ec "$md5s\t$ec\n";
-	}
-
-	# skip to next record
-	next
-      } # end of SQ case
-	
-      # reset EOL
-      $/="\n//";
-  }
-
-} # while fh2
-
-
-
-# be nice and close file handles
-close($fh2);
-close ($md5uniprot);
-close($md5go);
-close($md5ipr);
-close($md5pfam);
-close($md5kegg);
-close($md5uniprot);
-close($md5seq);
-=======
 if ($did_something == 0) {
     usage();
     exit 1;
 }
 
 exit 0;
->>>>>>> d0b76a6b2b1221e9174ac27eff6817b6605c6f71
