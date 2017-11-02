@@ -16,7 +16,7 @@ use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 use strict;
 use IO::Compress::Gzip qw(gzip $GzipError) ;
-use IO::File ;
+use IO::Uncompress::Gunzip;
 
 use Getopt::Long;
 
@@ -33,7 +33,7 @@ sub parse_Swiss_prot{
     # the main trick is to read the document record by record
     $/='//';
 
-    my $fh1 = new IO::File "<uniprot_sprot.dat.gz"
+    my $fh1 = new IO::Uncompress::Gunzip "<uniprot_sprot.dat.gz"
        or die "Cannot open 'uniprot_sprot.dat.gz': $!\n" ;
     
     open my $fh1, '<', $input_file or die;
@@ -249,7 +249,7 @@ sub parse_TrEmble {
 
     #open my $fh2, '<', 'uniprot_trembl.dat' or die;
     #open my $fh2, '<', $input_file or die;
-    my $fh2 = new IO::File $input_file
+    my $fh2 = new IO::Uncompress::Gunzip $input_file
            or die "Cannot open $input_file: $!\n" ;
     
     $/="\n//";  
