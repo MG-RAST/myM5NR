@@ -1,5 +1,17 @@
+#
+# M5NR configuration file
+#
+# supported variables:
+#
+# M5NR_BIN       Full path to the "bin" directory in the myM5NR repository (use in any field)
+# SOURCE_DIR     The directory where the source data is located (use "parser" field)
+# VERSION        Version string as obtained from remote website (use in "download" field)
+# user-defined   Use dict "env" to create user defined environvent variables: key is name of new variable, value is a command that generate value
+#
+#
 
-# protein
+
+##### protein
 
 Swiss-Prot:
   category: protein
@@ -7,13 +19,14 @@ Swiss-Prot:
   download:
     - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
   version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "Swiss-Prot" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
+  parser: ${M5NR_BIN}/uniprot2many.pl -swiss ${SOURCE_DIR}/uniprot_sprot.dat.gz 
 TrEmble:
   category: protein
   type: Functional annotation
   download:
     -  ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
   version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
-  parser: bin/uniprot2many.pl -trembl ../../Sources/TrEmble/uniprot_trembl.dat.gz
+  parser: ${M5NR_BIN}/uniprot2many.pl -trembl ${SOURCE_DIR}/uniprot_trembl.dat.gz
 PIR:
   category: protein
   type: Functional annotation
@@ -51,12 +64,12 @@ SEED-Subsystems:
   type: Hierarchical functional annotation
   homepage: http://www.theseed.org
   download: Null
-  download_command: ${BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq 
+  download_command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq 
 SEED-Annotations:
   category: protein
   homepage: http://www.theseed.org
   type: Functional annotation
-  download_command: ${BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org 
+  download_command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org 
 PATRIC:
   category: protein
   download:
@@ -67,13 +80,8 @@ CAZy:
   category: protein
   homepage: http://www.cazy.org
   type: Hierarchical functional annotation
-  download-command: ${BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
-FungiDB:
-  category: protein
-  homepage: http://fungalgenomes.org
-  download:
-    - http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz
-  comment: found no versiob
+  download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
+
 COG:
   category: protein
   type: Hierarchical functional annotation
@@ -190,7 +198,7 @@ singlecopygenes:
   comment: From Will
   
   
-# rRNA
+##### rRNA
 SILVA-LSU:
   homepage: http://www.arb-silva.de
   category: rRNA
@@ -215,13 +223,15 @@ Greengenes:
     - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
 FungiDB:
   skip: true
-  category: rRNA
+  category: rRNA / protein?
   homepage: http://fungalgenomes.org/
   type: ITS
   version: curl --silent http://fungidb.org/common/downloads/Current_Release/Build_number
   download: 
     - http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz
   comment: new version? http://fungidb.org/common/downloads/Current_Release/, where get proteins ?
+  
+  
 RDP:
   category: rRNA
   homepage: http://rdp.cme.msu.edu
