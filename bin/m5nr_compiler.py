@@ -52,7 +52,7 @@ def execute_command(command, env):
         print(fixed)
         
     if process.returncode:
-        raise MyException("Command failed (return code %d): %s" % (process.returncode, command))    
+        raise MyException("Command failed (return code %d, command: %s): %s" % (process.returncode, command, fixed[0:500]))    
         
     return fixed
 
@@ -144,7 +144,7 @@ def download_source(directory, source_name):
     return
 
 
-def parse_source(directory, source_name, sources_directory):
+def parse_source(directory, source_name, source_directory):
     global remote_versions_hashed
     
     
@@ -159,6 +159,9 @@ def parse_source(directory, source_name, sources_directory):
         if source_obj["skip"]:
             raise MyException("skipped")
     
+    if not os.path.exists(source_directory):
+       raise MyException("source dir missing") 
+    
     if 'parser' in source_obj:
         
         try:
@@ -167,7 +170,7 @@ def parse_source(directory, source_name, sources_directory):
             raise MyException("create_environment failed: %s" % (e))
         
         
-        new_environment['SOURCE_DIR'] = os.path.join(sources_directory, source_name)
+        new_environment['SOURCE_DIR'] = source_directory
         
         
         
@@ -281,8 +284,10 @@ def parse_sources(parsings_dir , sources, sources_directory):
             
             print("call parse_source")
             
+            source_directory = os.path.join(sources_directory, source)
+            
             try:
-                parse_source(parse_dir_part, source, sources_directory)
+                parse_source(parse_dir_part, source, source_directory)
                 success_after_parsing = True
             except Exception as e:
                 print("parsing %s failed: %s" % (source, str(e)) , file=sys.stderr)
