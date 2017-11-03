@@ -33,8 +33,8 @@ sub parse_Swiss_prot{
     # the main trick is to read the document record by record
     $/='//';
 
-    my $fh1 = new IO::Uncompress::Gunzip "<uniprot_sprot.dat.gz"
-       or die "Cannot open 'uniprot_sprot.dat.gz': $!\n" ;
+    my $fh1 = new IO::Uncompress::Gunzip "<".$input_file
+       or die "Cannot open ".$input_file.": $!\n" ;
     
     open my $fh1, '<', $input_file or die;
     #open my $fh1, '<', 'uniprot_sprot.dat' or die;
@@ -250,7 +250,7 @@ sub parse_TrEmble {
     #open my $fh2, '<', 'uniprot_trembl.dat' or die;
     #open my $fh2, '<', $input_file or die;
     my $fh2 = new IO::Uncompress::Gunzip $input_file
-           or die "Cannot open $input_file: $!\n" ;
+           or die "Cannot open ".$input_file.": $!\n" ;
     
     $/="\n//";  
 
