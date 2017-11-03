@@ -16,10 +16,10 @@ import time
 
 
 
-script_location = os.path.dirname(os.path.realpath(__file__))
-bin_dir = os.path.join(script_location,"bin")
-config_path = os.path.normpath(os.path.join(script_location, "..", "sources.yaml"))
-config_stream = open(config_path, "r")
+bin_dir = os.path.dirname(os.path.realpath(__file__))
+
+repo_dir = os.path.normpath(os.path.join(bin_dir, "..", "sources.yaml"))
+config_stream = open(repo_dir, "r")
 config_sources = yaml.load(config_stream)
 
 args = None
