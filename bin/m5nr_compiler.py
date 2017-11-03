@@ -12,7 +12,7 @@ import argparse
 import shutil
 import pickle
 import time
-
+from shutil import copyfile
 
 
 
@@ -181,6 +181,11 @@ def parse_source(directory, source_name, source_directory):
         except Exception as e:
             raise MyException("execute_command failed: %s" % (e))
     
+        
+        # success, copy verison file
+        source_version_file = os.path.join(source_directory, "version.txt")
+        copyfile(source_version_file, directory)
+        
     else:
         raise MyException("Field \"parser\" not found in config.")    
             
