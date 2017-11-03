@@ -422,6 +422,7 @@ def status(sources_directory, parses_directory):
         # get current version (version file inidcates success)
         current_version = ''
         version_file = os.path.join(source_dir, "version.txt")
+        parsing_version_file = os.path.join(parse_dir, "version.txt")
         download_error_file = os.path.join(source_dir, "error.txt")
         parse_error_file = os.path.join(parse_dir_part, "error.txt")
         
@@ -452,6 +453,11 @@ def status(sources_directory, parses_directory):
         
         if len(p_message) == 30:
             p_message += "..."
+        
+        
+        if os.path.exists(parsing_version_file):
+            parsing_success = True
+        
         
         summary_table.append([source, remote_version, current_version, download_success, d_message, parsing_success, p_message ])
     
