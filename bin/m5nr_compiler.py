@@ -173,7 +173,7 @@ def parse_source(directory, source_name, sources_directory):
         
         command  = source_obj['parser']
         try:
-            something = execute_command(command, None)
+            something = execute_command(command, new_environment)
             print(something)
         except Exception as e:
             raise MyException("execute_command failed: %s" % (e))
