@@ -206,7 +206,7 @@ def get_remote_versions(sources):
         creation_time = os.path.getctime(remote_versions_file)
         if (current_time - creation_time) // (24 * 3600) >= 1:
             print("cached remote versions file is too old")
-            os.unlink(f)
+            os.unlink(remote_versions_file)
         else:        
             print("read cached remote versions from file")
             pickle_in = open(remote_versions_file,"rb")
