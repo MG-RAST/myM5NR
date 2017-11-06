@@ -8,7 +8,8 @@
 # VERSION        Version string as obtained from remote website (use in "download" field)
 # user-defined   Use dict "env" to create user defined environvent variables: key is name of new variable, value is a command that generate value
 #
-#
+# fields:
+#   download: [<url>] uses curl by default. If curl is not suited, provide a wget download instead of a plain url
 
 
 ##### protein
@@ -118,6 +119,11 @@ BacMet:
   version: curl --silent "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "Database Statistics (version [0-9\.]*)"  | grep -o [0-9\.]*
   download:
     - http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
+  
+  parser: 
+    - gunzip ${SOURCE_DIR}/BacMet1.1.zip
+    - command
+    
 ACLAME:
   category: protein
   homepage: http://aclame.ulb.ac.be/
@@ -204,9 +210,9 @@ SILVA-LSU:
   category: rRNA
   type: SSU
   version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
-  download: 
-    - ftp://ftp.arb-silva.de/current/Exports/rast/*
-    - ftp://ftp.arb-silva.de/current/Exports/*
+  download-command: 
+    - wget --no-parent --cut-dirs=3 ftp://ftp.arb-silva.de/current/Exports/rast/*
+    - wget --no-parent --cut-dirs=3 ftp://ftp.arb-silva.de/current/Exports/*
 
 SILVA-SSU:
   homepage: http://www.arb-silva.de
