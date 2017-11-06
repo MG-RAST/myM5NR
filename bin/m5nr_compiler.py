@@ -140,7 +140,7 @@ def download_source(directory, source_name):
                 try:
                     execute_command(download_command, new_environment)
                 except Exception as e:
-                    raise MyException("execute_command failed: %s" % (e))
+                    raise MyException("(download) execute_command failed: %s" % (e))
                     
     if 'download_command' in source_obj:
         
@@ -167,7 +167,7 @@ def download_source(directory, source_name):
             try:
                 value_evaluated  = execute_command(download_command, new_environment)
             except Exception as e:
-                raise MyException("execute_command failed: %s" % (e))
+                raise MyException("(download_command) execute_command failed: %s" % (e))
         
     
     
