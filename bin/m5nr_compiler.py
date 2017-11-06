@@ -423,7 +423,7 @@ def status(sources_directory, parses_directory):
         current_version = ''
         version_file = os.path.join(source_dir, "version.txt")
         parsing_version_file = os.path.join(parse_dir, "version.txt")
-        download_error_file = os.path.join(source_dir, "error.txt")
+        download_error_file = os.path.join(source_dir_part, "error.txt")
         parse_error_file = os.path.join(parse_dir_part, "error.txt")
         
         
