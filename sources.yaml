@@ -119,10 +119,9 @@ BacMet:
   version: curl --silent "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "Database Statistics (version [0-9\.]*)"  | grep -o [0-9\.]*
   download:
     - http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
-  
   parser: 
-    - gunzip ${SOURCE_DIR}/BacMet1.1.zip
-    - command
+    - unzip ${SOURCE_DIR}/BacMet1.1.zip
+    - ${M5NR_BIN}/bacmet.pl BacMet_EXP.704.fasta BacMet_Predicted.*.fasta 
     
 ACLAME:
   category: protein
