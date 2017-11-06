@@ -142,9 +142,9 @@ def download_source(directory, source_name):
                 except Exception as e:
                     raise MyException("(download) execute_command failed: %s" % (e))
                     
-    if 'download_command' in source_obj:
+    if 'download-command' in source_obj:
         
-        something  = source_obj['download_command']
+        something  = source_obj['download-command']
         if isinstance(something, list):
             command_array = something
         else:
