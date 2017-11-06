@@ -129,11 +129,17 @@ def download_source(directory, source_name):
             for url in download_array:
                 if not url:
                     continue
+                    
+                download_command = "curl -O "+url
+                    
                 if args.simulate:
-                    print("SIMULATION MODE: curl -O "+url)
+                    print("SIMULATION MODE: "+download_command)
                     continue
-                blubb = execute_command("curl -O "+url, new_environment)
-            
+                try:
+                    execute_command(download_command, new_environment)
+                except Exception as e:
+                    raise MyException("execute_command failed: %s" % (e))
+                    
     if 'download_command' in source_obj:    
         download_command = source_obj['download_command']
         download_instruction = True
