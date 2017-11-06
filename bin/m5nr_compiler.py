@@ -112,7 +112,9 @@ def download_source(directory, source_name):
     #    version_local = execute_command(command, new_environment)
     
     download_instruction = False
-        
+    if 'no-download' in source_obj:
+        if  source_obj['no-download']
+            raise MyException("no-download") # TODO not sure if I should declare success here.
     
     if 'download' in source_obj:    
         download_array  = source_obj['download']
@@ -140,9 +142,17 @@ def download_source(directory, source_name):
                 except Exception as e:
                     raise MyException("execute_command failed: %s" % (e))
                     
-    if 'download_command' in source_obj:    
-        download_command = source_obj['download_command']
+    if 'download_command' in source_obj:
+        
+        something  = source_obj['download_command']
+        if isinstance(something, list):
+            command_array = something
+        else:
+            command_array = [something]
+            
+        
         download_instruction = True
+        
         
         try:
             new_environment = create_environment(source_obj)
@@ -152,10 +162,12 @@ def download_source(directory, source_name):
         # add VERSION to environment, often needed for download
         new_environment['VERSION'] = version_remote
         
-        try:
-            value_evaluated  = execute_command(download_command, new_environment)
-        except Exception as e:
-            raise MyException("execute_command failed: %s" % (e))
+        
+        for download_command in command_array:
+            try:
+                value_evaluated  = execute_command(download_command, new_environment)
+            except Exception as e:
+                raise MyException("execute_command failed: %s" % (e))
         
     
     
@@ -203,12 +215,22 @@ def parse_source(directory, source_name, source_directory):
         
         
         
-        command  = source_obj['parser']
-        try:
-            something = execute_command(command, new_environment)
-            print(something)
-        except Exception as e:
-            raise MyException("execute_command failed: %s" % (e))
+        
+        command_array = []
+        something  = source_obj['parser']
+        if isinstance(something, list):
+            command_array = something
+        else:
+            command_array = [something]
+        
+        
+        
+        for command in command_array:
+            try:
+                something = execute_command(command, new_environment)
+            except Exception as e:
+                print(something)
+                raise MyException("execute_command failed: %s" % (e))
     
         
         # success, copy verison file
