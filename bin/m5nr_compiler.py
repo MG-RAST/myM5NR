@@ -113,7 +113,7 @@ def download_source(directory, source_name):
     
     download_instruction = False
     if 'no-download' in source_obj:
-        if  source_obj['no-download']
+        if  source_obj['no-download']:
             raise MyException("no-download") # TODO not sure if I should declare success here.
     
     if 'download' in source_obj:    
