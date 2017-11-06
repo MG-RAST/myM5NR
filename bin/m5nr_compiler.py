@@ -428,7 +428,7 @@ def status(sources_directory, parses_directory):
         
         
         if (not os.path.isdir(source_dir)) and os.path.exists(download_error_file):
-            with open(error_file) as x: 
+            with open(download_error_file) as x: 
                 download_error_message = x.read()
         
         if (not os.path.isdir(parse_dir)) and os.path.exists(parse_error_file):
