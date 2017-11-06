@@ -58,9 +58,8 @@ GenBank:
 RefSeq:
   category: protein
   type: Functional annotation
-  download:
-    - ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.genomic.gbff.gz
   version: curl --silent ftp://ftp.ncbi.nih.gov//refseq/release/RELEASE_NUMBER
+  download-command: wget ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.genomic.gbff.gz
 SEED-Subsystems:
   category: protein
   type: Hierarchical functional annotation
