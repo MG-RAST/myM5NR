@@ -9,8 +9,9 @@
 # user-defined   Use dict "env" to create user defined environvent variables: key is name of new variable, value is a command that generate value
 #
 # fields:
-#   download: [<url>] uses curl by default. If curl is not suited, provide a wget download instead of a plain url
-
+#   download: [<url>] uses curl by default. For wget and scripts specify an explicit command in field "download-command".
+#   download-command: <command> or [<command>]
+#   parser: <command> or [<command>]
 
 ##### protein
 
@@ -35,7 +36,7 @@ PIR:
 InterPro:
   category: protein
   type: Hierarchical functional annotation
-  download: Null
+  no-download: True
   download_command_disabled: wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}
   version: curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
 #    - ftp://ftp.ebi.ac.uk/pub/databases/interpro/Current/
@@ -46,7 +47,7 @@ IMG:
     - ftp://ftp.jgi-psf.org/pub/IMG/img_core_v400.tar 
 PFAM:
   type: Hierarchical functional annotation?
-  download: Null
+  no-download: True
       # comes from Uniprot
 GenBank:
   category: protein
@@ -64,7 +65,7 @@ SEED-Subsystems:
   category: protein
   type: Hierarchical functional annotation
   homepage: http://www.theseed.org
-  download: Null
+  no-download: True
   download_command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq 
 SEED-Annotations:
   category: protein
@@ -86,13 +87,13 @@ CAZy:
 COG:
   category: protein
   type: Hierarchical functional annotation
-  download: Null
+  no-download: True
   comment: obtained via Eggnog v4.5 (was ftp://ftp.ncbi.nih.gov/pub/COG/COG2014/data/) 
 KEGG:
   category: protein
   homepage: http://www.genome.jp/kegg/
   type: Hierarchical functional annotation
-  download: Null
+  no-download: True
   comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
   comment2: EC hierarchy from elsewhere    
 EggNOG:
@@ -218,7 +219,7 @@ SILVA-SSU:
   category: rRNA
   type: LSU
   version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
-  download: Null
+  no-download: True
 Greengenes:
   homepage: http://greengenes.lbl.gov/
   category: rRNA
