@@ -210,8 +210,8 @@ SILVA-LSU:
   type: SSU
   version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
   download-command: 
-    - wget --no-parent --cut-dirs=3 ftp://ftp.arb-silva.de/current/Exports/rast/*
-    - wget --no-parent --cut-dirs=3 ftp://ftp.arb-silva.de/current/Exports/*
+    - wget --tries=5 --dns-timeout=10 --connect-timeout=10 --read-timeout=30 --no-parent --cut-dirs=3 ftp://ftp.arb-silva.de/current/Exports/rast/*
+    - wget --tries=5 --dns-timeout=10 --connect-timeout=10 --read-timeout=30 --no-parent --cut-dirs=3 ftp://ftp.arb-silva.de/current/Exports/*
 
 SILVA-SSU:
   homepage: http://www.arb-silva.de
