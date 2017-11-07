@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
   libdbi-perl  \
   libdbd-pg-perl \
   wget\
+  unzip \
   make \
   python-biopython  \
   vim \
