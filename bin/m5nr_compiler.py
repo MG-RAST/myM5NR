@@ -33,6 +33,7 @@ class MyException(Exception):
     
 
 def execute_command(command, env):
+    global args
     if args.debug:
        print("exec: %s" % (command))
     
@@ -78,7 +79,7 @@ def create_environment(source_obj):
 
 def download_source(directory, source_name):
     global remote_versions_hashed
-   
+    global args
     
     if not source_name in config_sources:
         print("Error %s not found in config" % source_name)
@@ -301,7 +302,7 @@ def get_remote_versions(sources):
 
 
 def parse_sources(parsings_dir , sources, sources_directory):
-    
+    global args
     current_dir = os.getcwd()
     
     do_stop = 0
@@ -366,7 +367,7 @@ def parse_sources(parsings_dir , sources, sources_directory):
             
 
 def download_sources(sources_dir , sources):
-    
+    global args
     # define global dict remote_versions_hashed
     get_remote_versions(all_source)
     
