@@ -131,8 +131,9 @@ def download_source(directory, source_name):
             for url in download_array:
                 if not url:
                     continue
-                    
-                download_command = "curl -O "+url
+                
+                # curl: --speed-time 15 --speed-limit 1000 : stop transfer if less than 1000 bytes per second during 15 seconds
+                download_command = "curl --connect-timeout=10 --retry=5 --retry-delay=10 --speed-time 15 --speed-limit 1000 -O "+url
                     
                 if args.simulate:
                     print("SIMULATION MODE: "+download_command)
