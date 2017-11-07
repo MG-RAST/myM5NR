@@ -35,7 +35,7 @@ class MyException(Exception):
 def execute_command(command, env):
     global args
     if args.debug:
-       print("exec: %s" % (command))
+       print("exec: %s" % (command), flush=True)
     
     if env:
         #for key in env:
