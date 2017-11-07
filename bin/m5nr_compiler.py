@@ -535,16 +535,20 @@ parse_parser = subparsers.add_parser("parse")
 
 
 # download
+download_parser.add_argument('--sources', '-s', action='store')
 download_parser.add_argument('--force', '-f', action='store_true')
 download_parser.add_argument('--debug', '-d', action='store_true')
 download_parser.add_argument('--simulate', action='store_true')
 
 # parse
+parse_parser.add_argument('--sources', '-s', action='store')
 parse_parser.add_argument('--force', '-f', action='store_true')
 parse_parser.add_argument('--debug', '-d', action='store_true')
 
 # status
+status_parser.add_argument('--sources', '-s', action='store')
 status_parser.add_argument('--debug', '-d', action='store_true')
+
 
 
 
@@ -554,6 +558,8 @@ except Exception as e:
     print("Error: %s" % (str(e)))
     parser.print_help()
     sys.exit(0)
+
+
 
 
 if not args.commands:
@@ -574,9 +580,18 @@ if not args.commands:
 
 
 
-    
+
 all_source = config_sources.keys()
-sources = all_source # TODO make this an option
+
+sources = None
+
+if args.sources:
+    sources = args.sources.split(" ")
+    if len(sources) == 1:
+        sources = args.sources.split(",")
+else:
+    sources = all_source # TODO make this an option
+
 
 sources_directory = os.path.join(os.getcwd(), "Sources")
 parses_directory = os.path.join(os.getcwd(), "Parsed")
