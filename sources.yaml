@@ -103,7 +103,7 @@ EggNOG:
   download:
     - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
   parser:
-    - ${M5NR_BINg}/bacmet.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz
+    - ${M5NR_BINg}/eggnog.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz
   comment: https://github.com/jhcepas/eggnog-mapper/blob/master/eggnogmapper/common.py
   comment2: wget http://eggnogdb.embl.de/download/eggnog_3.0/{fun.txt.gz,UniProtAC2eggNOG.3.0.tsv.gz,COG.funccat.txt.gz,NOG.funccat.txt.gz,COG.description.txt.gz,NOG.description.txt.gz,sequences.v3.tar.gz}
   download: http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
