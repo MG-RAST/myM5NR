@@ -131,9 +131,9 @@ ACLAME:
   homepage: http://aclame.ulb.ac.be/
   type: Functional annotation
   version: curl --silent "http://aclame.ulb.ac.be/" | grep -o "Welcome to ACLAME version [0-9\.]*" | grep -o "[0-9\.]*"
-  download:
-    - http://aclame.ulb.ac.be/perl/Aclame/Tools/exporter.cgi?id=all&source=proteins&entry_id=1&length=on&ncbi_desc=on&family=on&xrefs=on&mge_id=on&mge_name=on&funct=on&sequence=on&fmt=fasta&format=gzip&x=85&y=15&notify=1
-    - http://aclame.ulb.ac.be/perl/Aclame/Tools/exporter.cgi?source=families&id=all&fam_id=on&aclame_fct=on&aclame_fct_name=on&aclame_fct_desc=on&nb_prot=on&x=112&y=11&mge_name=on&host_id=on&host_name=on&format=gzip&notify=1
+  download-command:
+    - curl --connect-timeout=10 --retry=5 --retry-delay=10 --speed-time 15 --speed-limit 1000 --output a.dat "http://aclame.ulb.ac.be/perl/Aclame/Tools/exporter.cgi?id=all&source=proteins&entry_id=1&length=on&ncbi_desc=on&family=on&xrefs=on&mge_id=on&mge_name=on&funct=on&sequence=on&fmt=fasta&format=gzip&x=85&y=15&notify=1"
+    - curl --connect-timeout=10 --retry=5 --retry-delay=10 --speed-time 15 --speed-limit 1000 --output b.dat "http://aclame.ulb.ac.be/perl/Aclame/Tools/exporter.cgi?source=families&id=all&fam_id=on&aclame_fct=on&aclame_fct_name=on&aclame_fct_desc=on&nb_prot=on&x=112&y=11&mge_name=on&host_id=on&host_name=on&format=gzip&notify=1"
 ARDB:
   category: protein
   homepage: https://ardb.cbcb.umd.edu/
