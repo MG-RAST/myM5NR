@@ -59,7 +59,7 @@ RefSeq:
   category: protein
   type: Functional annotation
   version: curl --silent ftp://ftp.ncbi.nih.gov//refseq/release/RELEASE_NUMBER
-  download-command: wget ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.genomic.gbff.gz
+  download-command: wget --tries=5 --dns-timeout=10 --connect-timeout=10 --read-timeout=30 ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.genomic.gbff.gz
 SEED-Subsystems:
   category: protein
   type: Hierarchical functional annotation
@@ -100,27 +100,21 @@ EggNOG:
   type: Hierarchical functional annotation
   homepage: http://eggnogdb.embl.de
   version: curl --silent "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
-  download:
-    - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
-  parser:
-    - ${M5NR_BIN}/bacmet.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz
-  comment: https://github.com/jhcepas/eggnog-mapper/blob/master/eggnogmapper/common.py
-  comment2: wget http://eggnogdb.embl.de/download/eggnog_3.0/{fun.txt.gz,UniProtAC2eggNOG.3.0.tsv.gz,COG.funccat.txt.gz,NOG.funccat.txt.gz,COG.description.txt.gz,NOG.description.txt.gz,sequences.v3.tar.gz}
+  download: http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
+  parser: ${M5NR_BIN}/bacmet.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz
 CARD:
   category: protein
   homepage: https://card.mcmaster.ca
   type: Functional annotation
   version: curl --silent "https://card.mcmaster.ca/download" | grep ">CARD<" | grep -o ">[0-9][0-9\.]*<" | head -n1 |  grep -o "[0-9\.]*"
-  download:
-    - https://card.mcmaster.ca/latest/data
+  download: https://card.mcmaster.ca/latest/data
   comment: double-check copyright conditions
 BacMet:
   category: protein
   homepage: http://bacmet.biomedicine.gu.se/
   type: Functional annotation
   version: curl --silent "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "Database Statistics (version [0-9\.]*)"  | grep -o [0-9\.]*
-  download:
-    - http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
+  download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
   parser: 
     - unzip ${SOURCE_DIR}/BacMet1.1.zip
     - ${M5NR_BIN}/bacmet.pl BacMet_EXP.704.fasta BacMet_Predicted.*.fasta 
@@ -149,9 +143,7 @@ PhAnToMe:
   version: date -d @${TIMESTAMP} +"%Y%m%d"
   download:
     - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.asta.gz
-    
   comment: curl --silent "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
-    
     
 goslim:
   category: protein
