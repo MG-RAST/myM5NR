@@ -237,7 +237,7 @@ def parse_source(directory, source_name, source_directory):
         
         # success, copy verison file
         source_version_file = os.path.join(source_directory, "version.txt")
-        copyfile(source_version_file, directory)
+        copyfile(source_version_file, os.path.join(directory, "version.txt"))
         
     else:
         raise MyException("Field \"parser\" not found in config.")    
