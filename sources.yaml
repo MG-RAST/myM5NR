@@ -189,7 +189,8 @@ RefSeq:
   category: protein
   type: Functional annotation
   version: curl --silent ftp://ftp.ncbi.nih.gov//refseq/release/RELEASE_NUMBER
-  download-command: wget --tries=5 --dns-timeout=10 --connect-timeout=10 --read-timeout=30 ftp://ftp.ncbi.nih.gov/refseq/release/complete/*.genomic.gbff.gz
+  download-command: wget --tries=5 --dns-timeout=10 --connect-timeout=10 --read-timeout=30 ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.*.faa.gz
+
 
 SEED-Annotations:
   category: protein
