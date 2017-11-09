@@ -69,11 +69,16 @@ def create_environment(source_obj):
                 value_evaluated  = execute_command(value, None)
             except Exception as e:
                 raise MyException("execute_command failed: %s" % (e))
+            
+            if args.debug:
+                print("%s=%s" % (key, value_evaluated))    
             new_environment[key]=value_evaluated
     
     
     
     new_environment['M5NR_BIN'] = bin_dir
+    
+    
         
     return new_environment
 
