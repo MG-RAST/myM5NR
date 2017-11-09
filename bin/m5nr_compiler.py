@@ -7,14 +7,13 @@ import sys
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import os
-from tabulate import tabulate
 import argparse
 import shutil
 import pickle
 import time
 from shutil import copyfile
-
-
+import pprint
+from prettytable import PrettyTable
 
 bin_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -99,7 +98,7 @@ def download_source(directory, source_name):
     if not source_name in remote_versions_hashed: 
         raise MyException("version is missing")
         
-    version_remote = remote_versions_hashed[source_name]
+    version_remote = str(remote_versions_hashed[source_name])
     
     if version_remote == "":
         raise MyException("version is empty")
@@ -267,6 +266,9 @@ def get_remote_versions(sources):
             print("read cached remote versions from file")
             pickle_in = open(remote_versions_file,"rb")
             remote_versions_hashed = pickle.load(pickle_in)
+            
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(remote_versions_hashed)
             return
 
 
@@ -451,7 +453,8 @@ def status(sources_directory, parses_directory):
     
     # define global dict remote_versions_hashed
     get_remote_versions(all_source)
-    summary_table = []
+    summary_table= PrettyTable()
+    #summary_table = []
     #summary = {}
     
     for source in sources:
@@ -465,8 +468,8 @@ def status(sources_directory, parses_directory):
         source_obj = config_sources[source]
         remote_version = ""
         if source in remote_versions_hashed:
-            remote_version = remote_versions_hashed[source]
-        
+            remote_version = str(remote_versions_hashed[source])
+            
         
         source_dir_part = os.path.join(sources_directory , source+"_part")
         source_dir = os.path.join(sources_directory , source)
@@ -515,11 +518,16 @@ def status(sources_directory, parses_directory):
             parsing_success = True
         
         
-        summary_table.append([source, remote_version, current_version, download_success, d_message, parsing_success, p_message ])
+        
+        summary_table.add_row([source, remote_version, current_version, download_success, d_message, parsing_success, p_message ])
     
     
+    summary_table.field_names = ['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Error','Parsing Success', 'Parsing Error']
+    summary_table.align = "l"
     
-    print(tabulate(summary_table, headers=['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Error','Parsing Success', 'Parsing Error']))
+    
+    print(summary_table.get_string())
+    #print(tabulate(summary_table, headers=['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Error','Parsing Success', 'Parsing Error']))
 
 
 

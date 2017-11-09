@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 
 
 RUN pip3 install --upgrade pip && pip3 install \
-  tabulate \
+  PrettyTable \
   pyyaml
 
 
