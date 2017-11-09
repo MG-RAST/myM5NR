@@ -563,7 +563,7 @@ def status(sources_directory, parses_directory):
         
         
         
-        summary_table.add_row([source, remote_version, current_version, download_success, (source_dir_size/1014*1024), d_message, parsing_success, p_message ])
+        summary_table.add_row([source, remote_version, current_version, download_success, int(source_dir_size/1014*1024), d_message, parsing_success, p_message ])
     
     
     summary_table.field_names = ['Database', 'Remote Version', 'Local Version', 'Download Success', 'Size (MB)', 'Download Error','Parsing Success', 'Parsing Error']
