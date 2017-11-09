@@ -126,9 +126,9 @@ InterPro:
   version: curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
 #    - ftp://ftp.ebi.ac.uk/pub/databases/interpro/Current/
   download: 
-      - ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/entry.list
-      - ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/short_names.dat
-      - ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/interpro2go
+      - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/entry.list
+      - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/short_names.dat
+      - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/interpro2go
 
 
 IMG:
