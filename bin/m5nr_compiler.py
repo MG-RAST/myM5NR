@@ -32,7 +32,7 @@ class MyException(Exception):
     
     
 
-def execute_command(command, env, executable):
+def execute_command(command, env, executable=None):
     global args
     if args.debug:
        print("exec: %s" % (command), flush=True)
