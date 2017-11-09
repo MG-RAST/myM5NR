@@ -239,17 +239,53 @@ SILVA-LSU:
   category: rRNA
   type: SSU
   version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
-  download-command: 
-    - wget --tries=5 --dns-timeout=10 --connect-timeout=10 --read-timeout=30 --no-parent --cut-dirs=3 ftp://ftp.arb-silva.de/current/Exports/rast/*
-    - wget --tries=5 --dns-timeout=10 --connect-timeout=10 --read-timeout=30 --no-parent --cut-dirs=3 ftp://ftp.arb-silva.de/current/Exports/*
-
+  download: 
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSUParc.rast.gz
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSUParc.rast.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_SSUParc.rast.gz
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_SSUParc.rast.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_SSURef.rast.gz
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_SSURef.rast.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_SSURef_Nr99.rast.gz
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_SSURef_Nr99.rast.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/README.txt
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSUParc_tax_silva.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSUParc_tax_silva.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSUParc_tax_silva_trunc.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSUParc_tax_silva_trunc.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_full_align_trunc.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_full_align_trunc.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSUParc_tax_silva.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSUParc_tax_silva.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSUParc_tax_silva_trunc.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSUParc_tax_silva_trunc.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_Nr99_tax_silva.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_Nr99_tax_silva.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_Nr99_tax_silva_full_align_trunc.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_Nr99_tax_silva_full_align_trunc.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_Nr99_tax_silva_trunc.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_Nr99_tax_silva_trunc.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_full_align_trunc.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_full_align_trunc.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz.md5
+  
 SILVA-SSU:
   homepage: http://www.arb-silva.de
   category: rRNA
   type: LSU
   version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
   no-download: True
-
+  
+  
 Swiss-Prot:
   category: protein
   type: Functional annotation
