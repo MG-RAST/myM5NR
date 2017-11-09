@@ -14,6 +14,7 @@ import time
 from shutil import copyfile
 import pprint
 from prettytable import PrettyTable
+import datetime
 
 bin_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -180,10 +181,12 @@ def download_source(directory, source_name):
     
     
     with open('version.txt', 'wt') as f:
-        f.write(version)
+        f.write(version_remote)
+    
+    
     
     with open('timestamp.txt', 'wt') as f:
-        f.write(version)
+        f.write(datetime.datetime.now().isoformat())
         
         
     return
