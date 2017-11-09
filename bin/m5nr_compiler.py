@@ -149,8 +149,13 @@ def download_source(directory, source_name):
                     print("SIMULATION MODE: "+download_command)
                     continue
                 try:
-                    execute_command(download_command, new_environment)
+                    some_text = execute_command(download_command, new_environment)
                 except Exception as e:
+                    
+                    if args.debug:
+                        if some_text:
+                            print(some_text)
+                    
                     raise MyException("(download) execute_command failed: %s" % (e))
                     
     if 'download-command' in source_obj:
