@@ -517,7 +517,7 @@ def status(sources_directory, parses_directory):
         parse_dir = os.path.join(parses_directory , source)
         parse_dir_part = os.path.join(parses_directory , source+"_part")
         
-        source_dir_size = 0
+        source_dir_size_mb_int = 0
         
         
         
@@ -547,6 +547,8 @@ def status(sources_directory, parses_directory):
         if current_version != "" :
             download_success = True # TODO is success possible without version number ?
             source_dir_size = get_dir_size(source_dir)
+            source_dir_size_mb = source_dir_size/(1014*1024)
+            source_dir_size_mb_int = int(source_dir_size_mb)
         
         d_message = download_error_message[0:30]
         p_message = parsing_error_message[0:30]
@@ -563,7 +565,7 @@ def status(sources_directory, parses_directory):
         
         
         
-        summary_table.add_row([source, remote_version, current_version, download_success, int((source_dir_size/1014*1024)), d_message, parsing_success, p_message ])
+        summary_table.add_row([source, remote_version, current_version, download_success, source_dir_size_mb_int, d_message, parsing_success, p_message ])
     
     
     summary_table.field_names = ['Database', 'Remote Version', 'Local Version', 'Download Success', 'Size (MB)', 'Download Error','Parsing Success', 'Parsing Error']
