@@ -32,7 +32,7 @@ class MyException(Exception):
     
     
 
-def execute_command(command, env):
+def execute_command(command, env, executable):
     global args
     if args.debug:
        print("exec: %s" % (command), flush=True)
@@ -41,10 +41,10 @@ def execute_command(command, env):
         #for key in env:
         #    print("using environment: %s=%s" % (key, env[key]))
             
-        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, env=env)
+        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable=executable, env=env)
     else:
         #print("no special environment")
-        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True)
+        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable=executable)
     
     process.wait()    
     output = process.stdout.read()
