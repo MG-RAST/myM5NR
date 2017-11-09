@@ -198,7 +198,7 @@ RefSeq:
     COUNT: curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
   #download-command: wget --tries=5 --dns-timeout=10 --connect-timeout=10 --read-timeout=30 ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.*.faa.gz
   download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.faa.gz
-
+  #download-command: curl --connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 --remote-name-all
 
 SEED-Annotations:
   category: protein

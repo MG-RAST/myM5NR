@@ -32,19 +32,28 @@ class MyException(Exception):
     
     
 
-def execute_command(command, env, executable=None):
+def execute_command(command, env):
     global args
-    if args.debug:
-       print("exec: %s" % (command), flush=True)
+    
+
     
     if env:
-        #for key in env:
-        #    print("using environment: %s=%s" % (key, env[key]))
+        for key in env:
+            print("key: %s" % (key))
+            search_string = "${"+key+"}"
+            print("search_string: %s" % (search_string))
+            value = new_environment[key]
+            command = command.replace(search_string, value)
+        
+        if args.debug:
+           print("exec: %s" % (command), flush=True)
             
-        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable=executable, env=env)
+        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable='/bin/bash', env=env)
     else:
+        if args.debug:
+           print("exec: %s" % (command), flush=True)
         #print("no special environment")
-        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable=executable)
+        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable='/bin/bash')
     
     process.wait()    
     output = process.stdout.read()
@@ -150,12 +159,13 @@ def download_source(directory, source_name):
                 # curl: --speed-time 15 --speed-limit 1000 : stop transfer if less than 1000 bytes per second during 15 seconds
                 download_command = "curl %s--connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 --remote-name-all  %s" % (silent, url)
                 
+                    
                 some_text=""    
                 if args.simulate:
                     print("SIMULATION MODE: "+download_command)
                     continue
                 try:
-                    some_text = execute_command(download_command, new_environment, executable="/bin/bash")
+                    some_text = execute_command(download_command, new_environment)
                 except Exception as e:
                     
                     if args.debug:
