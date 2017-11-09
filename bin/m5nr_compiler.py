@@ -563,7 +563,8 @@ def status(sources_directory, parses_directory):
         if os.path.exists(parsing_version_file):
             parsing_success = True
         
-        
+        if source_dir_size_mb_int == 0:
+            source_dir_size_mb_int = ''
         
         summary_table.add_row([source, remote_version, current_version, download_success, source_dir_size_mb_int, d_message, parsing_success, p_message ])
     
