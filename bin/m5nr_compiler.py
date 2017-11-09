@@ -118,7 +118,13 @@ def download_source(directory, source_name):
             raise MyException("no-download") # TODO not sure if I should declare success here.
     
     if 'download' in source_obj:    
-        download_array  = source_obj['download']
+        something  = source_obj['download']
+        
+        if isinstance(something, list):
+            download_array = something
+        else:
+            download_array = [something]
+        
         if download_array != None:
             download_instruction = True
             try:
