@@ -402,7 +402,7 @@ def download_sources(sources_dir , sources):
         print("---------------------")
         success = False
         success_after_download = False
-        remote_version="undef"
+        
         current_version=""
         
         source_dir_part = os.path.join(sources_dir , source+"_part")
@@ -441,7 +441,7 @@ def download_sources(sources_dir , sources):
             success = True
         
         if success_after_download:
-            print("download success: %s" % (remote_version))
+            print("download success.")
             os.rename(source_dir_part, source_dir)
         
             
