@@ -267,8 +267,8 @@ def get_remote_versions(sources):
             pickle_in = open(remote_versions_file,"rb")
             remote_versions_hashed = pickle.load(pickle_in)
             
-            pp = pprint.PrettyPrinter(indent=4)
-            pp.pprint(remote_versions_hashed)
+            #pp = pprint.PrettyPrinter(indent=4)
+            #pp.pprint(remote_versions_hashed)
             return
 
 
