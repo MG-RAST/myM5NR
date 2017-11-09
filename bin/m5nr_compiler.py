@@ -148,14 +148,14 @@ def download_source(directory, source_name):
                 if args.debug:
                     silent = ""
                 # curl: --speed-time 15 --speed-limit 1000 : stop transfer if less than 1000 bytes per second during 15 seconds
-                download_command = ["/bin/bash", "-c", "curl %s--connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 --remote-name-all  %s" % (silent, url)]
+                download_command = "curl %s--connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 --remote-name-all  %s" % (silent, url)
                 
                 some_text=""    
                 if args.simulate:
                     print("SIMULATION MODE: "+download_command)
                     continue
                 try:
-                    some_text = execute_command(download_command, new_environment)
+                    some_text = execute_command(download_command, new_environment, executable="/bin/bash")
                 except Exception as e:
                     
                     if args.debug:
