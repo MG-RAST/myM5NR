@@ -39,10 +39,11 @@ def execute_command(command, env):
     
     if env:
         for key in env:
-            print("key: %s" % (key))
+            #print("key: %s" % (key))
             search_string = "${"+key+"}"
-            print("search_string: %s" % (search_string))
-            value = new_environment[key]
+            if args.debug:
+                print("search_string: %s" % (search_string))
+            value = env[key]
             command = command.replace(search_string, value)
         
         if args.debug:
