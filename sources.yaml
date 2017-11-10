@@ -203,6 +203,7 @@ SEED-Annotations:
   category: protein
   homepage: http://www.theseed.org
   type: Functional annotation
+  version: ${TODAY}
   download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org 
 
 SEED-Subsystems:
@@ -210,6 +211,7 @@ SEED-Subsystems:
   type: Hierarchical functional annotation
   homepage: http://www.theseed.org
   no-download: True
+  version: ${TODAY}
   download-command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq 
 
 

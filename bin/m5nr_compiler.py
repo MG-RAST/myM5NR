@@ -85,7 +85,7 @@ def create_environment(source_obj):
             new_environment[key]=value_evaluated
     
     
-    
+    new_environment['TODAY'] = datetime.date.today().isoformat()
     new_environment['M5NR_BIN'] = bin_dir
     
     
