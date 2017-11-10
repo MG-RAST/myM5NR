@@ -417,6 +417,7 @@ def download_sources(sources_dir , sources):
     do_stop = 0
     for source in sources:
         resume = False
+        source_obj = config_sources[source]
         if 'resume-download' in source_obj:
             if source_obj['resume-download']:
                 resume=True
