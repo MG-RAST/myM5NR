@@ -158,7 +158,8 @@ def download_source(directory, source_name):
                 if args.debug:
                     silent = ""
                 # curl: --speed-time 15 --speed-limit 1000 : stop transfer if less than 1000 bytes per second during 15 seconds
-                download_command = "curl %s--connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 --remote-name-all  %s" % (silent, url)
+                # -C - (try to resume download)
+                download_command = "curl %s--connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 --remote-name-all -L -C - %s" % (silent, url)
                 
                     
                 some_text=""    
@@ -415,10 +416,15 @@ def download_sources(sources_dir , sources):
     
     do_stop = 0
     for source in sources:
-        source_dir_part = os.path.join(sources_dir , source+"_part")
-        if os.path.isdir(source_dir_part):
-            do_stop = 1
-            print("delete directory first: %s" % source_dir_part)
+        resume = False
+        if 'resume-download' in source_obj:
+            if source_obj['resume-download']:
+                resume=True
+        if not resume:
+            source_dir_part = os.path.join(sources_dir , source+"_part")
+            if os.path.isdir(source_dir_part):
+                do_stop = 1
+                print("delete directory first: %s" % source_dir_part)
             
     if do_stop:
         if not args.force:
@@ -446,12 +452,19 @@ def download_sources(sources_dir , sources):
             
             success = True
         else:
+            source_obj = config_sources[source]
             
-            if args.force:
-                if os.path.isdir(source_dir_part):
-                    shutil.rmtree(source_dir_part) 
+            resume = False
+            if 'resume-download' in source_obj:
+                if source_obj['resume-download']:
+                    resume=True
             
-            os.makedirs(source_dir_part)
+            if not resume:
+                if args.force:
+                    if os.path.isdir(source_dir_part):
+                        shutil.rmtree(source_dir_part) 
+            
+                os.makedirs(source_dir_part)
             
             os.chdir(source_dir_part)
             print("call download_source")
