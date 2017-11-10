@@ -211,7 +211,7 @@ SEED-Subsystems:
   type: Hierarchical functional annotation
   homepage: http://www.theseed.org
   no-download: True
-  version: ${TODAY}
+  version: echo ${TODAY}
   download-command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq 
 
 
