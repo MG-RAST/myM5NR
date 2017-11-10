@@ -7,14 +7,14 @@ import sys
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import os
-from tabulate import tabulate
 import argparse
 import shutil
 import pickle
 import time
 from shutil import copyfile
-
-
+import pprint
+from prettytable import PrettyTable
+import datetime
 
 bin_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -34,17 +34,27 @@ class MyException(Exception):
 
 def execute_command(command, env):
     global args
-    if args.debug:
-       print("exec: %s" % (command), flush=True)
+    
+
     
     if env:
-        #for key in env:
-        #    print("using environment: %s=%s" % (key, env[key]))
+        for key in env:
+            #print("key: %s" % (key))
+            search_string = "${"+key+"}"
+            if args.debug:
+                print("search_string: %s" % (search_string))
+            value = env[key]
+            command = command.replace(search_string, value)
+        
+        if args.debug:
+           print("exec: %s" % (command), flush=True)
             
-        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, env=env)
+        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable='/bin/bash', env=env)
     else:
+        if args.debug:
+           print("exec: %s" % (command), flush=True)
         #print("no special environment")
-        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True)
+        process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable='/bin/bash')
     
     process.wait()    
     output = process.stdout.read()
@@ -69,11 +79,16 @@ def create_environment(source_obj):
                 value_evaluated  = execute_command(value, None)
             except Exception as e:
                 raise MyException("execute_command failed: %s" % (e))
+            
+            if args.debug:
+                print("%s=%s" % (key, value_evaluated))    
             new_environment[key]=value_evaluated
     
     
     
     new_environment['M5NR_BIN'] = bin_dir
+    
+    
         
     return new_environment
 
@@ -99,7 +114,7 @@ def download_source(directory, source_name):
     if not source_name in remote_versions_hashed: 
         raise MyException("version is missing")
         
-    version_remote = remote_versions_hashed[source_name]
+    version_remote = str(remote_versions_hashed[source_name])
     
     if version_remote == "":
         raise MyException("version is empty")
@@ -118,7 +133,13 @@ def download_source(directory, source_name):
             raise MyException("no-download") # TODO not sure if I should declare success here.
     
     if 'download' in source_obj:    
-        download_array  = source_obj['download']
+        something  = source_obj['download']
+        
+        if isinstance(something, list):
+            download_array = something
+        else:
+            download_array = [something]
+        
         if download_array != None:
             download_instruction = True
             try:
@@ -133,15 +154,25 @@ def download_source(directory, source_name):
                 if not url:
                     continue
                 
+                silent="--silent "
+                if args.debug:
+                    silent = ""
                 # curl: --speed-time 15 --speed-limit 1000 : stop transfer if less than 1000 bytes per second during 15 seconds
-                download_command = "curl --connect-timeout=10 --retry=5 --retry-delay=10 --speed-time 15 --speed-limit 1000 -O \"%s\"" % (url)
+                download_command = "curl %s--connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 --remote-name-all  %s" % (silent, url)
+                
                     
+                some_text=""    
                 if args.simulate:
                     print("SIMULATION MODE: "+download_command)
                     continue
                 try:
-                    execute_command(download_command, new_environment)
+                    some_text = execute_command(download_command, new_environment)
                 except Exception as e:
+                    
+                    if args.debug:
+                        if some_text:
+                            print(some_text)
+                    
                     raise MyException("(download) execute_command failed: %s" % (e))
                     
     if 'download-command' in source_obj:
@@ -178,10 +209,12 @@ def download_source(directory, source_name):
     
     
     with open('version.txt', 'wt') as f:
-        f.write(version)
+        f.write(version_remote)
+    
+    
     
     with open('timestamp.txt', 'wt') as f:
-        f.write(version)
+        f.write(datetime.datetime.now().isoformat())
         
         
     return
@@ -264,6 +297,9 @@ def get_remote_versions(sources):
             print("read cached remote versions from file")
             pickle_in = open(remote_versions_file,"rb")
             remote_versions_hashed = pickle.load(pickle_in)
+            
+            #pp = pprint.PrettyPrinter(indent=4)
+            #pp.pprint(remote_versions_hashed)
             return
 
 
@@ -394,7 +430,7 @@ def download_sources(sources_dir , sources):
         print("---------------------")
         success = False
         success_after_download = False
-        remote_version="undef"
+        
         current_version=""
         
         source_dir_part = os.path.join(sources_dir , source+"_part")
@@ -433,7 +469,7 @@ def download_sources(sources_dir , sources):
             success = True
         
         if success_after_download:
-            print("download success: %s" % (remote_version))
+            print("download success.")
             os.rename(source_dir_part, source_dir)
         
             
@@ -442,13 +478,23 @@ def download_sources(sources_dir , sources):
     
     
 
+def get_dir_size(start_path):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    return total_size
+
+
 
 def status(sources_directory, parses_directory):
     
     
     # define global dict remote_versions_hashed
     get_remote_versions(all_source)
-    summary_table = []
+    summary_table= PrettyTable()
+    #summary_table = []
     #summary = {}
     
     for source in sources:
@@ -462,14 +508,18 @@ def status(sources_directory, parses_directory):
         source_obj = config_sources[source]
         remote_version = ""
         if source in remote_versions_hashed:
-            remote_version = remote_versions_hashed[source]
-        
+            remote_version = str(remote_versions_hashed[source])
+            
         
         source_dir_part = os.path.join(sources_directory , source+"_part")
         source_dir = os.path.join(sources_directory , source)
        
         parse_dir = os.path.join(parses_directory , source)
         parse_dir_part = os.path.join(parses_directory , source+"_part")
+        
+        source_dir_size_mb_int = 0
+        
+        
         
         
         # get current version (version file inidcates success)
@@ -496,7 +546,9 @@ def status(sources_directory, parses_directory):
         
         if current_version != "" :
             download_success = True # TODO is success possible without version number ?
-            
+            source_dir_size = get_dir_size(source_dir)
+            source_dir_size_mb = source_dir_size/(1014*1024)
+            source_dir_size_mb_int = int(source_dir_size_mb)
         
         d_message = download_error_message[0:30]
         p_message = parsing_error_message[0:30]
@@ -511,12 +563,18 @@ def status(sources_directory, parses_directory):
         if os.path.exists(parsing_version_file):
             parsing_success = True
         
+        if source_dir_size_mb_int == 0:
+            source_dir_size_mb_int = ''
         
-        summary_table.append([source, remote_version, current_version, download_success, d_message, parsing_success, p_message ])
+        summary_table.add_row([source, remote_version, current_version, download_success, source_dir_size_mb_int, d_message, parsing_success, p_message ])
     
     
+    summary_table.field_names = ['Database', 'Remote Version', 'Local Version', 'Download Success', 'Size (MB)', 'Download Error','Parsing Success', 'Parsing Error']
+    summary_table.align = "l"
     
-    print(tabulate(summary_table, headers=['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Error','Parsing Success', 'Parsing Error']))
+    
+    print(summary_table.get_string())
+    #print(tabulate(summary_table, headers=['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Error','Parsing Success', 'Parsing Error']))
 
 
 
