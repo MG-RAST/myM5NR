@@ -203,7 +203,7 @@ SEED-Annotations:
   category: protein
   homepage: http://www.theseed.org
   type: Functional annotation
-  version: ${TODAY}
+  version: echo ${TODAY}
   download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org 
 
 SEED-Subsystems:
