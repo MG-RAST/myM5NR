@@ -342,14 +342,15 @@ def parse_sources(parsings_dir , sources, sources_directory):
     global args
     current_dir = os.getcwd()
     
-    do_stop = 0
-    for source in sources:
-        parse_dir_part = os.path.join(parsings_dir , source+"_part")
-        if os.path.isdir(parse_dir_part):
-            do_stop = 1
-            print("delete directory first: %s" % parse_dir_part)
+    if not args.force:
+        do_stop = 0
+        for source in sources:
+            parse_dir_part = os.path.join(parsings_dir , source+"_part")
+            if os.path.isdir(parse_dir_part):
+                do_stop = 1
+                print("delete directory first: %s" % parse_dir_part)
             
-    if do_stop and (not args.force):
+        if do_stop:
             sys.exit(1)
             
             
@@ -415,20 +416,20 @@ def download_sources(sources_dir , sources):
     get_remote_versions(sources)
     
     do_stop = 0
-    for source in sources:
-        resume = False
-        source_obj = config_sources[source]
-        if 'resume-download' in source_obj:
-            if source_obj['resume-download']:
-                resume=True
-        if not resume:
-            source_dir_part = os.path.join(sources_dir , source+"_part")
-            if os.path.isdir(source_dir_part):
-                do_stop = 1
-                print("delete directory first: %s" % source_dir_part)
+    if not args.force:
+        for source in sources:
+            resume = False
+            source_obj = config_sources[source]
+            if 'resume-download' in source_obj:
+                if source_obj['resume-download']:
+                    resume=True
+            if not resume:
+                source_dir_part = os.path.join(sources_dir , source+"_part")
+                if os.path.isdir(source_dir_part):
+                    do_stop = 1
+                    print("delete directory first: %s" % source_dir_part)
             
-    if do_stop:
-        if not args.force:
+        if do_stop:
             sys.exit(1)
     
     for source in sources:
