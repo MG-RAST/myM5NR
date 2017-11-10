@@ -50,6 +50,7 @@ CAZy:
      category: protein
      homepage: http://www.cazy.org
      type: Hierarchical functional annotation
+     no-download: True
    #  download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
 
 COG:
