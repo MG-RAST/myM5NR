@@ -188,7 +188,7 @@ PhAnToMe:
 PIR:
   category: protein
   type: Functional annotation
-  version: curl --silent pir.georgetown.edu/rps/data/2017_09/release_note.txt | head -n 5 | grep "^Release" | grep -o 20[0-9][0-9]_[0-9][0-9]
+  version: curl --silent pir.georgetown.edu/rps/data/current/release_note.txt | head -n 5 | grep "^Release" | grep -o 20[0-9][0-9]_[0-9][0-9]
 
 RefSeq:
   category: protein
