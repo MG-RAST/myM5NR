@@ -50,7 +50,7 @@ CAZy:
      category: protein
      homepage: http://www.cazy.org
      type: Hierarchical functional annotation
-   #  download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
+     download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
 
 COG:
      category: protein
@@ -73,17 +73,7 @@ EggNOG:
      parser: ${M5NR_BIN}/eggnog.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz   
    
     
-    
-FungiDB:
-  skip: true
-  category: rRNA / protein?
-  homepage: http://fungalgenomes.org/
-  type: ITS
-  version: curl --silent http://fungidb.org/common/downloads/Current_Release/Build_number
-  download: 
-    - http://fungalgenomes.org/public/mobedac/for_VAMPS/fungalITSdatabaseID.taxonomy.seqs.gz
-  comment: new version? http://fungidb.org/common/downloads/Current_Release/, where get proteins ?
-  
+
 GenBank:
   category: protein
   type: Functional annotation
