@@ -52,11 +52,6 @@ CAZy:
      type: Hierarchical functional annotation
      download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
 
-COG:
-     category: protein
-     type: Hierarchical functional annotation
-     no-download: True
-     comment: obtained via Eggnog v4.5 (was ftp://ftp.ncbi.nih.gov/pub/COG/COG2014/data/) 
 
 EggNOG:
      category: protein
@@ -67,13 +62,10 @@ EggNOG:
        - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
      parser:
        - ${M5NR_BINg}/eggnog.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz
-     comment: https://github.com/jhcepas/eggnog-mapper/blob/master/eggnogmapper/common.py
-     comment2: wget http://eggnogdb.embl.de/download/eggnog_3.0/{fun.txt.gz,UniProtAC2eggNOG.3.0.tsv.gz,COG.funccat.txt.gz,NOG.funccat.txt.gz,COG.description.txt.gz,NOG.description.txt.gz,sequences.v3.tar.gz}
-     download: http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
-     parser: ${M5NR_BIN}/eggnog.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz   
    
+     comment: https://github.com/jhcepas/eggnog-mapper/blob/master/eggnogmapper/common.py
+     comment2: wget http://eggnogdb.embl.de/download/eggnog_3.0/{fun.txt.gz,UniProtAC2eggNOG.3.0.tsv.gz,COG.funccat.txt.gz,NOG.funccat.txt.gz,COG.description.txt.gz,NOG.description.txt.gz,sequences.v3.tar.gz}   
     
-
 GenBank:
   category: protein
   type: Functional annotation
@@ -163,6 +155,8 @@ PFAM:
   type: Hierarchical functional annotation?
   no-download: True
       # comes from Uniprot
+  parser:
+      - (rm md52pfam ; cat ../*/*_pfam.txt >> md52id_pfam.txt)
       
 PhAnToMe:
   category: protein
