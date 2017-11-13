@@ -88,7 +88,7 @@ HITdb:
   category: protein
   homepage: https://github.com/microbiome/HITdb.git
   type: Functional annotation
-  version: curl --silent "https://raw.githubusercontent.com/microbiome/HITdb/master/README.md" | grep -A 100 "Version history" | grep "^v." | head -n 1 | cut -d ',' -f 1 | cut -d ' ' -f 2
+  version: curl --silent -L "https://raw.githubusercontent.com/microbiome/HITdb/master/README.md" | grep -A 100 "Version history" | grep "^v." | head -n 1 | cut -d ',' -f 1 | cut -d ' ' -f 2
   download:
       - https://github.com/microbiome/HITdb/archive/master.zip
   comment: reduced 16s db for human microbiome
