@@ -33,10 +33,11 @@ sub parse_Swiss_prot{
     # the main trick is to read the document record by record
     $/='//';
 
+    
     my $fh1 = new IO::Uncompress::Gunzip $input_file
        or die "Cannot open ".$input_file.": $!\n" ;
     
-    open my $fh1, '<', $input_file or die;
+    #open my $fh1, '<', $input_file or die;
     #open my $fh1, '<', 'uniprot_sprot.dat' or die;
 
     open(my $md5uniprot, '>', 'md52id_uni.txt') or die ;
