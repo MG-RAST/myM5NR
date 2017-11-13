@@ -33,9 +33,7 @@ my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
 
 open(my $md52id, '>',    'md52id_eggnog.txt') or die ;
-#open(my $md52func, '>',  'md52func_eggnog.txt') or die ;
 open(my $md52seq, '>',   'md52seq_eggnog.txt') or die ;
-#open(my $id2func, '>',   'id2func_eggnog.txt') or die ;
 open(my $md52tax, '>',  'md52tax_eggnog.txt') or die ;
 open(my $id2tax, '>',  'id2tax_eggnog.txt') or die ;
 
