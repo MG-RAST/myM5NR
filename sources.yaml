@@ -113,12 +113,6 @@ InterPro:
       - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/interpro2go
 
 
-IMG:
-  category: protein
-  type: Functional annotation
-  download:
-    - ftp://ftp.jgi-psf.org/pub/IMG/img_core_v400.tar 
-
 KEGG:
      category: protein
      homepage: http://www.genome.jp/kegg/
@@ -172,10 +166,6 @@ PhAnToMe:
     - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.asta.gz
   comment: curl --silent "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
     
-PIR:
-  category: protein
-  type: Functional annotation
-  version: curl --silent pir.georgetown.edu/rps/data/current/release_note.txt | head -n 5 | grep "^Release" | grep -o 20[0-9][0-9]_[0-9][0-9]
 
 RefSeq:
   category: protein

@@ -37,9 +37,6 @@ RUN mkdir -p /sas/ && \
 ENV PERL5LIB $PERL5LIB:/sas/lib:/sas/modules/lib
 ENV PATH $PATH:/sas/bin
 
-# install cazy parser tools
-RUN pip install cazy-parser
-
 # copy stuff from the repo into the /root (note the .dockerignore file)
 COPY . /myM5NR
 ENV PATH $PATH:/root/bin
