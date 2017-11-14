@@ -142,6 +142,9 @@ motuDB:
   version: curl --silent http://vm-lux.embl.de/~kultima/MOCAT/download.html | grep -o "mOTU\.v[0-9\.] " | grep -o "v[0-9\.]" | grep -o "[0-9\.]"
   download: 
     - http://vm-lux.embl.de/~kultima/share/mOTU/mOTU.v${VERSION}.padded.tar.gz
+  parser:
+    - tar xfz ${SOURCE_DIR}/motuDB/mOTU.v1.padded.tar.gz 
+    - 
     
 PATRIC:
   category: protein
