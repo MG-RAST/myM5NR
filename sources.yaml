@@ -49,11 +49,13 @@ CAZy:
          - ${M5NR_BIN}/create-cazy-hierachy.sh > cazy-hierarchy.txt
 COG:
     category: protein
-    yype: Hierarchical functional annotation
+    type: Hierarchical functional annotation
     no-download: True
     comment: obtained via UNIprot
+    depends:
+        - TrEmble
     parser:
-        - fgrep COG ../TrEmbl/md52id_eggnog.txt > md52id_cog.txt
+        - fgrep COG ../TrEmble/md52id_eggnog.txt > md52id_cog.txt
 
 EggNOG:
      category: protein
@@ -158,7 +160,7 @@ PFAM:
   type: Hierarchical functional annotation?
   no-download: True
       # comes from Uniprot
-  depend: 
+  depends: 
     - Swiss-Prot
     - TrEmble
   parser:
@@ -240,6 +242,17 @@ SILVA-LSU:
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_full_align_trunc.fasta.gz.md5
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSUParc.rast.gz
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSUParc.rast.gz.md5
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz
+    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz.md5
+    
+SILVA-SSU:
+  homepage: http://www.arb-silva.de
+  category: rRNA
+  type: SSU
+  version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
+  download:
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSUParc_tax_silva.fasta.gz
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSUParc_tax_silva.fasta.gz.md5
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSUParc_tax_silva_trunc.fasta.gz
@@ -256,17 +269,6 @@ SILVA-LSU:
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_full_align_trunc.fasta.gz.md5
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz.md5
-  
-SILVA-SSU:
-  homepage: http://www.arb-silva.de
-  category: rRNA
-  type: SSU
-  version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
-  download: 
-    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSUParc.rast.gz
-    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSUParc.rast.gz.md5
-    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz
-    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz.md5
     - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_SSUParc.rast.gz
     - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_SSUParc.rast.gz.md5
     - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_SSURef.rast.gz
