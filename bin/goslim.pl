@@ -86,9 +86,6 @@ if ( $filename eq "" )
   } # while $record 
   
     # handle last record (before EOF)
-      print $fh1 "$id\t$name\t$namespace\n";
-
-
 
     exit 0;
 
