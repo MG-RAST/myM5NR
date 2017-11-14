@@ -260,7 +260,11 @@ def parse_source(directory, source_name, source_directory):
         if not os.path.exists(dep_version_file):
             raise MyException("dependency %s missing" % (dep))
     
-    
+    version_file = os.path.join(source_directory)
+    version = 'NA'
+    with open(version_file, 'r') as myfile:
+        version=myfile.read()
+        
     
     if not os.path.exists(source_directory):
        raise MyException("source dir missing") 
@@ -274,7 +278,7 @@ def parse_source(directory, source_name, source_directory):
         
         
         new_environment['SOURCE_DIR'] = source_directory
-        
+        new_environment['VERSION'] = version
         
         
         
