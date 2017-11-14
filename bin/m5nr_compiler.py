@@ -258,7 +258,7 @@ def parse_source(directory, source_name, source_directory):
         dep_dir = os.path.normpath(os.path.join(directory, "..", dep))
         dep_version_file = os.path.join(dep_dir, "version.txt")
         if not os.path.exists(dep_version_file):
-            raise MyException("dependency %s missing")
+            raise MyException("dependency %s missing" % (dep))
     
     
     
