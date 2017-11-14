@@ -145,8 +145,9 @@ motuDB:
   category: protein
   homepage: http://www.bork.embl.de/software/mOTU/
   type: Filter set
+  version: curl --silent http://vm-lux.embl.de/~kultima/MOCAT/download.html | grep -o "mOTU\.v[0-9\.] " | grep -o "v[0-9\.]" | grep -o "[0-9\.]"
   download: 
-    - http://vm-lux.embl.de/~kultima/share/mOTU/mOTU.v1.padded.tar.gz
+    - http://vm-lux.embl.de/~kultima/share/mOTU/mOTU.v${VERSION}.padded.tar.gz
     
 PATRIC:
   category: protein
