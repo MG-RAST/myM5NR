@@ -11,7 +11,7 @@ my @sources ;
 my $output_filename;
 my $verbose = 0;
 my $debug   = 0;
-
+my $resume  = 1;
 
 my $md5 		= Digest::MD5->new;
 my $sapObject 	= SAPserver->new();
@@ -21,6 +21,7 @@ GetOptions (
 	'output=s' => \$output_filename,
 	'verbose+' => \$verbose ,
 	'debug+'   => \$debug   ,
+  'resume'   => \$resume ,
 	);
 	
 @sources = split(/,/,join(',',@sources));
@@ -34,7 +35,7 @@ if ($output_filename eq "") {
 	die "output_filename not defined.\n";
 }
 
-if (-e $output_filename) {
+if (-e $output_filename and not $resume) {
 	die "file ".$output_filename." already exists.\n";
 }
 
@@ -84,7 +85,8 @@ foreach my $source (@sources){
 			print STDERR "$ss -> ".$ss_filename."\n";
 			if (-e $ss_filename) {
 				print STDERR "Skip $ss , file ".$ss_filename." already exists\n";
-				paste_file($out_fh, $ss_filename);
+        # ??????
+        paste_file($out_fh, $ss_filename);
 				next;
 			}
 			
@@ -94,7 +96,11 @@ foreach my $source (@sources){
 			my $retry = 0;
 			my $success = 0;
 			my $debug = 0;
-			while (($retry < 5) && ($success==0)) {
+      
+      # Set wait time for resume
+      my $wait = 10 ;
+      
+			while (($retry < 10) && ($success==0)) {
 				$retry++;
 				
 				if ($retry > 1) {
@@ -123,7 +129,12 @@ foreach my $source (@sources){
 					print STDERR "Processing Subsystem $ss failed [$current/$total]\n";
 					print STDERR $@."\n";
 					$success = 0;
-					sleep 10;
+					sleep $wait;
+          $wait = $wait * 2 ;
+          # Don't wait longer than 2 hours
+          if ($wait >= 7200) {
+            $wait = 7200 ;
+          } 
 					
 				};
 			}
