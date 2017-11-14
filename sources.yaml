@@ -49,9 +49,11 @@ CAZy:
          - ${M5NR_BIN}/create-cazy-hierachy.sh > cazy-hierarchy.txt
 COG:
     category: protein
-    yype: Hierarchical functional annotation
+    type: Hierarchical functional annotation
     no-download: True
     comment: obtained via UNIprot
+    depends:
+        - TrEmble
     parser:
         - fgrep COG ../TrEmbl/md52id_eggnog.txt > md52id_cog.txt
 
