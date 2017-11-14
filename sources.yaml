@@ -43,8 +43,17 @@ CAZy:
      category: protein
      homepage: http://www.cazy.org
      type: Hierarchical functional annotation
-     download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
-
+#     download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
+     no-download: True
+     parser:
+         - ${M5NR_BIN}/create-cazy-hierachy.sh > cazy-hierarchy.txt
+COG:
+    category: protein
+    yype: Hierarchical functional annotation
+    no-download: True
+    comment: obtained via UNIprot
+    parser:
+        - fgrep COG ../TrEmbl/md52id_eggnog.txt > md52id_cog.txt
 
 EggNOG:
      category: protein
@@ -53,8 +62,13 @@ EggNOG:
      version: curl --silent "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
      download:
        - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
+#       - http://eggnogdb.embl.de/download/eggnog_4.5/OG_hierarchies.tsv.gz 
+       - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.functional_categories.txt  
+       - http://eggnogdb.embl.de/download/eggnog_4.5/COG_functional_categories.txt
+       - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog-mapper-data/og2level.tsv.gz
+       
      parser:
-       - ${M5NR_BINg}/eggnog.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz 
+       - ${M5NR_BIN}/eggnog.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz 
      comment: https://github.com/jhcepas/eggnog-mapper/blob/master/eggnogmapper/common.py
      comment2: wget http://eggnogdb.embl.de/download/eggnog_3.0/{fun.txt.gz,UniProtAC2eggNOG.3.0.tsv.gz,COG.funccat.txt.gz,NOG.funccat.txt.gz,COG.description.txt.gz,NOG.description.txt.gz,sequences.v3.tar.gz}   
     
@@ -72,8 +86,7 @@ goslim:
   version: curl --silent "http://archive.geneontology.org/full/DATESTAMP"
   download:
     - http://www.geneontology.org/ontology/subsets/goslim_metagenomics.obo
-  parser:
-    - 
+#  parser: 
   comment: version might be unrelated to goslim_metagenomics.obo?
     
 Greengenes:
@@ -88,9 +101,12 @@ HITdb:
   category: protein
   homepage: https://github.com/microbiome/HITdb.git
   type: Functional annotation
-  version: curl --silent -L "https://raw.githubusercontent.com/microbiome/HITdb/master/README.md" | grep -A 100 "Version history" | grep "^v." | head -n 1 | cut -d ',' -f 1 | cut -d ' ' -f 2
+  version: curl --silent "https://raw.githubusercontent.com/microbiome/HITdb/master/README.md" | grep -A 100 "Version history" | grep "^v." | head -n 1 | cut -d ',' -f 1 | cut -d ' ' -f 2
   download:
       - https://github.com/microbiome/HITdb/archive/master.zip
+  parser:
+      - unzip master.zip
+      - cd HITdb-master/HITdb_v1.00
   comment: reduced 16s db for human microbiome
     
 InterPro:
@@ -264,7 +280,8 @@ Swiss-Prot:
   download:
     - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
   version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "Swiss-Prot" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
-  parser: ${M5NR_BIN}/uniprot2many.pl -swiss ${SOURCE_DIR}/uniprot_sprot.dat.gz 
+  parser: 
+      - ${M5NR_BIN}/uniprot2many.pl -swiss ${SOURCE_DIR}/uniprot_sprot.dat.gz 
 
 TrEmble:
   category: protein
@@ -272,7 +289,8 @@ TrEmble:
   download:
     -  ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
   version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
-  parser: ${M5NR_BIN}/uniprot2many.pl -trembl ${SOURCE_DIR}/uniprot_trembl.dat.gz
+  parser: 
+    - ${M5NR_BIN}/uniprot2many.pl -trembl ${SOURCE_DIR}/uniprot_trembl.dat.gz
   
   
 
