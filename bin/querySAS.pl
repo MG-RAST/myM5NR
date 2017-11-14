@@ -69,9 +69,15 @@ foreach my $source (@sources){
 		print STDERR "Retrieving Subsystems and functional roles.\n" if ($verbose) ;
 		my $subsystems 	= $sapObject->all_subsystems({-exclude => ['experimental']});
 		
+    open(File , ">subsystem.list") ;
+    foreach my $ss (sort keys %$subsystems){
+      print File "$ss\n";
+    }
+    close File ; 
+    
 		my $total = scalar (keys %$subsystems)  ;
 		my $current = 0;
-		foreach my $ss (keys %$subsystems){
+		foreach my $ss (sort keys %$subsystems){
 			$current++;
 			print STDERR "$current/$total :  $ss \n";
 			my $ss_filename = $ss;
@@ -149,6 +155,11 @@ foreach my $source (@sources){
 
 	}
 	
+  else{
+    print STDERR "Unkown source.\n" ;
+    
+  }
+  
 }
 
 close($out_fh);
