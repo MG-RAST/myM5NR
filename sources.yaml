@@ -55,7 +55,7 @@ COG:
     depends:
         - TrEmble
     parser:
-        - fgrep COG ../TrEmbl/md52id_eggnog.txt > md52id_cog.txt
+        - fgrep COG ../TrEmble/md52id_eggnog.txt > md52id_cog.txt
 
 EggNOG:
      category: protein
