@@ -250,7 +250,7 @@ def parse_source(directory, source_name, source_directory):
             raise MyException("skipped")
     
     depends = []
-    if 'depends' in source_obj
+    if 'depends' in source_obj:
         depends =  source_obj["depends"]
     
     
