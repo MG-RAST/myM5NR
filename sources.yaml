@@ -158,7 +158,7 @@ PFAM:
   type: Hierarchical functional annotation?
   no-download: True
       # comes from Uniprot
-  depend: 
+  depends: 
     - Swiss-Prot
     - TrEmble
   parser:
