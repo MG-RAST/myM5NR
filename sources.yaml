@@ -133,13 +133,6 @@ KEGG:
      comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
      comment2: EC hierarchy from elsewhere  
 
-MITOZOA:
-  category: rRNA
-  homepage: http://srv00.recas.ba.infn.it/mitozoa
-  type: mtRNA
-  version: curl --silent "http://srv00.recas.ba.infn.it/mitozoa/ftp_download.php" | grep -o "Rel. [0-9\.]*" | tail -n 1 | cut -d ' ' -f 2
-  download:
-    - http://srv00.recas.ba.infn.it/mitozoa/ftp/dbMZ_v${VERSION}.zip
 
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)
 motuDB:
