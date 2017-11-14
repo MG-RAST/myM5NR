@@ -260,7 +260,7 @@ def parse_source(directory, source_name, source_directory):
         if not os.path.exists(dep_version_file):
             raise MyException("dependency %s missing" % (dep))
     
-    version_file = os.path.join(source_directory)
+    version_file = os.path.join(source_directory, "version.txt")
     version = 'NA'
     with open(version_file, 'r') as myfile:
         version=myfile.read()
