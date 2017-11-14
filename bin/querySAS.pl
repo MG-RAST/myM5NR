@@ -11,7 +11,6 @@ my @sources ;
 my $output_filename;
 my $verbose = 0;
 my $debug   = 0;
-my $resume  = 1;
 
 my $md5 		= Digest::MD5->new;
 my $sapObject 	= SAPserver->new();
@@ -21,7 +20,6 @@ GetOptions (
 	'output=s' => \$output_filename,
 	'verbose+' => \$verbose ,
 	'debug+'   => \$debug   ,
-  'resume'   => \$resume ,
 	);
 	
 @sources = split(/,/,join(',',@sources));
@@ -35,11 +33,8 @@ if ($output_filename eq "") {
 	die "output_filename not defined.\n";
 }
 
-if (-e $output_filename and not $resume) {
-	die "file ".$output_filename." already exists.\n";
-}
 
-open my $out_fh, '>>', $output_filename
+open my $out_fh, '>', $output_filename
 	or die "Couldn't open ".$output_filename." for appending: $!\n";
 
 
@@ -85,7 +80,6 @@ foreach my $source (@sources){
 			print STDERR "$ss -> ".$ss_filename."\n";
 			if (-e $ss_filename) {
 				print STDERR "Skip $ss , file ".$ss_filename." already exists\n";
-        # ??????
         paste_file($out_fh, $ss_filename);
 				next;
 			}
