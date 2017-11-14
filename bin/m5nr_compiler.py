@@ -106,15 +106,30 @@ def download_source(directory, source_name):
         if source_obj["skip"]:
             raise MyException("skipped")
     
-    
+    no_download = False
+    if 'no-download' in source_obj:
+        if  source_obj['no-download']:
+            no_download = True
+            
+            
+            
     if args.debug:
         print(source_obj)
     
     version_remote = ''
-    if not source_name in remote_versions_hashed: 
-        raise MyException("version is missing")
+    
+    
+    
+    if source_name in remote_versions_hashed:
+        version_remote = str(remote_versions_hashed[source_name])
         
-    version_remote = str(remote_versions_hashed[source_name])
+    else:
+        if no_download:
+            version_remote = "-"
+        else:
+            raise MyException("version is missing")
+        
+    
     
     if version_remote == "":
         raise MyException("version is empty")
@@ -128,9 +143,7 @@ def download_source(directory, source_name):
     #    version_local = execute_command(command, new_environment)
     
     download_instruction = False
-    if 'no-download' in source_obj:
-        if  source_obj['no-download']:
-            raise MyException("no-download") # TODO not sure if I should declare success here.
+    
     
     if 'download' in source_obj:    
         something  = source_obj['download']
@@ -205,9 +218,9 @@ def download_source(directory, source_name):
         
     
     
-    if not download_instruction:
+    if (not download_instruction) and (not no_download):
         raise MyException("download instruction mising")
-    
+        
     
     with open('version.txt', 'wt') as f:
         f.write(version_remote)
