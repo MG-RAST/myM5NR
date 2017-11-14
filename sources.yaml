@@ -171,7 +171,7 @@ PhAnToMe:
     TIMESTAMP: curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
   version: date -d @${TIMESTAMP} +"%Y%m%d"
   download:
-    - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.asta.gz
+    - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz
   comment: curl --silent "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
     
 
