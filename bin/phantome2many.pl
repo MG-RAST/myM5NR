@@ -29,14 +29,14 @@ my $filename="/tmp/phantome.data.gz";
 my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
 
-open(my $md52idphantome, '>', 'md52id_phantome.txt') or die ;
+open(my $md52id'>', 'md52id_phantome.txt') or die ;
 open(my $md5seq, '>', 'md52seq_phantome.txt') or die ;
-open(my $phantome2func, '>', 'id2func_phantome.txt') or die ;
+open(my $id2func, '>', 'id2func_phantome.txt') or die ;
 open(my $md5func, '>', 'md52func_phantome.txt') or die ;
-open(my $phantome2tax, '>', 'id2tax_phantome.txt') or die ;
+open(my $id2tax, '>', 'id2tax_phantome.txt') or die ;
 open(my $md5tax, '>', 'md52tax_phantome.txt') or die ;
-open(my $phantome2subsystem, '>', 'phantome2subsystem.txt') or die ;
-open(my $id2func_phantom , '>' , 'id2func_phantome.txt') or die ;
+open(my $id2subsystem, '>', 'id2hierarchy_phantome.txt') or die ;
+open(my $id2func , '>' , 'id2func_phantome.txt') or die ;
 
 # ################# ################# ################# ################
 # ################# ################# ################# ################
@@ -54,13 +54,13 @@ while (<$fh1>) {
          $md5s = md5_hex($seq);
          
          # print the output
-         print $md52idphantome "$md5s\t$id\n";
+         print $md52id "$md5s\t$id\n";
          print $md5seq "$md5s\t$seq\n";
          print $md5func "$md5s\t$func\n";
-         print $id2func_phantom "$id\t$func\n";
+         print $id2func"$id\t$func\n";
  	       print $md5tax   "$md5s\t$taxid\n";
-         print $phantome2tax "$id\t$taxid\n";
-         print $phantome2subsystem "$id\t$subsys\n";
+         print $id2tax "$id\t$taxid\n";
+         print $id2subsystem "$id\t$subsys\n";
          # reset the values for the next record
          $id='';  $md5s='';  $func='';  $subsys='';  $taxid='';  $taxname='';   
        }              
