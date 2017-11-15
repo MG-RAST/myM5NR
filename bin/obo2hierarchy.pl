@@ -34,7 +34,7 @@ if ( $filename eq "" )
   
     open my $fh1, '<', $filename or die;
     #open my $fh1, '<', 'uniprot_sprot.dat' or die;
-    open(my $id2hier, '>',    'id2hierachy.txt') or die ;
+    open(my $id2hier, '>',    'id2hierarchy.txt') or die ;
 
     my $id=""; my $name=""; my $namespace=""; my $hier1='';
     
