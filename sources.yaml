@@ -38,7 +38,9 @@ CARD:
      download: https://card.mcmaster.ca/latest/data
      parser:
        - cat ${SOURCE_DIR}/data | bunzip2 | tar xf - 
-   
+       - ${M5NR_BIN}/card.pl ${SOURCE_DIR}/protein_fasta_protein_homolog_model.fasta
+       - ${M5NR_BIN}/obo2hierarchy.pl ${SOURCE_DIR}/aro.obo 
+       - mv id2hierarchy.txt id2hierarchy_card.txt
 CAZy:
      category: protein
      homepage: http://www.cazy.org
