@@ -23,25 +23,34 @@ use IO::Uncompress::Gunzip;
 
 # the main trick is to read the document record by record
 
-my $filename="/tmp/phantome.data.gz";
+my $filename=shift @ARGV;
 
+if ( $filename eq "" )
+{
+  print STDERR "Usage: \tmotudb.pl <filename1> \n";
+  print STDERR " \te.g. motudb.pl mOTU.v1.padded	\n";
+  exit 1;
+}
 
 my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
+       
 
-open(my $md52id'>', 'md52id_phantome.txt') or die ;
+open(my $md52id, '>', 'md52id_phantome.txt') or die ;
 open(my $md5seq, '>', 'md52seq_phantome.txt') or die ;
 open(my $id2func, '>', 'id2func_phantome.txt') or die ;
 open(my $md5func, '>', 'md52func_phantome.txt') or die ;
 open(my $id2tax, '>', 'id2tax_phantome.txt') or die ;
 open(my $md5tax, '>', 'md52tax_phantome.txt') or die ;
-open(my $id2subsystem, '>', 'id2hierarchy_phantome.txt') or die ;
+open(my $id2hierarchy, '>', 'id2hierarchy_phantome.txt') or die ;
 open(my $id2func , '>' , 'id2func_phantome.txt') or die ;
 
 # ################# ################# ################# ################
 # ################# ################# ################# ################
 # ################# ################# ################# ################
 my $header=''; my $id; my $md5s=''; my $func=''; my $subsys=''; my $taxid=''; my $taxname=''; my $seq='';
+my $subsystems='';
+
 while (<$fh1>) {
   
   # for every header line
@@ -57,12 +66,15 @@ while (<$fh1>) {
          print $md52id "$md5s\t$id\n";
          print $md5seq "$md5s\t$seq\n";
          print $md5func "$md5s\t$func\n";
-         print $id2func"$id\t$func\n";
+         print $id2func "$id\t$func\n";
  	       print $md5tax   "$md5s\t$taxid\n";
          print $id2tax "$id\t$taxid\n";
-         print $id2subsystem "$id\t$subsys\n";
+
+         foreach  $subsys (split ';', $subsystems) { # print one entry per subsystem record we find
+           print $id2hierarchy "$id\t$func\t$subsys\n";
+         }    
          # reset the values for the next record
-         $id='';  $md5s='';  $func='';  $subsys='';  $taxid='';  $taxname='';   
+         $id='';  $md5s='';  $func='';  $subsys='';  $taxid='';  $taxname=''; $subsystems="";
        }              
 
 # >fig|10756.2.peg.12 [Phage protein] [ACLAME_Phage_head; Phage_capsid_proteins] [10756.2] [Bacillus phage phi29]
@@ -76,7 +88,7 @@ my $line = $_;
       
       $id=@header[0];
       $func=@header[1]; 
-      $subsys=@header[2];   # might be multiple needs unwrapping
+      $subsystems=@header[2];   # map to array to help unwrapping later
       $taxid=@header[3]; 
       $taxname=@header[4];
 
