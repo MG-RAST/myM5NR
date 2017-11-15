@@ -34,8 +34,8 @@ if ($output_filename eq "") {
 }
 
 
-if ( -e $output_filename eq "") {
-	die "output_filename already exists.\n";
+if ( -e $output_filename ) {
+	die $output_filename." already exists.\n";
 }
 
 my $output_filename_part = $output_filename."_part";
