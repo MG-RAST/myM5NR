@@ -46,7 +46,7 @@ CAZy:
 #     download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
      no-download: True
      parser:
-         - ${M5NR_BIN}/create-cazy-hierachy.sh > cazy-hierarchy.txt
+         - ${M5NR_BIN}/create-cazy-hierarchy.sh > cazy-hierarchy.txt
 COG:
     category: protein
     type: Hierarchical functional annotation
