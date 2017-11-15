@@ -281,7 +281,7 @@ Swiss-Prot:
     - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
   version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "Swiss-Prot" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
   parser: 
-      - ${M5NR_BIN}/uniprot2many.pl -swiss ${SOURCE_DIR}/uniprot_sprot.dat.gz 
+      - ${M5NR_BIN}/swissprot.pl ${SOURCE_DIR}/uniprot_sprot.dat.gz 
 
 TrEmble:
   category: protein
