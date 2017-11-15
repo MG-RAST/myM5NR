@@ -76,7 +76,7 @@ EggNOG:
        
      parser:
 #       - ${M5NR_BIN}/eggnog.pl ${SOURCE_DIR}/eggnog4.proteins.core_periphery.fa.gz 
-       - zcat ${SOURCES_DIR}/NOG.members.tsv.gz -f1,5 > eggnog-hierarchy.txt
+       - zcat ${SOURCES_DIR}/NOG.members.tsv.gz | cut -f1,5 > eggnog-hierarchy.txt
        
 GenBank:
   category: protein
