@@ -125,7 +125,8 @@ InterPro:
       - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/entry.list
       - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/short_names.dat
       - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/interpro2go
-
+  parser:
+      - ${M5NR_BIN}/interpro.pl ${SOURCE_DIR}/interpro2go
 
 KEGG:
      category: protein
