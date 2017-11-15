@@ -66,7 +66,9 @@ EggNOG:
      homepage: http://eggnogdb.embl.de
      version: curl --silent "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
      download:
-       - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.core_periphery.fa.gz
+       - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.proteins.all.fa.gz 
+       - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.members.tsv.gz
+       - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.protein_id_conversion.tsv.gz
 #       - http://eggnogdb.embl.de/download/eggnog_4.5/OG_hierarchies.tsv.gz 
        - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.functional_categories.txt  
        - http://eggnogdb.embl.de/download/eggnog_4.5/COG_functional_categories.txt
