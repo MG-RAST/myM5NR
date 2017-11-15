@@ -34,8 +34,17 @@ if ($output_filename eq "") {
 }
 
 
-open my $out_fh, '>', $output_filename
-	or die "Couldn't open ".$output_filename." for appending: $!\n";
+if ( -e $output_filename ) {
+	die $output_filename." already exists.\n";
+}
+
+my $output_filename_part = $output_filename."_part";
+
+
+unlink ($output_filename_part) if (-e $output_filename_part);
+
+open my $out_fh, '>', $output_filename_part
+	or die "Couldn't open ".$output_filename_part.": $!\n";
 
 
 # id2genome_name mapping used globally
@@ -164,6 +173,8 @@ foreach my $source (@sources){
 
 close($out_fh);
 
+
+rename($output_filename_part, $output_filename);
 
 exit;
 
