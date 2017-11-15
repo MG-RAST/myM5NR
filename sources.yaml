@@ -290,7 +290,7 @@ TrEmble:
     -  ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
   version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
   parser: 
-    - ${M5NR_BIN}/uniprot2many.pl -trembl ${SOURCE_DIR}/uniprot_trembl.dat.gz
+    - ${M5NR_BIN}/trembl.pl ${SOURCE_DIR}/uniprot_trembl.dat.gz
   
   
 
