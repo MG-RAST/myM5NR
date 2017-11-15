@@ -30,7 +30,7 @@ my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
 
     # the main trick is to read the document record by record
-$/='//';
+$/='//\n';
 
 open(my $md52id, '>',    'md52id_swissprot.txt') or die ;
 open(my $md52seq, '>',   'md52seq_swissprot.txt') or die ;
@@ -131,7 +131,7 @@ while (my $record = <$fh1>) {
           print $md52uni_func "$md5s\t$func\n";
         	print $md52tax "$md5s\t$tax\n";
   
-          die "cannot find ID\n" if ( $id eq "");  
+          if ( $id eq "") { print $record."\n" ;          die "cannot find ID\n" }
 
           print $md52id "$md5s\t$id\n" ;    	        
           print $md52id_ipr "$md5s\t$ipr\n"    	    if ( $ipr ne "" ); 
@@ -147,7 +147,7 @@ while (my $record = <$fh1>) {
         } # of if ($line =~ /^SQ/) 
 
           # reset EOL
-          $/='//';
+          $/='//\n';
       } # foreach
       
 } # while read
