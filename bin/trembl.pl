@@ -109,8 +109,10 @@ while (my $record = <$fh1>) {
         if  ($line =~ /^DR\W+eggNOG;\W+COG(\d+);\W+LUCA./) {
           $cog="COG$1";  next;
          }
-    #trembl_short.dat:DR   eggNOG; arCOG01218; Archaea.
-
+    
+    if  ($line =~ /^DR\W+eggNOG;\W+(\w+);/) {
+         $eggnog="$1"; next;
+    }
     #sprot_short.dat:DR   eggNOG; ENOG410J6YU; Eukaryota.
        if  ($line =~ /^DR\W+eggNOG;\W+(\w+);/) {
          if ( $eggnog ne '' ) {
@@ -134,14 +136,13 @@ while (my $record = <$fh1>) {
     	#print "GO:$go\n";
             next;
         }
-     
+            
               
-              
-    # parse sequence, generate md5 and write outfiles 
-        if  ($line =~ /^SQ/) {
+      # parse sequence, generate md5 and write outfiles 
+      if  ($line =~ /^SQ/) {
 
     	my @lines = split ('SQ ', $record);
-    #	print Dumper(@lines);
+      #	print Dumper(@lines);
             
         # split the record at the correct position to catch the sequences
         my $sequence = @lines[1];

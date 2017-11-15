@@ -34,7 +34,6 @@ $/='//';
 
 open(my $md52id, '>',    'md52id_swissprot.txt') or die ;
 open(my $md52seq, '>',   'md52seq_swissprot.txt') or die ;
-open(my $id2func, '>',   'id2func_swissprot.txt') or die ;
 open(my $md52id_go, '>', 'md52id_go_swissprot.txt') or die ;
 open(my $md52id_ipr, '>', 'md52id_ipr_swissprot.txt') or die ;
 #open(my $md52tax, '>',  'md52tax_motudb.txt') or die ;
@@ -44,7 +43,7 @@ open(my $md52id_pfam, '>', 'md52id_pfam_swissprot.txt') or die ;
 open(my $md52id_kegg, '>', 'md52id_kegg_swissprot.txt') or die ;
 open(my $md52id_cazy, '>', 'md52id_cazy_swissprot.txt') or die ;
 open(my $md52id_ec, '>', 'md52id_ec_swissprot.txt') or die ;
-open(my $md52id_eggnog, '>', 'md52id-eggnog_swissprot.txt') or die ;
+open(my $md52id_eggnog, '>', 'md52id_eggnog_swissprot.txt') or die ;
 open(my $md52id_cog, '>', 'md52id_cog_swissprot.txt') or die ;
 open(my $md52tax, '>', 'md52taxid.txt') or die ;
 
@@ -63,7 +62,7 @@ while (my $record = <$fh1>) {
   foreach my $line (split /\n/ ,$record)  {
       #print $line."\n";
 
-      if ($line =~ /^ID\W+(\w+)/ ) {
+      if ($line =~ /^ID\W+(\w+)\W+.+/ ) {
           $id=$1;  next;
       }
 
