@@ -20,34 +20,31 @@ use strict;
 use IO::Compress::Gzip qw(gzip $GzipError) ;
 use IO::Uncompress::Gunzip;
 
-#my $verbose;
-
 my $filename=shift @ARGV;
 
 if ( $filename eq "" )
 {
-  print STDERR "Usage: \tmotudb.pl <filename1> \n";
-  print STDERR " \te.g. motudb.pl mOTU.v1.padded	\n";
+  print STDERR "Usage: \ttrembl.pl <filename1> \n";
   exit 1;
 }
 
 my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
 
-open(my $md52id, '>',    'md52id_uni.txt') or die ;
-open(my $md52seq, '>',   'md52seq_uniprot.txt') or die ;
-open(my $id2func, '>',   'id2func_uniprot.txt') or die ;
-open(my $md52id_go, '>', 'md52id_go.txt') or die ;
-open(my $md52id_ipr, '>', 'md52id_ipr.txt') or die ;
+open(my $md52id, '>',    'md52id_trembl.txt') or die ;
+open(my $md52seq, '>',   'md52seq_trembl.txt') or die ;
+open(my $id2func, '>',   'id2func_trembl.txt') or die ;
+open(my $md52id_go, '>', 'md52id_go_trembl.txt') or die ;
+open(my $md52id_ipr, '>', 'md52id_ipr_trembl.txt') or die ;
 #open(my $md52tax, '>',  'md52tax_motudb.txt') or die ;
 #open(my $id2tax, '>',  'id2tax_motudb.txt') or die ;
-open(my $md52uni_func, '>', 'md52func_uniprot.txt') or die ;
-open(my $md52id_pfam, '>', 'md52id_pfam.txt') or die ;
-open(my $md52id_kegg, '>', 'md52id_kegg.txt') or die ;
-open(my $md52id_cazy, '>', 'md52id_cazy.txt') or die ;
-open(my $md52id_ec, '>', 'md52id_ec.txt') or die ;
-open(my $md52id_eggnog, '>', 'md52id_eggnog.txt') or die ;
-open(my $md52id_cog, '>', 'md52id_cog.txt') or die ;
+open(my $md52uni_func, '>', 'md52func_trembl.txt') or die ;
+open(my $md52id_pfam, '>', 'md52id_pfam_trembl.txt') or die ;
+open(my $md52id_kegg, '>', 'md52id_kegg_trembl.txt') or die ;
+open(my $md52id_cazy, '>', 'md52id_cazy_trembl.txt') or die ;
+open(my $md52id_ec, '>', 'md52id_ec_trembl.txt') or die ;
+open(my $md52id_eggnog, '>', 'md52id-eggnog_trembl.txt') or die ;
+open(my $md52id_cog, '>', 'md52id_cog_trembl.txt') or die ;
 open(my $md52tax, '>', 'md52taxid.txt') or die ;
     
  
