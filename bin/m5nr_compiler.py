@@ -55,17 +55,31 @@ def execute_command(command, env):
            print("exec: %s" % (command), flush=True)
         #print("no special environment")
         process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable='/bin/bash')
+  
+    last_line = ''
+    while True:
+        #print('loop')
+        output = process.stdout.readline()
+        rc = process.poll()
+        if output == '' and process.poll() is not None:
+            #print("Cond 1")
+            break
+        
+        if output:
+            last_line = output.decode("utf-8").rstrip()
+            print(last_line)
+        if rc==0:
+            #print("Cond 2")
+            break
+       
     
-    process.wait()    
-    output = process.stdout.read()
-    fixed = output.decode("utf-8").rstrip()
     if args.debug:
-        print(fixed)
+        print(last_line)
         
     if process.returncode:
-        raise MyException("Command failed (return code %d, command: %s): %s" % (process.returncode, command, fixed[0:500]))    
+        raise MyException("Command failed (return code %d, command: %s): %s" % (process.returncode, command, last_line[0:500]))    
         
-    return fixed
+    return last_line
 
 
 def create_environment(source_obj):
@@ -491,12 +505,16 @@ def download_sources(sources_dir , sources):
                 if source_obj['resume-download']:
                     resume=True
             
-            if not resume:
+            if resume:
+                if not os.path.isdir(source_dir_part):
+                    os.makedirs(source_dir_part)
+            else:
                 if args.force:
                     if os.path.isdir(source_dir_part):
                         shutil.rmtree(source_dir_part) 
-            
+                        
                 os.makedirs(source_dir_part)
+                
             
             os.chdir(source_dir_part)
             print("call download_source")
