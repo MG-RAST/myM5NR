@@ -618,7 +618,7 @@ def status(sources_directory, parses_directory):
     summary_table.align = "l"
     
     
-    print(summary_table.get_string())
+    print(summary_table.get_string(sortby="Database"))
     #print(tabulate(summary_table, headers=['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Error','Parsing Success', 'Parsing Error']))
 
 
