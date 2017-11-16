@@ -67,10 +67,12 @@ while (<$fh1>) {
       $id = substr(@words[0],1);
       my $pos=index ($line, '[');
       my $len= length($id);
-      $func = substr ($line, $len+1, $pos-$len);
+      $func = substr ($line, $len+1, ($pos-$len)-1);
       $func =~ s/MULTISPECIES:\ //g;
+      $func =~ s/PREDICTED:\ //g;
       $func =~ s/RecName:\ Full=//g;
       $func =~ s/Short=.*//g;
+      $func =~ s/AltName:.*//g;
       $func =~ s/\x01.*//g; # we still need to split off some CTRL-A tails ; should have been caught before but isn't
         
 #      print "FUNC: $func\n";
