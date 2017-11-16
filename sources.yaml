@@ -82,6 +82,8 @@ GenBank:
   download:
     - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
   version: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
+  parser:
+      - ${M5NR_BIN}/genbank.pl ${SOURCE_DIR}/nr.gz
 
 goslim:
   category: protein
