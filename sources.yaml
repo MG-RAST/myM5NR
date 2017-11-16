@@ -149,6 +149,8 @@ PATRIC:
   type: Functional annotation
   version: wget -qO- ftp://ftp.patricbrc.org/patric2/ | grep current_release | grep -o "20[0-9][0-9] [a-zA-Z]*"
   download-command: ${M5NR_BIN}/download_PATRIC.sh 
+  parser:
+      - ${M5NR_BIN}/patric.pl ${SOURCE_DIR}/
     
 PFAM:
   type: Hierarchical functional annotation?
