@@ -107,18 +107,7 @@ Greengenes:
   parser:
     - ${M5NR_BIN}/greengenes.pl ${SOURCE_DIR}/current_GREENGENES_gg16S_unaligned.fasta.gz
 
-HITdb:
-  category: protein
-  homepage: https://github.com/microbiome/HITdb.git
-  type: Functional annotation
-  version: curl --silent "https://raw.githubusercontent.com/microbiome/HITdb/master/README.md" | grep -A 100 "Version history" | grep "^v." | head -n 1 | cut -d ',' -f 1 | cut -d ' ' -f 2
-  download:
-      - https://github.com/microbiome/HITdb/archive/master.zip
-  parser:
-      - unzip master.zip
-      - cd HITdb-master/HITdb_v1.00
-  comment: reduced 16s db for human microbiome
-    
+
 InterPro:
   category: protein
   type: Hierarchical functional annotation
