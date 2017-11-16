@@ -76,6 +76,7 @@ EggNOG:
      parser:
        - zcat ${SOURCE_DIR}/NOG.members.tsv.gz | cut -f2,5 > eggnog-mapping.txt
        - ${M5NR_BIN}/COG.sh > eggnog-hierarchy.txt
+
 GenBank:
   category: protein
   type: Functional annotation
@@ -103,6 +104,8 @@ Greengenes:
   version: date --date="$(curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]")" '+%Y-%m-%d'
   download: 
     - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
+  parser:
+    - ${M5NR_BIN}/greengenes.pl ${SOURCE_DIR}/current_GREENGENES_gg16S_unaligned.fasta.gz
 
 HITdb:
   category: protein
