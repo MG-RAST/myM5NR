@@ -171,7 +171,7 @@ while (my $record = <$fh1>) {
       print $md52id_go "$md5s\t$go\n"     	    if ( $go ne "");
       print $md52id_cazy "$md5s\t$cazy\n"  	    if ( $cazy ne "" );
       print $md52id_ec "$md5s\t$ec\n"     	    if ( $ec ne "" );
-
+      print $md52tax "$md5s\t$tax\n"     	      if ( $tax ne "" );
     	# skip to next record
     	next
       } # end of SQ case
