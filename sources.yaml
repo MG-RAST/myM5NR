@@ -187,23 +187,8 @@ RDP:
     - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
     - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
     - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
-
-RefSeq:
-  category: protein
-  type: Functional annotation
-  version: curl --silent ftp://ftp.ncbi.nih.gov//refseq/release/RELEASE_NUMBER
-  env:
-    COUNT: curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
-  download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.faa.gz
-  resume-download: True
-
-SEED-Annotations:
-  category: protein
-  homepage: http://www.theseed.org
-  type: Functional annotation
-  version: echo ${TODAY}
-  download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org
-  resume-download: True
+  parser:
+      - ${M5NR_BIN}/rdp.pl ${SOURCE_DIR}/current_Fungi_unaligned.gb.gz ${SOURCE_DIR}/current_Bacteria_unaligned.gb.gz ${SOURCE_DIR}/current_Archaea_unaligned.gb.gz
 
 RefSeq:
   category: protein
