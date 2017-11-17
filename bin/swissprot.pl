@@ -7,7 +7,7 @@
 # naming convention md52id_<source>.txt
 #
 # obtain: uniprot sequence, uniprot function, uniprot taxonomy, EC, CAZy, eggnog, pfam, interpro, go
-# 
+#
 # the parser is very brute force as bioperl and biopython will not extract all required fields
 # folker@anl.gov
 
@@ -30,7 +30,7 @@ my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
 
     # the main trick is to read the document record by record
-$/='//\n';
+$/="//\n";
 
 open(my $md52id, '>',    'md52id_swissprot.txt') or die ;
 open(my $md52seq, '>',   'md52seq_swissprot.txt') or die ;
@@ -88,7 +88,7 @@ while (my $record = <$fh1>) {
 
       if  ($line =~ /^DE\W+RecName:\W+Full=(.+);/) {
             $func="$1"; next;
-      } 
+      }
 
     #DE            EC=3.2.1.1 {ECO:0000313|EMBL:AAC45663.1};
     # needs to push ids into an array
@@ -112,7 +112,7 @@ while (my $record = <$fh1>) {
         $go=$1;  next;
       }
 
-    # parse sequence, generate md5 and write outfiles 
+    # parse sequence, generate md5 and write outfiles
       if  ($line =~ /^SQ/) {
 
         	my @lines = split ('SQ ', $record);
@@ -130,13 +130,13 @@ while (my $record = <$fh1>) {
           print $md52seq "$md5s\t$sequence\n";
           print $md52uni_func "$md5s\t$func\n";
         	print $md52tax "$md5s\t$tax\n";
-  
+
           if ( $id eq "") { print $record."\n" ;          die "cannot find ID\n" }
 
-          print $md52id "$md5s\t$id\n" ;    	        
-          print $md52id_ipr "$md5s\t$ipr\n"    	    if ( $ipr ne "" ); 
-          print $md52id_cog "$md5s\t$cog\n"         if ( $cog ne "" ); 
-          print $md52id_eggnog "$md5s\t$eggnog\n"   if ( $eggnog ne "" ); 
+          print $md52id "$md5s\t$id\n" ;
+          print $md52id_ipr "$md5s\t$ipr\n"    	    if ( $ipr ne "" );
+          print $md52id_cog "$md5s\t$cog\n"         if ( $cog ne "" );
+          print $md52id_eggnog "$md5s\t$eggnog\n"   if ( $eggnog ne "" );
           print $md52id_pfam "$md5s\t$pfam\n"       if ( $pfam ne "");
           print $md52id_kegg "$md5s\t$kegg\n"     	if ( $kegg ne "" ) ;
           print $md52id_go "$md5s\t$go\n"     	    if ( $go ne "");
@@ -144,12 +144,10 @@ while (my $record = <$fh1>) {
           print $md52id_ec "$md5s\t$ec\n"     	    if ( $ec ne "" );
 
         	next;
-        } # of if ($line =~ /^SQ/) 
+        } # of if ($line =~ /^SQ/)
 
           # reset EOL
-          $/='//\n';
+          $/="//\n";
       } # foreach
-      
-} # while read
 
-  
+} # while read
