@@ -96,9 +96,13 @@ while (my $record = <$fh1>) {
             $ec="$1.$2.$3.$4";  next;
       }
 
-    #trembl_short.dat:DR   eggNOG; arCOG01218; Archaea.
     #trembl_short.dat:DR   eggNOG; COG0526; LUCA.
+    if  ($line =~ /^DR\W+eggNOG;\W+COG(\d+);\W+LUCA./) {
+      $cog="COG$1";  next;
+     }
+
     #sprot_short.dat:DR   eggNOG; ENOG410J6YU; Eukaryota.
+    #trembl_short.dat:DR   eggNOG; arCOG01218; Archaea.
       if  ($line =~ /^DR\W+eggNOG;\W+(\w+);/) {
            $eggnog="$1"; next;
       }
