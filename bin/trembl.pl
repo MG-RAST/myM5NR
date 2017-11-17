@@ -9,7 +9,7 @@
 #                   id2hierarchy_<source>.txt
 #
 # obtain: trembl sequence, trembl function, trembl taxonomy, EC, CAZy, eggnog, pfam, interpro, go
-# 
+#
 # the parser is very brute force as bioperl and biopython will not extract all required fields
 # folker@anl.gov
 
@@ -46,15 +46,15 @@ open(my $md52id_ec, '>', 'md52id_ec_trembl.txt') or die ;
 open(my $md52id_eggnog, '>', 'md52id-eggnog_trembl.txt') or die ;
 open(my $md52id_cog, '>', 'md52id_cog_trembl.txt') or die ;
 open(my $md52tax, '>', 'md52taxid.txt') or die ;
-    
- 
-  
-$/="\n//";  
+
+
+
+$/="\n//";
 
 # now almost the same procedure for trembl
 while (my $record = <$fh1>) {
 
-    my $id; my $go=''; my $kegg=''; my $md5s; my $pfam=''; my $ipr=''; my $func=''; 
+    my $id; my $go=''; my $kegg=''; my $md5s; my $pfam=''; my $ipr=''; my $func='';
     my $cazy=''; my $ec=''; my $eggnog=''; my $tax=''; my $cog='';
 
     #  print $record;
@@ -68,8 +68,8 @@ while (my $record = <$fh1>) {
         if ($line =~ /^ID\W+(\w+)/ ) {
           $id=$1;       next;
         }
-    
-        if  ($line =~ /^OX\W+NCBI_TaxID=(\w+);/) {
+
+        if  ($line =~ /^OX\W+NCBI_TaxID=(\w+)\W+/) {
                  $tax=$1; next;
         }
 
@@ -102,14 +102,14 @@ while (my $record = <$fh1>) {
         if  ($line =~ /^DR\W+KEGG;\W+(\w+):(\w+)/) {
             $kegg="$1:$2";   next;
         }
-        
+
         # catch COG first
         #trembl_short.dat:DR   eggNOG; COG0526; LUCA.
         # remaining eggnog will be collected next
         if  ($line =~ /^DR\W+eggNOG;\W+COG(\d+);\W+LUCA./) {
           $cog="COG$1";  next;
          }
-    
+
     if  ($line =~ /^DR\W+eggNOG;\W+(\w+);/) {
          $eggnog="$1"; next;
     }
@@ -117,12 +117,12 @@ while (my $record = <$fh1>) {
        if  ($line =~ /^DR\W+eggNOG;\W+(\w+);/) {
          if ( $eggnog ne '' ) {
            $eggnog = "$eggnog,$1"
-           }  
+           }
          else { $eggnog="$1";
-              }  
+              }
             next;
         }
-        
+
     #DE            EC=3.2.1.1 {ECO:0000313|EMBL:AAC45663.1};
     # needs to push ids into an array
         if  ($line =~ /^DE\W+EC=(\w+).(\w+).(\w+).(\w+)\W+/) {
@@ -136,20 +136,20 @@ while (my $record = <$fh1>) {
     	#print "GO:$go\n";
             next;
         }
-            
-              
-      # parse sequence, generate md5 and write outfiles 
+
+
+      # parse sequence, generate md5 and write outfiles
       if  ($line =~ /^SQ/) {
 
     	my @lines = split ('SQ ', $record);
       #	print Dumper(@lines);
-            
+
         # split the record at the correct position to catch the sequences
         my $sequence = @lines[1];
         # join lines, remove the first list as well as the record separator
     	$sequence =~ s/^(.*\n)//;
     	$sequence =~ tr / \n\/\///ds;
-	
+
       #	print "SEQ: $sequence\n";
     	#print $sequence."\n\n\n";
 
@@ -159,13 +159,13 @@ while (my $record = <$fh1>) {
       print $md52seq "$md5s\t$sequence\n";
       print $md52uni_func "$md5s\t$func\n";
     	print $md52tax "$md5s\t$tax\n";
-      
-      die "cannot find ID\n" if ( $id eq "");  
 
-      print $md52id "$md5s\t$id\n" ;    	        
-      print $md52id_ipr "$md5s\t$ipr\n"    	    if ( $ipr ne "" ); 
-      print $md52id_cog "$md5s\t$cog\n"         if ( $cog ne "" ); 
-      print $md52id_eggnog "$md5s\t$eggnog\n"   if ( $eggnog ne "" ); 
+      die "cannot find ID\n" if ( $id eq "");
+
+      print $md52id "$md5s\t$id\n" ;
+      print $md52id_ipr "$md5s\t$ipr\n"    	    if ( $ipr ne "" );
+      print $md52id_cog "$md5s\t$cog\n"         if ( $cog ne "" );
+      print $md52id_eggnog "$md5s\t$eggnog\n"   if ( $eggnog ne "" );
       print $md52id_pfam "$md5s\t$pfam\n"       if ( $pfam ne "");
       print $md52id_kegg "$md5s\t$kegg\n"     	if ( $kegg ne "" ) ;
       print $md52id_go "$md5s\t$go\n"     	    if ( $go ne "");
@@ -178,7 +178,7 @@ while (my $record = <$fh1>) {
     }
           # reset EOL
           $/="\n//";
-      
+
 }
 
 exit 0;
