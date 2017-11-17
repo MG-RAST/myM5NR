@@ -253,7 +253,7 @@ SILVA-SSU:
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
     - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz.md5
   parser:
-    - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
+    - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
 
 Swiss-Prot:
   category: protein
