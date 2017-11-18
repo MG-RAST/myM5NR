@@ -45,7 +45,7 @@ while (my $filename = readdir(DIR)) {
   next if $filename !~ /.*\.faa/ ;
 #  print "WORKING ON: $filename\n";
 
-  open (my $fh1, '<', "$filename") or die "Cannot open $filename: $!\n" ;
+  open (my $fh1, '<', "$dirname/$filename") or die "Cannot open $dirname/$filename: $!\n" ;
 
       # ################# ################# ################# ################
       # ################# ################# ################# ################
