@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 # patric
-# 
-# extract md52id, md52seq. 
+#
+# extract md52id, md52seq.
 #
 #>fig|101571.178.peg.1|WL35_01530|   Proteins incorrectly called adenylate cyclase   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
 #>fig|101571.178.peg.2|WL35_01535|   Ferredoxin reductase   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
@@ -41,27 +41,26 @@ open(my $id2tax, '>',   'id2tax_patric.txt') or die ;
 opendir(DIR, $dirname) or die "Could not open $dirname\n";
 
 while (my $filename = readdir(DIR)) {
-  
+
   next if $filename !~ /.*\.faa/ ;
 #  print "WORKING ON: $filename\n";
-  
-  my $fh1 = new IO::Uncompress::Gunzip ("$filename")
-         or die "Cannot open '$filename': $!\n" ;
-  
+
+  open (my $fh1, '<', "$filename") or die "Cannot open $filename: $!\n" ;
+
       # ################# ################# ################# ################
       # ################# ################# ################# ################
       # ################# ################# ################# ################
       my $header=''; my $id; my $md5s=''; my $func='';   my $seq=''; my $tax;
       while (<$fh1>) {
-  
+
         # for every header line
           if (/>/) {
-  
+
             # if we already have a sequence ...  ## need to take care of last record
              if ($seq ne "") {    # found the next record
-       
+
                $md5s = md5_hex($seq);
-         
+
                # print the output
                print $md52id "$md5s\t$id\n";
                print $md52seq "$md5s\t$seq\n";
@@ -69,40 +68,40 @@ while (my $filename = readdir(DIR)) {
                print $id2tax "$id\t$tax\n";
 
                # reset the values for the next record
-               $id='';  $md5s='';  $func='';  
-             }              
+               $id='';  $md5s='';  $func='';
+             }
 
 
       #   >WP_003131952.1 30S ribosomal protein S18 [Lactococcus lactis]
           my $line = $_;
       #    $line =~ s/>//g;
-      #>fig|101571.178.peg.5|   hypothetical protein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]         
-         
+      #>fig|101571.178.peg.5|   hypothetical protein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
+
           $id = (split( /\|/, $line))[1];
           $id= "fig|$id";
       #    print "ID\t$id\n";
-          
+
           my $pos=index ($line, '[');
           my $len= length($id);
           $func = (split (/\[/, $line))[0];
           my $cut= rindex ($func,'|');
           $func = substr ($func, $cut+2);
-          
-          $tax = (split (/\[/, $line))[1];    
+
+          $tax = (split (/\[/, $line))[1];
           my $cut= rindex ($tax,'|');
           $tax = substr ($tax, 0, $cut);
-              
+
           chomp $tax;
           chomp $func;
-     #    print "TAX\t$tax\n";      
+     #    print "TAX\t$tax\n";
   #       print "FUN\t$func\n";
               $seq = ""; # clear out old sequence
-           }         
-         else {    
+           }
+         else {
             s/\s+//g; # remove whitespace
             $seq .= $_; # add sequence
-         }         
-      }  # end of line  
+         }
+      }  # end of line
 
       close ($fh1);
 
