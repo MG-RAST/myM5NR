@@ -206,6 +206,8 @@ SEED-Annotations:
   version: echo ${TODAY}
   download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org
   resume-download: True
+  parser:
+      - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org 
 
 SEED-Subsystems:
   category: protein
