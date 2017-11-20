@@ -17,7 +17,7 @@ use IO::Uncompress::Gunzip;
 
 # the main trick is to read the document record by record
 
-my $dirname=shift @ARGV;
+my $filename=shift @ARGV;
 
 if ( $dirname eq "" )
 {
