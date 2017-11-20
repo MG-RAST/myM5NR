@@ -193,10 +193,10 @@ RDP:
 RefSeq:
   category: protein
   type: Functional annotation
-  version: curl --silent ftp://ftp.ncbi.nih.gov//refseq/release/RELEASE_NUMBER
+  version: curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/RELEASE_NUMBER
   env:
     COUNT: curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
-  download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.faa.gz
+  download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.gpff.gz
   resume-download: True
 
 SEED-Annotations:
@@ -207,7 +207,7 @@ SEED-Annotations:
   download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org
   resume-download: True
   parser:
-      - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org 
+      - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org
 
 SEED-Subsystems:
   category: protein
