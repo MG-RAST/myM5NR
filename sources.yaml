@@ -214,6 +214,8 @@ SEED-Subsystems:
   version: echo ${TODAY}
   download-command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq --verbose
   resume-download: True
+  parser:
+      - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
 
 # no suitable download mechanism other than manual, does not seem to be updated
 #FOAM:
