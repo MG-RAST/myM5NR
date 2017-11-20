@@ -81,8 +81,6 @@ while (defined (my $filename = readdir($dirh)) ) {
 
       chomp $func;
       # if we already have a sequence ...  ## need to take care of last record
-      my $md52 = md5_hex($seq);
-      die "$filename::$id\t\$md5\n"if ($md52 != $md5); # a safety precaution since SEED is important
 
       # print the output
       print $md52id "$md5\t$id\n";
