@@ -19,7 +19,7 @@ use IO::Uncompress::Gunzip;
 
 my $filename=shift @ARGV;
 
-if ( $dirname eq "" )
+if ( $filename eq "" )
 {
   print STDERR "Usage: \tseed-annotations.pl <filename>\n";
   exit 1;
