@@ -79,7 +79,7 @@ EC:
        - Swiss-Prot
        - TrEmble
      parser:
-       - cp ../TrEmbl/md52id_ec.txt  md52id.txt
+       - cp ../TrEmble/md52id_ec.txt  md52id.txt
        - cat ../Swiss-Prot/md52id_ec.txt  >> md52id.txt
      comment: kegg EC mappings obtained from UniProt
      comment2: EC hierarchy from elsewhere
@@ -148,7 +148,7 @@ KEGG:
      type: Hierarchical functional annotation
      no-download: True
      parser:
-       - cp ../TrEmbl/md52id_kegg.txt  md52id.txt
+       - cp ../TrEmble/md52id_kegg.txt  md52id.txt
        - cat ../Swiss-Prot/md52id_kegg.txt  >> md52id.txt
      depends:
        - Swiss-Prot
@@ -210,7 +210,7 @@ PFAM:
     - Swiss-Prot
     - TrEmble
   parser:
-      - (cat ../TrEmbl/md52id_pfam.txt >> ./md52id.txt)
+      - (cat ../TrEmble/md52id_pfam.txt >> ./md52id.txt)
       - (cat ../Swiss-Prot/md52id_pfam.txt >> ./md52id.txt)
 
 PhAnToMe:
