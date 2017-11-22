@@ -49,8 +49,12 @@ CAZy:
      type: Hierarchical functional annotation
 #     download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
      no-download: True
+     depends:
+        - TrEmble
      parser:
          - ${M5NR_BIN}/create-cazy-hierarchy.sh > cazy-hierarchy.txt
+         - cp ../TrEmble/md52id_cazy_trembl.txt md52id.txt
+    # CAZy has no internal IDs just 2 level of categories
 COG:
     category: protein
     type: Hierarchical functional annotation
