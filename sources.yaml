@@ -136,6 +136,26 @@ KEGG:
      comment2: EC hierarchy from elsewhere
 
 
+#M5nr.fasta
+M5nr:
+  category: output
+  type: protein
+  no-download: True
+  parser:
+      - cat ../*/md52seq.txt > m5nr_in.txt
+      - sort -u m5nr_in.txt > m5nr_sorted.txt
+
+#M5rna.fasta
+M5rna:
+  category: output
+  type: rRNA
+  no-download: True
+  parser:
+      - cat ../*/md52rnaseq.txt > m5rna_in.txt
+      - sort -u m5rna_in.txt > m5rna_sorted.txt
+
+
+
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)
 motuDB:
   category: protein
@@ -165,7 +185,8 @@ PFAM:
     - Swiss-Prot
     - TrEmble
   parser:
-      - (cat ../*/md52id_pfam.txt >> ./md52id_pfam.txt)
+      - (cat ../TrEmbl/md52id_pfam.txt >> ./md52id.txt)
+      - (cat ../Swiss-Prot/md52id_pfam.txt >> ./md52id.txt)
 
 PhAnToMe:
   category: protein
