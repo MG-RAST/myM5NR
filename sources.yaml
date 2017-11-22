@@ -65,7 +65,7 @@ COG:
         - TrEmble
         - EggNOG
     parser:
-        - fgrep COG ../TrEmble/md52id_eggnog.txt > md52id.txt
+        - fgrep COG ../TrEmble/md52id_cog.txt > md52id.txt
         - fgrep COG ../EggNOG/eggnog-hierarchy.txt > cog-mapping.txt
         - ${M5NR_BIN}/COG.sh > cog-hierarchy.txt
 
@@ -165,7 +165,7 @@ PFAM:
     - Swiss-Prot
     - TrEmble
   parser:
-      - (rm ./md52pfam.txt; cat ../*/md52id_pfam.txt >> ./md52id_pfam.txt)
+      - (cat ../*/md52id_pfam.txt >> ./md52id_pfam.txt)
 
 PhAnToMe:
   category: protein
