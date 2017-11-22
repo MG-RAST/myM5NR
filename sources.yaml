@@ -77,7 +77,7 @@ EC:
      no-download: True
      depends:
        - Swiss-Prot
-       - TrEmbl
+       - TrEmble
      parser:
        - cp ../TrEmbl/md52id_ec.txt  md52id.txt
        - cat ../Swiss-Prot/md52id_ec.txt  >> md52id.txt
