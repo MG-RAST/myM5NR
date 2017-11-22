@@ -31,20 +31,20 @@ if ( $filename eq "" )
 my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
 
-open(my $md52id, '>',    'md52id_trembl.txt') or die ;
-open(my $md52seq, '>',   'md52seq_trembl.txt') or die ;
-open(my $id2func, '>',   'id2func_trembl.txt') or die ;
-open(my $md52id_go, '>', 'md52id_go_trembl.txt') or die ;
-open(my $md52id_ipr, '>', 'md52id_ipr_trembl.txt') or die ;
+open(my $md52id, '>',    'md52id.txt') or die ;
+open(my $md52seq, '>',   'md52seq.txt') or die ;
+open(my $id2func, '>',   'id2func.txt') or die ;
+open(my $md52id_go, '>', 'md52id_go.txt') or die ;
+open(my $md52id_ipr, '>', 'md52id_ipr.txt') or die ;
 #open(my $md52tax, '>',  'md52tax_motudb.txt') or die ;
 #open(my $id2tax, '>',  'id2tax_motudb.txt') or die ;
-open(my $md52uni_func, '>', 'md52func_trembl.txt') or die ;
-open(my $md52id_pfam, '>', 'md52id_pfam_trembl.txt') or die ;
-open(my $md52id_kegg, '>', 'md52id_kegg_trembl.txt') or die ;
-open(my $md52id_cazy, '>', 'md52id_cazy_trembl.txt') or die ;
+open(my $md52uni_func, '>', 'md52func.txt') or die ;
+open(my $md52id_pfam, '>', 'md52id_pfam.txt') or die ;
+open(my $md52id_kegg, '>', 'md52id_kegg.txt') or die ;
+open(my $md52id_cazy, '>', 'md52id_cazy.txt') or die ;
 open(my $md52id_ec, '>', 'md52id_ec_trembl.txt') or die ;
-open(my $md52id_eggnog, '>', 'md52id-eggnog_trembl.txt') or die ;
-open(my $md52id_cog, '>', 'md52id_cog_trembl.txt') or die ;
+open(my $md52id_eggnog, '>', 'md52id_eggnog.txt') or die ;
+open(my $md52id_cog, '>', 'md52id_cog.txt') or die ;
 open(my $md52tax, '>', 'md52taxid.txt') or die ;
 
 
@@ -180,5 +180,21 @@ while (my $record = <$fh1>) {
           $/="\n//";
 
 }
+# print final record
+print $md52seq "$md5s\t$sequence\n";
+print $md52uni_func "$md5s\t$func\n";
+print $md52tax "$md5s\t$tax\n";
 
+die "cannot find ID\n" if ( $id eq "");
+
+print $md52id "$md5s\t$id\n" ;
+print $md52id_ipr "$md5s\t$ipr\n"    	    if ( $ipr ne "" );
+print $md52id_cog "$md5s\t$cog\n"         if ( $cog ne "" );
+print $md52id_eggnog "$md5s\t$eggnog\n"   if ( $eggnog ne "" );
+print $md52id_pfam "$md5s\t$pfam\n"       if ( $pfam ne "");
+print $md52id_kegg "$md5s\t$kegg\n"     	if ( $kegg ne "" ) ;
+print $md52id_go "$md5s\t$go\n"     	    if ( $go ne "");
+print $md52id_cazy "$md5s\t$cazy\n"  	    if ( $cazy ne "" );
+print $md52id_ec "$md5s\t$ec\n"     	    if ( $ec ne "" );
+print $md52tax "$md5s\t$tax\n"     	      if ( $tax ne "" );
 exit 0;
