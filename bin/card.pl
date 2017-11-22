@@ -38,7 +38,7 @@ my $fh1 = new IO::Uncompress::Gunzip ("$filename")
 open (my $ncbitax, '<', 'ncbi_taxomony.csv' ) or die "cannot open ncbi_taxomony.csv";
 
 open(my $md52id,  '>', 'md52id.txt') or die ;
-open(my $md5hier, '>', 'md52hier.txt' ) or die ;
+open(my $md52hier,'>', 'md52hier.txt' ) or die ;
 open(my $id2hier, '>', 'id2hier.txt' ) or die ;
 open(my $md52seq, '>', 'md52seq.txt') or die ;
 open(my $md52tax, '>', 'md52tax.txt') or die ;
@@ -123,10 +123,13 @@ while (<$fh1>) {
 }  # end of line
 
 # print the output
+
 print $md52id "$md5s\t$id\n";
 print $md52seq "$md5s\t$seq\n";
 print $md52func "$md5s\t$func\n";
-print $md52id_cardid "$md5s\t$card\n";
-print $md52tax "$md5s\t$ncbihash{$tax}\n";
+print $md52hier "$md5s\t$card\n";
+print $id2hier "$id\t$card\n";
+print $md52tax "$md5s\t$ncbihash{$tax}\n";  # convert via CARD provided translation table
+
 
 close ($fh1);
