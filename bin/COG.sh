@@ -2,12 +2,12 @@
 
 # print the COG functional category mapping
 cat << EOF
-J       "Translation, ribosomal structure and biogenesis"       INFORMATION STORAGE AND PROCESSING
+J       Translation, ribosomal structure and biogenesis       INFORMATION STORAGE AND PROCESSING
 A       RNA processing and modification INFORMATION STORAGE AND PROCESSING
 K       Transcription   INFORMATION STORAGE AND PROCESSING
-L       "Replication, recombination and repair" INFORMATION STORAGE AND PROCESSING
+L       Replication, recombination and repair INFORMATION STORAGE AND PROCESSING
 B       Chromatin structure and dynamics        INFORMATION STORAGE AND PROCESSING
-D       "Cell cycle control, cell division, chromosome partitioning"    CELLULAR PROCESSES AND SIGNALING
+D       Cell cycle control, cell division, chromosome partitioning    CELLULAR PROCESSES AND SIGNALING
 Y       Nuclear structure       CELLULAR PROCESSES AND SIGNALING
 V       Defense mechanisms      CELLULAR PROCESSES AND SIGNALING
 T       Signal transduction mechanisms  CELLULAR PROCESSES AND SIGNALING
@@ -24,6 +24,6 @@ F       Nucleotide transport and metabolism     METABOLISM
 H       Coenzyme transport and metabolism       METABOLISM
 I       Lipid transport and metabolism  METABOLISM
 P       Inorganic ion transport and metabolism  METABOLISM
-Q       "Secondary metabolites biosynthesis, transport and catabolism"  METABOLISM
+Q       Secondary metabolites biosynthesis, transport and catabolism  METABOLISM
 R       General function prediction only        POORLY CHARACTERIZED
 S       Function unknown        POORLY CHARACTERIZED
