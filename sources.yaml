@@ -65,7 +65,7 @@ COG:
         - TrEmble
         - EggNOG
     parser:
-        - fgrep COG ../TrEmble/md52id_eggnog.txt > md52id_cog.txt
+        - fgrep COG ../TrEmble/md52id_eggnog.txt > md52id.txt
         - fgrep COG ../EggNOG/eggnog-hierarchy.txt > cog-mapping.txt
         - ${M5NR_BIN}/COG.sh > cog-hierarchy.txt
 
