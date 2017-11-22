@@ -205,6 +205,7 @@ PFAM:
   depends:
     - Swiss-Prot
     - TrEmble
+
   parser:
       - (cat ../TrEmbl/md52id_pfam.txt >> ./md52id.txt)
       - (cat ../Swiss-Prot/md52id_pfam.txt >> ./md52id.txt)
