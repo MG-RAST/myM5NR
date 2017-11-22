@@ -40,7 +40,8 @@ CARD:
        - cat ${SOURCE_DIR}/data | bunzip2 | tar xf -
        - ${M5NR_BIN}/card.pl protein_fasta_protein_homolog_model.fasta
        - ${M5NR_BIN}/obo2hierarchy.pl aro.obo
-       - mv id2hierarchy.txt id2hierarchy_card.txt
+       - rm -f ncbi* *.fasta snps.txt version.txt card.json aro* CARD* mo* ro*
+
 
 CAZy:
      category: protein
@@ -75,7 +76,7 @@ EggNOG:
        - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog-mapper-data/og2level.tsv.gz
      parser:
        - zcat ${SOURCE_DIR}/NOG.members.tsv.gz | cut -f2,5 > eggnog-mapping.txt
-       - ${M5NR_BIN}/COG.sh > eggnog-hierarchy.txt
+       - ${M5NR_BIN}/COG.sh > id2hierarchy.txt
 
 GenBank:
   category: protein
