@@ -30,8 +30,8 @@ my $fh1 = new IO::Uncompress::Gunzip ("$filename")
 
 open(my $md52id, '>',    'md52id.txt') or die ;
 open(my $md52seq, '>',   'md52rnaseq.txt') or die ;
-open(my $md52tax, '>',  'md52taxstring.txt') or die ;
-open(my $id2tax, '>',  'id2taxstring.txt') or die ;
+open(my $md52tax, '>',  'md52tax.txt') or die ;
+open(my $id2tax, '>',  'id2tax.txt') or die ;
 
 
 # ################# ################# ################# ################
