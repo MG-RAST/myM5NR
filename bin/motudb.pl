@@ -37,22 +37,22 @@ open(my $md52seq, '>',   'md52seq_motudb.txt') or die ;
 # ################# ################# ################# ################
 my $header=''; my $id; my $md5s='';  my $seq='';
 while (<$fh1>) {
-  
+
   # for every header line
     if (/>/) {
-  
+
       # if we already have a sequence ...  ## need to take care of last record
        if ($seq ne "") {    # found the next record
-       
+          $seq=lc($seq) ;
          $md5s = md5_hex($seq);
-         
+
          # print the output
-         print $md52id "$md5s\t$id\n"; 
+         print $md52id "$md5s\t$id\n";
          print $md52seq "$md5s\t$seq\n";
         #
          # reset the values for the next record
-         $id='';  $md5s='';   
-       }              
+         $id='';  $md5s='';
+       }
 
 
     my $line = $_;
@@ -61,14 +61,13 @@ while (<$fh1>) {
       ($id)= ( $line =~ />(.*)\W\d+\W\d+/ );
 
       $seq = ""; # clear out old sequence
-   }         
-   else {    
+   }
+   else {
       s/\s+//g; # remove whitespace
       $seq .= $_; # add sequence
-   }         
-}  # end of line  
+   }
+}  # end of line
 
 
 
 close ($fh1);
-

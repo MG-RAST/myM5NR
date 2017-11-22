@@ -64,6 +64,8 @@ sub read_file {
               # join lines, remove the first list as well as the record separator
           	$sequence =~ s/^(.*\n)//;
           	$sequence =~ tr /[0-9] \n\///ds;
+            chomp $sequence;
+            $sequence = lc ($sequence);
 
           	$md5s = md5_hex($sequence);
           	#print "MD5 $md5\n";

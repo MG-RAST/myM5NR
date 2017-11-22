@@ -58,6 +58,8 @@ while (my $filename = readdir(DIR)) {
 
             # if we already have a sequence ...  ## need to take care of last record
              if ($seq ne "") {    # found the next record
+              chomp $seq;
+              $seq= lc ($seq);
 
                $md5s = md5_hex($seq);
 

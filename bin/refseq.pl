@@ -118,7 +118,8 @@ while (my $filename = readdir(DIR)) {
                 $sequence =~ tr / \n\/\/[0-9]//ds;
 
                 #print $sequence."\n\n\n";
-
+                chomp $sequence;
+                $sequence= lc ($sequence);
                 $md5 = md5_hex($sequence);
                 #print "MD5 $md5\n";
 

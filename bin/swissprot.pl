@@ -126,6 +126,9 @@ while (my $record = <$fh1>) {
             # join lines, remove the first list as well as the record separator
         	$sequence =~ s/^(.*\n)//;
         	$sequence =~ tr / \n\/\///ds;
+          chomp $sequence;
+          $sequence = lc ($sequence);
+
         #	print "ID: $id\n";
         #	print "SEQ: $sequence\n";
         	$md5s = md5_hex($sequence);
