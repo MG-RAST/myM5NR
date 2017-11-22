@@ -96,7 +96,7 @@ while (my $record = <$fh1>) {
 
     # needs to push ids into an array
         if  ($line =~ /^DR\W+Pfam;\W+PF(\w+)/) {
-            $pfam=$1;  next;
+            $pfam="pfam".$1;  next;
         }
 
         if  ($line =~ /^DR\W+KEGG;\W+(\w+):(\w+)/) {
