@@ -171,10 +171,14 @@ M5rna:
   category: output
   type: rRNA
   no-download: True
+  depends:
+    - SILVA-SSU
+    - SILVA-LSU
+    - RDP
+    - Greengenes
   parser:
       - cat ../*/md52rnaseq.txt > m5rna_in.txt
       - sort -u m5rna_in.txt > m5rna_sorted.txt
-
 
 
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)

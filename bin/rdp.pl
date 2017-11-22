@@ -24,9 +24,9 @@ if ( $filename1 eq "" || $filename2 eq "" || $filename3 eq "")
 }
 
 
-open(my $md52id, '>',    'md52id_rdp.txt') or die ;
-open(my $md52seq, '>',   'md52seq_rdp.txt') or die ;
-open(my $md52tax, '>',  'md52tax_rdp.txt') or die ;
+open(my $md52id, '>',    'md52id.txt') or die ;
+open(my $md52seq, '>',   'md52rnaseq.txt') or die ;
+open(my $md52tax, '>',  'md52tax.txt') or die ;
 
 
 read_file($filename1);
