@@ -2,28 +2,28 @@
 
 # print the COG functional category mapping
 cat << EOF
-INFORMATION STORAGE AND PROCESSING|Translation, ribosomal structure and biogenesis|J
-INFORMATION STORAGE AND PROCESSING|RNA processing and modification|A
-INFORMATION STORAGE AND PROCESSING|Transcription|K
-INFORMATION STORAGE AND PROCESSING|Replication, recombination and repair|L
-INFORMATION STORAGE AND PROCESSING|Chromatin structure and dynamics|B
-CELLULAR PROCESSES AND SIGNALING|Cell cycle control, cell division, chromosome partitioning|D
-CELLULAR PROCESSES AND SIGNALING|Nuclear structure|Y
-CELLULAR PROCESSES AND SIGNALING|Defense mechanisms|V
-CELLULAR PROCESSES AND SIGNALING|Signal transduction mechanisms|T
-CELLULAR PROCESSES AND SIGNALING|Cell wall/membrane/envelope biogenesis|M
-CELLULAR PROCESSES AND SIGNALING|Cell motility|N
-CELLULAR PROCESSES AND SIGNALING|Cytoskeleton|Z
-CELLULAR PROCESSES AND SIGNALING|Extracellular structures|W
-CELLULAR PROCESSES AND SIGNALING|Intracellular trafficking, secretion, and vesicular transport|U
-CELLULAR PROCESSES AND SIGNALING|Posttranslational modification, protein turnover, chaperones|O
-METABOLISM|Energy production and conversion|C
-METABOLISM|Carbohydrate transport and metabolism|G
-METABOLISM|Amino acid transport and metabolism|E
-METABOLISM|Nucleotide transport and metabolism|F
-METABOLISM|Coenzyme transport and metabolism|H
-METABOLISM|Lipid transport and metabolism|I
-METABOLISM|Inorganic ion transport and metabolism|P
-METABOLISM|Secondary metabolites biosynthesis, transport and catabolism|Q
-POORLY CHARACTERIZED|General function prediction only|R
-POORLY CHARACTERIZED|Function unknown|S
+J       "Translation, ribosomal structure and biogenesis"       INFORMATION STORAGE AND PROCESSING
+A       RNA processing and modification INFORMATION STORAGE AND PROCESSING
+K       Transcription   INFORMATION STORAGE AND PROCESSING
+L       "Replication, recombination and repair" INFORMATION STORAGE AND PROCESSING
+B       Chromatin structure and dynamics        INFORMATION STORAGE AND PROCESSING
+D       "Cell cycle control, cell division, chromosome partitioning"    CELLULAR PROCESSES AND SIGNALING
+Y       Nuclear structure       CELLULAR PROCESSES AND SIGNALING
+V       Defense mechanisms      CELLULAR PROCESSES AND SIGNALING
+T       Signal transduction mechanisms  CELLULAR PROCESSES AND SIGNALING
+M       Cell wall/membrane/envelope biogenesis  CELLULAR PROCESSES AND SIGNALING
+N       Cell motility   CELLULAR PROCESSES AND SIGNALING
+Z       Cytoskeleton    CELLULAR PROCESSES AND SIGNALING
+W       Extracellular structures        CELLULAR PROCESSES AND SIGNALING
+U       Intracellular trafficking, secretion, and vesicular transport   CELLULAR PROCESSES AND SIGNALING
+O       Posttranslational modification, protein turnover, chaperones    CELLULAR PROCESSES AND SIGNALING
+C       Energy production and conversion        METABOLISM
+G       Carbohydrate transport and metabolism   METABOLISM
+E       Amino acid transport and metabolism     METABOLISM
+F       Nucleotide transport and metabolism     METABOLISM
+H       Coenzyme transport and metabolism       METABOLISM
+I       Lipid transport and metabolism  METABOLISM
+P       Inorganic ion transport and metabolism  METABOLISM
+Q       "Secondary metabolites biosynthesis, transport and catabolism"  METABOLISM
+R       General function prediction only        POORLY CHARACTERIZED
+S       Function unknown        POORLY CHARACTERIZED
