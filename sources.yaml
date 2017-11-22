@@ -51,9 +51,11 @@ CAZy:
      no-download: True
      depends:
         - TrEmble
+        - Swiss-Prot
      parser:
          - ${M5NR_BIN}/create-cazy-hierarchy.sh > cazy-hierarchy.txt
          - cp ../TrEmble/md52id_cazy.txt md52id.txt
+         - cat ../Swiss-Prot/md52id_cazy.txt >> md52id.txt
     # CAZy has no internal IDs just 2 level of categories
 COG:
     category: protein
@@ -68,6 +70,19 @@ COG:
         - fgrep COG ../TrEmble/md52id_cog.txt > md52id.txt
         - fgrep COG ../EggNOG/eggnog-hierarchy.txt > cog-mapping.txt
         - ${M5NR_BIN}/COG.sh > cog-hierarchy.txt
+
+EC:
+     category: protein
+     type: Hierarchical functional annotation
+     no-download: True
+     parser:
+       - cp ../TrEmbl/md52id_ec.txt  md52id.txt
+       - cat ../Swiss-Prot/md52id_ec.txt  >> md52id.txt
+     depends:
+       - Swiss-Prot
+       - TrEmbl
+     comment: kegg EC mappings obtained from UniProt
+     comment2: EC hierarchy from elsewhere
 
 EggNOG:
      category: protein
@@ -132,6 +147,12 @@ KEGG:
      homepage: http://www.genome.jp/kegg/
      type: Hierarchical functional annotation
      no-download: True
+     parser:
+       - cp ../TrEmbl/md52id_kegg.txt  md52id.txt
+       - cat ../Swiss-Prot/md52id_kegg.txt  >> md52id.txt
+     depends:
+       - Swiss-Prot
+       - TrEmbl
      comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
      comment2: EC hierarchy from elsewhere
 

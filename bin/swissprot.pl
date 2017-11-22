@@ -32,19 +32,19 @@ my $fh1 = new IO::Uncompress::Gunzip ("$filename")
     # the main trick is to read the document record by record
 $/="//\n";
 
-open(my $md52id, '>',    'md52id_swissprot.txt') or die ;
-open(my $md52seq, '>',   'md52seq_swissprot.txt') or die ;
-open(my $md52id_go, '>', 'md52id_go_swissprot.txt') or die ;
-open(my $md52id_ipr, '>', 'md52id_ipr_swissprot.txt') or die ;
+open(my $md52id, '>',    'md52id.txt') or die ;
+open(my $md52seq, '>',   'md52seq.txt') or die ;
+open(my $md52id_go, '>', 'md52id_go.txt') or die ;
+open(my $md52id_ipr, '>', 'md52id_ipr.txt') or die ;
 #open(my $md52tax, '>',  'md52tax_motudb.txt') or die ;
 #open(my $id2tax, '>',  'id2tax_motudb.txt') or die ;
-open(my $md52uni_func, '>', 'md52func_swissprot.txt') or die ;
-open(my $md52id_pfam, '>', 'md52id_pfam_swissprot.txt') or die ;
-open(my $md52id_kegg, '>', 'md52id_kegg_swissprot.txt') or die ;
-open(my $md52id_cazy, '>', 'md52id_cazy_swissprot.txt') or die ;
-open(my $md52id_ec, '>', 'md52id_ec_swissprot.txt') or die ;
-open(my $md52id_eggnog, '>', 'md52id_eggnog_swissprot.txt') or die ;
-open(my $md52id_cog, '>', 'md52id_cog_swissprot.txt') or die ;
+open(my $md52uni_func, '>', 'md52func.txt') or die ;
+open(my $md52id_pfam, '>', 'md52id_pfam.txt') or die ;
+open(my $md52id_kegg, '>', 'md52id_kegg.txt') or die ;
+open(my $md52id_cazy, '>', 'md52id_cazy.txt') or die ;
+open(my $md52id_ec, '>', 'md52id_ec.txt') or die ;
+open(my $md52id_eggnog, '>', 'md52id_eggnog.txt') or die ;
+open(my $md52id_cog, '>', 'md52id_cog.txt') or die ;
 open(my $md52tax, '>', 'md52taxid.txt') or die ;
 
 
