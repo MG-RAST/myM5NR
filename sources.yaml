@@ -47,7 +47,7 @@ CAZy:
      category: protein
      homepage: http://www.cazy.org
      type: Hierarchical functional annotation
-#     download-command: ${M5NR_BIN}/get_cazy_table.pl ./cazy_all_v042314.txt
+     depth: 2
      no-download: True
      depends:
         - TrEmble
@@ -60,21 +60,25 @@ CAZy:
 COG:
     category: protein
     type: Hierarchical functional annotation
-    download:
-      - http://eggnogdb.embl.de/download/eggnog_4.5/COG_functional_categories.txt
-    comment: obtained via UNIprot
+    depth: 3
+    no-download: True
     depends:
         - TrEmble
         - EggNOG
     parser:
         - fgrep COG ../TrEmble/md52id_cog.txt > md52id.txt
-        - fgrep COG ../EggNOG/eggnog-hierarchy.txt > cog-mapping.txt
+        - fgrep COG ../EggNOG/eggnog-mapping.txt > cog-mapping.txt
         - ${M5NR_BIN}/COG.sh > cog-hierarchy.txt
+        # the hierarchy is hardcoded in shell script
 
 EC:
      category: protein
      type: Hierarchical functional annotation
-     no-download: True
+     depth: 4
+     version: curl -s "ftp://ftp.expasy.org/databases/enzyme/release/enzclass.txt" | grep '^Release' | grep -o '[0-9a-zA-Z\-]\+$'
+     download:
+         - ftp://ftp.expasy.org/databases/enzyme/enzyme.dat
+         - ftp://ftp.expasy.org/databases/enzyme/enzclass.txt
      depends:
        - Swiss-Prot
        - TrEmble
@@ -82,20 +86,23 @@ EC:
        - cp ../TrEmble/md52id_ec.txt  md52id.txt
        - cat ../Swiss-Prot/md52id_ec.txt  >> md52id.txt
      comment: kegg EC mappings obtained from UniProt
-     comment2: EC hierarchy from elsewhere
+     comment2: EC hierarchy needs to be parsed
 
 EggNOG:
      category: protein
      type: Hierarchical functional annotation
+     depth: 3
      homepage: http://eggnogdb.embl.de
      version: curl --silent "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
+     depends:
+         - TrEmble
      download:
-       - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.members.tsv.gz
-       - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog4.functional_categories.txt
-       - http://eggnogdb.embl.de/download/eggnog_4.5/eggnog-mapper-data/og2level.tsv.gz
+       - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
      parser:
-       - zcat ${SOURCE_DIR}/NOG.members.tsv.gz | cut -f2,5 > eggnog-mapping.txt
-       - ${M5NR_BIN}/COG.sh > id2hierarchy.txt
+       - fgrep ENOG ../TrEmble/md52id_eggnog.txt > md52id.txt
+       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 > eggnog-mapping.txt
+       - ${M5NR_BIN}/COG.sh > eggnog-hierarchy.txt
+       # the hierarchy is hardcoded in shell script
 
 GenBank:
   category: protein
@@ -146,6 +153,7 @@ KEGG:
      category: protein
      homepage: http://www.genome.jp/kegg/
      type: Hierarchical functional annotation
+     depth: 4
      no-download: True
      parser:
        - cp ../TrEmble/md52id_kegg.txt  md52id.txt
@@ -264,7 +272,9 @@ SEED-Annotations:
 
 SEED-Subsystems:
   category: protein
+  type: Functional annotation
   type: Hierarchical functional annotation
+  depth: 4
   homepage: http://www.theseed.org
   version: echo ${TODAY}
   download-command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq --verbose
