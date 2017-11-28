@@ -18,268 +18,280 @@
 #
 ##### protein
 
-
-
 BacMet:
-     category: protein
-     homepage: http://bacmet.biomedicine.gu.se/
-     type: Functional annotation
-     version: curl --silent "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "Database Statistics (version [0-9\.]*)"  | grep -o [0-9\.]*
-     download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
-     parser:
-       - unzip ${SOURCE_DIR}/BacMet1.1.zip
-       - ${M5NR_BIN}/bacmet.pl BacMet_EXP.704.fasta BacMet_Predicted.*.fasta
+    category: protein
+    homepage: http://bacmet.biomedicine.gu.se/
+    type: Functional annotation
+    version: curl --silent "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "Database Statistics (version [0-9\.]*)" | grep -o [0-9\.]*
+    download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
+    parser:
+      - unzip ${SOURCE_DIR}/BacMet1.1.zip
+      - ${M5NR_BIN}/bacmet.pl BacMet_EXP.704.fasta BacMet_Predicted.*.fasta
 
 CARD:
-     category: protein
-     homepage: https://card.mcmaster.ca
-     type: Functional annotation
-     version: curl --silent "https://card.mcmaster.ca/download" | grep ">CARD<" | grep -o ">[0-9][0-9\.]*<" | head -n1 |  grep -o "[0-9\.]*"
-     download: https://card.mcmaster.ca/latest/data
-     parser:
-       - cat ${SOURCE_DIR}/data | bunzip2 | tar xf -
-       - ${M5NR_BIN}/card.pl protein_fasta_protein_homolog_model.fasta
-       - ${M5NR_BIN}/obo2hierarchy.pl aro.obo
-       - rm -f ncbi* *.fasta snps.txt version.txt card.json aro* CARD* mo* ro*
-
+    category: protein
+    homepage: https://card.mcmaster.ca
+    type: Functional annotation
+    version: curl --silent "https://card.mcmaster.ca/download" | grep ">CARD<" | grep -o ">[0-9][0-9\.]*<" | head -n1 |  grep -o "[0-9\.]*"
+    download: https://card.mcmaster.ca/latest/data
+    parser:
+      - cat ${SOURCE_DIR}/data | bunzip2 | tar xf -
+      - ${M5NR_BIN}/card.pl protein_fasta_protein_homolog_model.fasta
+      - ${M5NR_BIN}/obo2hierarchy.pl aro.obo
+      - rm -f ncbi* *.fasta snps.txt version.txt card.json aro* CARD* mo* ro*
 
 CAZy:
-     category: protein
-     homepage: http://www.cazy.org
-     type: Hierarchical functional annotation
-     depth: 2
-     no-download: True
-     depends:
-        - TrEmble
-        - Swiss-Prot
-     parser:
-         - ${M5NR_BIN}/create-cazy-hierarchy.sh > cazy-hierarchy.txt
-         - cp ../TrEmble/md52id_cazy.txt md52id.txt
-         - cat ../Swiss-Prot/md52id_cazy.txt >> md52id.txt
-    # CAZy has no internal IDs just 2 level of categories
+    category: protein
+    homepage: http://www.cazy.org
+    type: Hierarchical functional annotation
+    depth: 2
+    no-download: true
+    depends:
+      - TrEmble
+      - Swiss-Prot
+    parser:
+      - cp ../TrEmble/md52id_cazy.txt md52id.txt
+      - cat ../Swiss-Prot/md52id_cazy.txt >> md52id.txt
+      - ${M5NR_BIN}/create-cazy-hierarchy.pl --input md52id.txt > id2hierarchy.txt
+    # the hierarchy is hardcoded in script
+
 COG:
     category: protein
     type: Hierarchical functional annotation
     depth: 3
-    no-download: True
     depends:
-        - TrEmble
-        - EggNOG
+      - TrEmble
+    download:
+      - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
     parser:
-        - fgrep COG ../TrEmble/md52id_cog.txt > md52id.txt
-        - fgrep COG ../EggNOG/eggnog-mapping.txt > cog-mapping.txt
-        - ${M5NR_BIN}/COG.sh > cog-hierarchy.txt
-        # the hierarchy is hardcoded in shell script
+      - fgrep COG ../TrEmble/md52id_cog.txt > md52id.txt
+      - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > id2func.txt
+      - ${M5NR_BIN}/create-nog-hierarchy.pl --input id2func.txt > id2hierarchy.txt
+    # the hierarchy is hardcoded in script
 
 EC:
-     category: protein
-     type: Hierarchical functional annotation
-     depth: 4
-     version: curl -s "ftp://ftp.expasy.org/databases/enzyme/release/enzclass.txt" | grep '^Release' | grep -o '[0-9a-zA-Z\-]\+$'
-     download:
-         - ftp://ftp.expasy.org/databases/enzyme/enzyme.dat
-         - ftp://ftp.expasy.org/databases/enzyme/enzclass.txt
-     depends:
-       - Swiss-Prot
-       - TrEmble
-     parser:
-       - cp ../TrEmble/md52id_ec.txt  md52id.txt
-       - cat ../Swiss-Prot/md52id_ec.txt  >> md52id.txt
-     comment: kegg EC mappings obtained from UniProt
-     comment2: EC hierarchy needs to be parsed
+    category: protein
+    type: Hierarchical functional annotation
+    depth: 4
+    homepage: https://enzyme.expasy.org
+    version: curl -s "ftp://ftp.expasy.org/databases/enzyme/release/enzclass.txt" | grep '^Release' | grep -o '[0-9a-zA-Z\-]\+$'
+    download:
+      - ftp://ftp.expasy.org/databases/enzyme/enzyme.dat
+      - ftp://ftp.expasy.org/databases/enzyme/enzclass.txt
+    depends:
+      - Swiss-Prot
+      - TrEmble
+    parser:
+      - cp ../TrEmble/md52id_ec.txt  md52id.txt
+      - cat ../Swiss-Prot/md52id_ec.txt  >> md52id.txt
+      - ${M5NR_BIN}/create-ec-hierarchy.pl --class ${SOURCE_DIR}/enzclass.txt --input ${SOURCE_DIR}/enzyme.dat > id2hierarchy.txt
 
 EggNOG:
-     category: protein
-     type: Hierarchical functional annotation
-     depth: 3
-     homepage: http://eggnogdb.embl.de
-     version: curl --silent "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
-     depends:
-         - TrEmble
-     download:
-       - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
-     parser:
-       - fgrep ENOG ../TrEmble/md52id_eggnog.txt > md52id.txt
-       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 > eggnog-mapping.txt
-       - ${M5NR_BIN}/COG.sh > eggnog-hierarchy.txt
-       # the hierarchy is hardcoded in shell script
+    category: protein
+    type: Hierarchical functional annotation
+    depth: 3
+    homepage: http://eggnogdb.embl.de
+    version: curl --silent "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
+    depends:
+      - TrEmble
+    download:
+      - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
+    parser:
+      - fgrep ENOG ../TrEmble/md52id_eggnog.txt > md52id.txt
+      - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > id2func.txt
+      - ${M5NR_BIN}/create-nog-hierarchy.pl --input id2func.txt > id2hierarchy.txt
+    # the hierarchy is hardcoded in script
 
 GenBank:
-  category: protein
-  type: Functional annotation
-  download:
-    - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
-  version: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
-  parser:
+    category: protein
+    type: Functional annotation
+    download:
+      - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
+    version: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
+    parser:
       - ${M5NR_BIN}/genbank.pl ${SOURCE_DIR}/nr.gz
 
 goslim:
-  category: protein
-  homepage: http://www.geneontology.org
-  type: Hierarchical functional annotation
-  version: curl --silent "http://archive.geneontology.org/full/DATESTAMP"
-  download:
-    - http://www.geneontology.org/ontology/subsets/goslim_metagenomics.obo
-  parser:
-    - ${M5NR_BIN}/goslim.pl ${SOURCE_DIR}/goslim_metagenomics.obo > go2hier.txt
-  comment: version might be unrelated to goslim_metagenomics.obo?
+    category: protein
+    type: Hierarchical functional annotation
+    depth: 3
+    homepage: http://www.geneontology.org
+    version: curl --silent "http://archive.geneontology.org/full/DATESTAMP"
+    download:
+      - http://www.geneontology.org/ontology/subsets/goslim_metagenomics.obo
+    parser:
+      - ${M5NR_BIN}/goslim.pl ${SOURCE_DIR}/goslim_metagenomics.obo
 
 Greengenes:
-  homepage: http://greengenes.lbl.gov/
-  category: rRNA
-  type: SSU?
-  version: date --date="$(curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]")" '+%Y-%m-%d'
-  download:
-    - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
-  parser:
-    - ${M5NR_BIN}/greengenes.pl ${SOURCE_DIR}/current_GREENGENES_gg16S_unaligned.fasta.gz
-
+    category: rRNA
+    type: SSU
+    homepage: http://greengenes.lbl.gov/
+    version: date --date="$(curl --silent http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]")" '+%Y-%m-%d'
+    download:
+      - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
+    parser:
+      - ${M5NR_BIN}/greengenes.pl ${SOURCE_DIR}/current_GREENGENES_gg16S_unaligned.fasta.gz
 
 InterPro:
-  category: protein
-  type: Hierarchical functional annotation
-  #no-download: True
-  download-command_disabled: wget --recursive --no-clobber --convert-links --no-parent ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION_REMOTE}
-  version: curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
-#    - ftp://ftp.ebi.ac.uk/pub/databases/interpro/Current/
-  download:
+    category: protein
+    type: Hierarchical functional annotation
+    version: curl --silent ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
+    download:
       - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/entry.list
       - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/short_names.dat
       - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/interpro2go
-  parser:
+    parser:
       - ${M5NR_BIN}/interpro.pl ${SOURCE_DIR}/interpro2go
 
 KEGG:
-     category: protein
-     homepage: http://www.genome.jp/kegg/
-     type: Hierarchical functional annotation
-     depth: 4
-     no-download: True
-     parser:
-       - cp ../TrEmble/md52id_kegg.txt  md52id.txt
-       - cat ../Swiss-Prot/md52id_kegg.txt  >> md52id.txt
-     depends:
-       - Swiss-Prot
-       - TrEmbl
-     comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
-     comment2: EC hierarchy from elsewhere
-
+    category: protein
+    type: Hierarchical functional annotation
+    homepage: http://www.genome.jp/kegg/
+    depth: 4
+    no-download: true
+    parser:
+      - cp ../TrEmble/md52id_kegg.txt  md52id.txt
+      - cat ../Swiss-Prot/md52id_kegg.txt  >> md52id.txt
+    depends:
+      - Swiss-Prot
+      - TrEmbl
+    comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
+    comment2: KO hierarchy from ???
 
 #M5nr.fasta
 M5nr:
-  category: output
-  type: protein
-  no-download: True
-  parser:
+    category: output
+    type: protein
+    no-download: true
+    depends:
+      - BacMet
+      - CARD
+      - CAZy
+      - COG
+      - EC
+      - EggNOG
+      - GenBank
+      - goslim
+      - InterPro
+      - KEGG
+      - PATRIC
+      - PFAM
+      - PhAnToMe
+      - RefSeq
+      - SEED-Annotations
+      - SEED-Subsystems
+#     - singlecopygenes
+      - Swiss-Pro
+      - TrEmble
+    parser:
       - cat ../*/md52seq.txt > m5nr_in.txt
       - sort -u m5nr_in.txt > m5nr_sorted.txt
 
 #M5rna.fasta
 M5rna:
-  category: output
-  type: rRNA
-  no-download: True
-  depends:
-    - SILVA-SSU
-    - SILVA-LSU
-    - RDP
-    - Greengenes
-  parser:
+    category: output
+    type: rRNA
+    no-download: true
+    depends:
+      - SILVA-SSU
+      - SILVA-LSU
+      - RDP
+      - Greengenes
+    parser:
       - cat ../*/md52rnaseq.txt > m5rna_in.txt
       - sort -u m5rna_in.txt > m5rna_sorted.txt
 
-
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)
 motuDB:
-  category: protein
-  homepage: http://www.bork.embl.de/software/mOTU/
-  type: Filter set
-  version: curl --silent http://vm-lux.embl.de/~kultima/MOCAT/download.html | grep -o "mOTU\.v[0-9\.] " | grep -o "v[0-9\.]" | grep -o "[0-9\.]"
-  download:
-    - http://vm-lux.embl.de/~kultima/share/mOTU/mOTU.v${VERSION}.padded.tar.gz
-  parser:
-    - tar xfz ${SOURCE_DIR}/mOTU.v${VERSION}.padded.tar.gz
-    - ${M5NR_BIN}/motudb.pl mOTU.v${VERSION}.padded
+    category: protein
+    type: Filter set
+    homepage: http://www.bork.embl.de/software/mOTU/
+    version: curl --silent http://vm-lux.embl.de/~kultima/MOCAT/download.html | grep -o "mOTU\.v[0-9\.] " | grep -o "v[0-9\.]" | grep -o "[0-9\.]"
+    download:
+      - http://vm-lux.embl.de/~kultima/share/mOTU/mOTU.v${VERSION}.padded.tar.gz
+    parser:
+      - tar xfz ${SOURCE_DIR}/mOTU.v${VERSION}.padded.tar.gz
+      - ${M5NR_BIN}/motudb.pl mOTU.v${VERSION}.padded
 
 PATRIC:
-  category: protein
-  homepage: https://www.patricbrc.org/
-  type: Functional annotation
-  version: wget -qO- ftp://ftp.patricbrc.org/patric2/ | grep current_release | grep -o "20[0-9][0-9] [a-zA-Z]*"
-  download-command: ${M5NR_BIN}/download_PATRIC.sh
-  parser:
+    category: protein
+    type: Functional annotation
+    homepage: https://www.patricbrc.org/
+    version: wget -qO- ftp://ftp.patricbrc.org/patric2/ | grep current_release | grep -o "20[0-9][0-9] [a-zA-Z]*"
+    download-command: ${M5NR_BIN}/download_PATRIC.sh
+    parser:
       - ${M5NR_BIN}/patric.pl ${SOURCE_DIR}/
 
 PFAM:
-  type: Hierarchical functional annotation?
-  no-download: True
+    category: protein
+    type: Functional annotation
+    no-download: true
       # comes from Uniprot
-  depends:
-    - Swiss-Prot
-    - TrEmble
-  parser:
+    depends:
+      - Swiss-Prot
+      - TrEmble
+    parser:
       - (cat ../TrEmble/md52id_pfam.txt >> ./md52id.txt)
       - (cat ../Swiss-Prot/md52id_pfam.txt >> ./md52id.txt)
 
 PhAnToMe:
-  category: protein
-  homepage: http://www.phantome.org
-  type: Functional annotation
-  env:
-    TIMESTAMP: curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
-  version: date -d @${TIMESTAMP} +"%Y%m%d"
-  download:
-    - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz
-  comment: curl --silent "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
-  parser:
-    - ${M5NR_BIN}/phantome.pl ${SOURCE_DIR}/phage_proteins_${TIMESTAMP}.fasta.gz
+    category: protein
+    type: Functional annotation
+    homepage: http://www.phantome.org
+    env:
+        TIMESTAMP: curl --silent http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
+    version: date -d @${TIMESTAMP} +"%Y%m%d"
+    download:
+      - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz
+    comment: curl --silent "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
+    parser:
+      - ${M5NR_BIN}/phantome.pl ${SOURCE_DIR}/phage_proteins_${TIMESTAMP}.fasta.gz
 
 RDP:
-  category: rRNA
-  homepage: http://rdp.cme.msu.edu
-  type: SSU
-  version: curl --silent 'http://rdp.cme.msu.edu/download/releaseREADME.txt'
-  download:
-    - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.fa.gz
-    - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.fa.gz
-    - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.fa.gz
-    - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
-    - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
-    - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
-  parser:
+    category: rRNA
+    type: SSU
+    homepage: http://rdp.cme.msu.edu
+    version: curl --silent 'http://rdp.cme.msu.edu/download/releaseREADME.txt'
+    download:
+      - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.fa.gz
+      - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.fa.gz
+      - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.fa.gz
+      - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
+      - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
+      - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
+    parser:
       - ${M5NR_BIN}/rdp.pl ${SOURCE_DIR}/current_Fungi_unaligned.gb.gz ${SOURCE_DIR}/current_Bacteria_unaligned.gb.gz ${SOURCE_DIR}/current_Archaea_unaligned.gb.gz
 
 RefSeq:
-  category: protein
-  type: Functional annotation
-  version: curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/RELEASE_NUMBER
-  env:
-    COUNT: curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
-  download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.gpff.gz
-  resume-download: True
-  parser:
+    category: protein
+    type: Functional annotation
+    version: curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/RELEASE_NUMBER
+    env:
+        COUNT: curl --silent ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
+    download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.gpff.gz
+    resume-download: true
+    parser:
       - ${M5NR_BIN}/refseq.pl ${SOURCE_DIR}
 
 SEED-Annotations:
-  category: protein
-  homepage: http://www.theseed.org
-  type: Functional annotation
-  version: echo ${TODAY}
-  download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org
-  resume-download: True
-  parser:
+    category: protein
+    type: Functional annotation
+    homepage: http://www.theseed.org
+    version: echo ${TODAY}
+    download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org
+    resume-download: true
+    parser:
       - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org
 
 SEED-Subsystems:
-  category: protein
-  type: Functional annotation
-  type: Hierarchical functional annotation
-  depth: 4
-  homepage: http://www.theseed.org
-  version: echo ${TODAY}
-  download-command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq --verbose
-  resume-download: True
-  parser:
+    category: protein
+    type: Hierarchical functional annotation
+    depth: 4
+    homepage: http://www.theseed.org
+    version: echo ${TODAY}
+    download-command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq --verbose
+    resume-download: true
+    parser:
       - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
 
 # no suitable download mechanism other than manual, does not seem to be updated
@@ -290,52 +302,51 @@ SEED-Subsystems:
 #  download:
 #    - http://cbb.pnnl.gov/portal/software/FOAM.html
 
-
-singlecopygenes:
-  category: protein
-  type: Filter set
-  comment: From Will
-
+# not enabeled for now
+#singlecopygenes:
+#    category: protein
+#    type: Filter set
+#    comment: From Will
 
 SILVA-LSU:
-  homepage: http://www.arb-silva.de
-  category: rRNA
-  type: LSU
-  version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
-  download:
-    - ftp://ftp.arb-silva.de/current/Exports/README.txt
-    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
-    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz.md5
-    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz
-    - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz.md5
-  parser:
-    - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
+    category: rRNA
+    type: LSU
+    homepage: http://www.arb-silva.de
+    version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
+    download:
+      - ftp://ftp.arb-silva.de/current/Exports/README.txt
+      - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
+      - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz.md5
+      - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz
+      - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz.md5
+    parser:
+      - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
 
 SILVA-SSU:
-  homepage: http://www.arb-silva.de
-  category: rRNA
-  type: SSU
-  version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
-  download:
-    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
-    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz.md5
-  parser:
-    - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
+    category: rRNA
+    type: SSU
+    homepage: http://www.arb-silva.de
+    version: curl --silent -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
+    download:
+      - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
+      - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz.md5
+    parser:
+      - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
 
 Swiss-Prot:
-  category: protein
-  type: Functional annotation
-  download:
-    - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
-  version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "Swiss-Prot" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
-  parser:
+    category: protein
+    type: Functional annotation
+    download:
+      - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
+    version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "Swiss-Prot" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
+    parser:
       - ${M5NR_BIN}/swissprot.pl ${SOURCE_DIR}/uniprot_sprot.dat.gz
 
 TrEmble:
-  category: protein
-  type: Functional annotation
-  download:
-    -  ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
-  version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
-  parser:
-    - ${M5NR_BIN}/trembl.pl ${SOURCE_DIR}/uniprot_trembl.dat.gz
+    category: protein
+    type: Functional annotation
+    download:
+      - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
+    version: curl --silent ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
+    parser:
+      - ${M5NR_BIN}/trembl.pl ${SOURCE_DIR}/uniprot_trembl.dat.gz
