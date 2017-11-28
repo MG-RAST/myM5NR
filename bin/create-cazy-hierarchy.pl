@@ -26,6 +26,7 @@ unless ( $input && (-s $input) ) {
 
 my @ids = `cut -f2 $input | sort -u`;
 foreach my $id (@ids) {
+    chomp $id;
     if ($id =~ /^([A-Z]+)(\d+)$/) {
         if (exists $cazy->{$1}) {
             # ID, level 1, level 2

@@ -42,7 +42,7 @@ while (my $record = <INFILE>) {
             $id = $1;
             next;
         }
-        if ($line =~ /^DE\s+(.+)\.?$/) {
+        if ($line =~ /^DE\s+(.+)\.$/) {
             $desc = $1;
             next;
         }
