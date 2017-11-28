@@ -59,6 +59,7 @@ COG:
     category: protein
     type: Hierarchical functional annotation
     depth: 3
+    version: echo '-'
     depends:
       - TrEmble
     download:
