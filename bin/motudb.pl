@@ -26,8 +26,8 @@ if ( $filename eq "" )
 my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
 
-open(my $md52id, '>',    'md52id_motudb.txt') or die ;
-open(my $md52seq, '>',   'md52seq_motudb.txt') or die ;
+open(my $md52id, '>',    'md52id.txt') or die ;
+open(my $md52seq, '>',   'md52seq.txt') or die ;
 #open(my $md52tax, '>',  'md52tax_motudb.txt') or die ;
 #open(my $id2tax, '>',  'id2tax_motudb.txt') or die ;
 

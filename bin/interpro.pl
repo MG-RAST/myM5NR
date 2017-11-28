@@ -27,8 +27,8 @@ my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
        
 
-open(my $id2func_interpro, '>',   'id2func_interpro.txt') or die ;
-open(my $id2go_interpro, '>',   'id2go_interpro.txt') or die ;
+open(my $id2func_interpro, '>',   'id2func.txt') or die ;
+open(my $id2go_interpro, '>',   'id2go.txt') or die ;
 
 # ################# ################# ################# ################
 # ################# ################# ################# ################

@@ -32,10 +32,10 @@ if ( $dirname eq "" )
 }
 
 
-open(my $md52id, '>',    'md52id_patric.txt') or die ;
-open(my $md52seq, '>',   'md52seq_patric.txt') or die ;
-open(my $md52func, '>',   'md52func_patric.txt') or die ;
-open(my $id2tax, '>',   'id2tax_patric.txt') or die ;
+open(my $md52id, '>',    'md52id.txt') or die ;
+open(my $md52seq, '>',   'md52seq.txt') or die ;
+open(my $md52func, '>',   'md52func.txt') or die ;
+open(my $id2tax, '>',   'id2tax.txt') or die ;
 
 # FOR EACH FILE IN THE DIRECTORY
 opendir(DIR, $dirname) or die "Could not open $dirname\n";

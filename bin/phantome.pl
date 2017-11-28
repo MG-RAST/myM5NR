@@ -36,14 +36,13 @@ my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
        
 
-open(my $md52id, '>', 'md52id_phantome.txt') or die ;
-open(my $md5seq, '>', 'md52seq_phantome.txt') or die ;
-open(my $id2func, '>', 'id2func_phantome.txt') or die ;
-open(my $md5func, '>', 'md52func_phantome.txt') or die ;
-open(my $id2tax, '>', 'id2tax_phantome.txt') or die ;
-open(my $md5tax, '>', 'md52tax_phantome.txt') or die ;
-open(my $id2hierarchy, '>', 'id2hierarchy_phantome.txt') or die ;
-open(my $id2func , '>' , 'id2func_phantome.txt') or die ;
+open(my $md52id, '>', 'md52id.txt') or die ;
+open(my $md5seq, '>', 'md52seq.txt') or die ;
+open(my $id2func, '>', 'id2func.txt') or die ;
+open(my $md5func, '>', 'md52func.txt') or die ;
+open(my $id2tax, '>', 'id2tax.txt') or die ;
+open(my $md5tax, '>', 'md52tax.txt') or die ;
+open(my $id2hierarchy, '>', 'id2hierarchytxt') or die ;
 
 # ################# ################# ################# ################
 # ################# ################# ################# ################

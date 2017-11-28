@@ -26,10 +26,10 @@ if ( $filename eq "" )
 }
 
 
-open(my $md52id, '>',    'md52id_seed.txt') or die ;
-open(my $md52seq, '>',   'md52seq_seed.txt') or die ;
-open(my $md52func, '>',   'md52func_seed.txt') or die ;
-open(my $id2func, '>' ,'id2func_seed.txt') or die ;
+open(my $md52id, '>',    'md52id.txt') or die ;
+open(my $md52seq, '>',   'md52seq.txt') or die ;
+open(my $md52func, '>',   'md52func.txt') or die ;
+open(my $id2func, '>' ,'id2func.txt') or die ;
 
 # FOR EACH FILE IN THE DIRECTORY
 open (my $fh1, '<', "$filename") or die "Cannot open $filename: $!\n" ;

@@ -28,12 +28,12 @@ if ( $dirname eq "" )
 }
 
 
-open(my $md52id, '>',    'md52id_refseq.txt') or die ;
-open(my $md52seq, '>',   'md52seq_refseq.txt') or die ;
-open(my $md52func, '>',   'md52func_refseq.txt') or die ;
-open(my $id2tax, '>',   'id2tax_refseq.txt') or die ;
-open(my $id2func, '>',   'id2func_refseq.txt') or die ;
-open(my $md52tax, '>',   'md52tax_refseq.txt') or die ;
+open(my $md52id, '>',    'md52id.txt') or die ;
+open(my $md52seq, '>',   'md52seq.txt') or die ;
+open(my $md52func, '>',   'md52func.txt') or die ;
+open(my $id2tax, '>',   'id2tax.txt') or die ;
+open(my $id2func, '>',   'id2func.txt') or die ;
+open(my $md52tax, '>',   'md52tax.txt') or die ;
 
 # FOR EACH FILE IN THE DIRECTORY
 opendir(DIR, $dirname) or die "Could not open $dirname\n";
