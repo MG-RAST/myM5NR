@@ -154,7 +154,7 @@ KEGG:
       - cat ../Swiss-Prot/md52id_kegg.txt  >> md52id.txt
     depends:
       - Swiss-Prot
-      - TrEmbl
+      - TrEmble
     comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
     comment2: KO hierarchy from ???
 
