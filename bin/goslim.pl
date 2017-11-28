@@ -72,7 +72,8 @@ if ( $filename eq "" )
           $hier1 = $1;
 
       #      print "END\t\tGO:$id\t$name\t$namespace\n";
-            print $id2hier "GO:$id\t$name\t$hier1\t$namespace\n";
+            print $id2hier "GO:$id\t$namespace\t$hier1\t$name\n";
+            #print $id2hier "GO:$id\t$name\t$hier1\t$namespace\n";
             next;
           } # if namespace
 

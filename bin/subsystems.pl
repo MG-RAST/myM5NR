@@ -30,12 +30,10 @@ if ( $dirname eq "" )
 }
 
 
-open(my $md52id, '>',    'md52id_subsystems.txt') or die ;
-open(my $md52seq, '>',   'md52seq_subsystems.txt') or die ;
-open(my $md52func, '>',   'md52func_subsystems.txt') or die ;
-open(my $md52hierarchy, '>',   'md52hierarchy_subsystems.txt') or die ;
-open(my $id2hierarchy, '>',   'id52hierarchy_subsystems.txt') or die ;
-open(my $id2func, '>' ,'id2func_subsystems.txt') or die ;
+open(my $md52id, '>',    'md52id.txt') or die ;
+open(my $md52seq, '>',   'md52seq.txt') or die ;
+open(my $md52hierarchy, '>',   'md52hierarchy.txt') or die ;
+open(my $id2hierarchy, '>',   'id2hierarchy.txt') or die ;
 
 # FOR EACH FILE IN THE DIRECTORY
 opendir(my $dirh, $dirname) or die "Could not open $dirname\n";
@@ -85,10 +83,8 @@ while (defined (my $filename = readdir($dirh)) ) {
       # print the output
       print $md52id "$md5\t$id\n";
       print $md52seq "$md5\t$seq\n";
-      print $md52func "$md5\t$func\n";
-      print $id2func "$id\t$func\n";
-      print $md52hierarchy "$md5\t$subsystem1\t$subsystem2\t$subsystem3\n";
-      print $id2hierarchy "$id\t$subsystem1\t$subsystem2\t$subsystem3\n";
+      print $md52hierarchy "$md5\t$subsystem1\t$subsystem2\t$subsystem3\t$func\n";
+      print $id2hierarchy "$id\t$subsystem1\t$subsystem2\t$subsystem3\t$func\n";
 
    # reset the values for the next record
    $id='';  $md5='';  $func=''; $subsystem1='';$subsystem2=''; $subsystem3='';
