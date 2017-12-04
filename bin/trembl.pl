@@ -74,7 +74,17 @@ while (my $record = <$fh1>) {
         }
 
         if  ($line =~ /^DE\W+\w+Name:\W+Full=(.+);/) {
-            $func=$1; next;
+            $func = $1;
+            $func =~ s/\{\S+\|\S+\}$//;
+            if ($func =~ /^\| \/ /) {
+                $func = (split(/\//, $func))[1];
+            } elsif ($func =~ /^\| /) {
+                $func = (split(/\|/, $func))[1];
+            }
+            $func =~ s/^\s+//;
+            $func =~ s/\s+$//;
+            print $func."\n";
+            next;
         }
 
     # needs to push ids into an array
