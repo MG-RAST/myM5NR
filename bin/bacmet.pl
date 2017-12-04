@@ -39,8 +39,6 @@ my $fh2 = new IO::Uncompress::Gunzip ("$filename_pre")
 open(my $md52id, '>',    'md52id.txt') or die ;
 open(my $md52func, '>',  'md52func.txt') or die ;
 open(my $md52seq, '>',   'md52seq.txt') or die ;
-open(my $id2func, '>',   'id2func.txt') or die ;
-
 
 # ################# ################# ################# ################
 # ################# ################# ################# ################
@@ -62,7 +60,6 @@ while (<$fh1>) {
          print $md52id "$md5s\t$id\n";
          print $md52seq "$md5s\t$seq\n";
          print $md52func "$md5s\t$func\n";
-         print $id2func "$id\t$func\n";
 
          # reset the values for the next record
          $id='';  $md5s='';  $func='';  $subsys='';  $taxid='';  $taxname='';
@@ -113,7 +110,6 @@ while (<$fh2>) {
          print $md52id "$md5s\t$id\n";
          print $md52seq "$md5s\t$seq\n";
          print $md52func "$md5s\t$func\n";
-         print $id2func "$id\t$func\n";
 
          # reset the values for the next record
          $id='';  $md5s='';  $func='';  $subsys='';  $taxid='';  $taxname='';

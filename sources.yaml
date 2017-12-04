@@ -83,8 +83,8 @@ EC:
       - Swiss-Prot
       - TrEmble
     parser:
-      - cp ../TrEmble/md52id_ec.txt  md52id.txt
-      - cat ../Swiss-Prot/md52id_ec.txt  >> md52id.txt
+      - cp ../TrEmble/md52id_ec.txt md52id.txt
+      - cat ../Swiss-Prot/md52id_ec.txt >> md52id.txt
       - ${M5NR_BIN}/create-ec-hierarchy.pl --class ${SOURCE_DIR}/enzclass.txt --input ${SOURCE_DIR}/enzyme.dat > id2hierarchy.txt
 
 EggNOG:
@@ -159,6 +159,34 @@ KEGG:
     comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
     comment2: KO hierarchy from ???
 
+#unique_func.txt
+M5functions:
+    category: output
+    type: protein
+    no-download: true
+    depends:
+      - BacMet
+      - CARD
+      - CAZy
+      - COG
+      - EC
+      - EggNOG
+      - GenBank
+      - goslim
+      - InterPro
+      - KEGG
+      - PATRIC
+      - PFAM
+      - PhAnToMe
+      - RefSeq
+      - SEED-Annotations
+      - SEED-Subsystems
+#     - singlecopygenes
+      - Swiss-Pro
+      - TrEmble
+    parser:
+      - cut -f2 ../*/md52func.txt | sort -u > unique_func.txt
+
 #M5nr.fasta
 M5nr:
     category: output
@@ -185,8 +213,7 @@ M5nr:
       - Swiss-Pro
       - TrEmble
     parser:
-      - cat ../*/md52seq.txt > m5nr_in.txt
-      - sort -u m5nr_in.txt > m5nr_sorted.txt
+      - cat ../*/md52seq.txt | sort -u | ${M5NR_BIN}/tab2fasta.pl > m5nr.fasta
 
 #M5rna.fasta
 M5rna:
@@ -199,8 +226,7 @@ M5rna:
       - RDP
       - Greengenes
     parser:
-      - cat ../*/md52rnaseq.txt > m5rna_in.txt
-      - sort -u m5rna_in.txt > m5rna_sorted.txt
+      - cat ../*/md52rnaseq.txt | sort -u | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
 
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)
 motuDB:
@@ -232,8 +258,8 @@ PFAM:
       - Swiss-Prot
       - TrEmble
     parser:
-      - (cat ../TrEmble/md52id_pfam.txt >> ./md52id.txt)
-      - (cat ../Swiss-Prot/md52id_pfam.txt >> ./md52id.txt)
+      - cp ../TrEmble/md52id_pfam.txt md52id.txt
+      - cat ../Swiss-Prot/md52id_pfam.txt >> md52id.txt
 
 PhAnToMe:
     category: protein
