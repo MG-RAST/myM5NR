@@ -182,7 +182,7 @@ M5functions:
       - SEED-Annotations
       - SEED-Subsystems
 #     - singlecopygenes
-      - Swiss-Pro
+      - Swiss-Prot
       - TrEmble
     parser:
       - cut -f2 ../*/md52func.txt | sort -u > unique_func.txt
@@ -210,7 +210,7 @@ M5nr:
       - SEED-Annotations
       - SEED-Subsystems
 #     - singlecopygenes
-      - Swiss-Pro
+      - Swiss-Prot
       - TrEmble
     parser:
       - cat ../*/md52seq.txt | sort -u | ${M5NR_BIN}/tab2fasta.pl > m5nr.fasta
