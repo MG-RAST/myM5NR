@@ -35,7 +35,7 @@ if ( $dirname eq "" )
 open(my $md52id, '>',    'md52id.txt') or die ;
 open(my $md52seq, '>',   'md52seq.txt') or die ;
 open(my $md52func, '>',   'md52func.txt') or die ;
-open(my $id2tax, '>',   'id2tax.txt') or die ;
+open(my $md52tax, '>',   'md52tax.txt') or die ;
 
 # FOR EACH FILE IN THE DIRECTORY
 opendir(DIR, $dirname) or die "Could not open $dirname\n";
@@ -67,38 +67,27 @@ while (my $filename = readdir(DIR)) {
                print $md52id "$md5s\t$id\n";
                print $md52seq "$md5s\t$seq\n";
                print $md52func "$md5s\t$func\n";
-               print $id2tax "$id\t$tax\n";
+               print $md52tax "$md5s\t$tax\n";
 
                # reset the values for the next record
-               $id='';  $md5s='';  $func='';
+               $id='';  $md5s='';  $func=''; $tax='';
              }
 
-
-      #   >WP_003131952.1 30S ribosomal protein S18 [Lactococcus lactis]
-          my $line = $_;
-      #    $line =~ s/>//g;
+      #>WP_003131952.1 30S ribosomal protein S18 [Lactococcus lactis]
       #>fig|101571.178.peg.5|   hypothetical protein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
+          
+          my $line = $_;
 
-          $id = (split( /\|/, $line))[1];
-          $id= "fig|$id";
-      #    print "ID\t$id\n";
-
-          my $pos=index ($line, '[');
-          my $len= length($id);
-          $func = (split (/\[/, $line))[0];
-          my $cut= rindex ($func,'|');
-          $func = substr ($func, $cut+2);
-
-          $tax = (split (/\[/, $line))[1];
-          my $cut= rindex ($tax,'|');
-          $tax = substr ($tax, 0, $cut);
-
-          chomp $tax;
-          chomp $func;
-     #    print "TAX\t$tax\n";
-  #       print "FUN\t$func\n";
-              $seq = ""; # clear out old sequence
-           }
+          my @parts = split(/\|/, $line);
+          $id = "fig|".$parts[1];
+          
+          ($func, $tax) = split(/\[/, $parts[2]);
+          
+          $func =~ s/^\s+|\s+$//g
+          $tax =~ s/^\s+|\s+$//g
+          $seq = ""; # clear out old sequence
+         
+         }
          else {
             s/\s+//g; # remove whitespace
             $seq .= $_; # add sequence
