@@ -173,8 +173,7 @@ sub print_record {
     print $md52id "$md5s\t$id\n";
     print $md52seq "$md5s\t$sequence\n";
 
-    print $md52func "$md5s\t$func\n";
-    if ( $func ne "" );
+    print $md52func "$md5s\t$func\n"        if ( $func   ne "" );
     print $md52tax "$md5s\t$tax\n"          if ( $tax    ne "" );
     print $md52id_ipr "$md5s\t$ipr\n"       if ( $ipr    ne "" );
     print $md52id_cog "$md5s\t$cog\n"       if ( $cog    ne "" );
