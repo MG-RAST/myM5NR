@@ -25,7 +25,7 @@ my $filename_pre=shift @ARGV;
 if ( $filename eq "" or $filename_pre eq "" )
 {
   print STDERR "Usage: \tbacmet.pl <filename1> <filename2>\n";
-  print STDERR " \te.g. bacmet.pl BacMet_EXP.704.fasta BacMet_Predicted.40556.fasta\n";
+  print STDERR " \te.g. bacmet.pl BacMet_EXP.704.fasta BacMet_PRE.40556.fasta\n";
   exit 1;
 }
 
@@ -103,7 +103,8 @@ while (<$fh2>) {
     if (/>/) {
         # if we already have a sequence ...  ## need to take care of last record
        if ($seq ne "") {    # found the next record
-
+         chomp $seq;
+         $seq=lc($seq);
          $md5s = md5_hex($seq);
 
          # print the output
@@ -115,7 +116,7 @@ while (<$fh2>) {
          $id='';  $md5s='';  $func='';  $subsys='';  $taxid='';  $taxname='';
        }
 
-#>BAC0002|abeS|tr|Q2FD83|Q2FD83_ACIBA QacEdelta1 SMR family efflux pump OS=Acinetobacter baumannii GN=qacEdelta1 PE=3 SV=1
+#>gi|118471459|ref|YP_889645.1| cadA gene product [Mycobacterium smegmatis str. MC2 155] [ctpD:Chr:Cobalt (Co), Nickel (Ni)]
 my $line = $_;
   $line =~ s/>//g;
   $line =~ s/\]//g;
