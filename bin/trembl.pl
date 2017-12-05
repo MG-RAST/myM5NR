@@ -84,7 +84,6 @@ while ( my $record = <$fh1> ) {
             }
             $func =~ s/^\s+//;
             $func =~ s/\s+$//;
-            print $func. "\n";
             next;
         }
 
