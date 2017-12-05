@@ -122,7 +122,7 @@ while ( my $record = <$fh1> ) {
             my @lines = split( 'SQ ', $record );
 
             # split the record at the correct position to catch the sequences
-            $sequence = @lines[1];
+            $sequence = $lines[1];
 
             # join lines, remove the first list as well as the record separator
             $sequence =~ s/^(.*\n)//;
