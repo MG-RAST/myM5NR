@@ -44,9 +44,9 @@ if ( $filename eq "" )
 
     my $id=""; my $name=""; my $namespace=""; my $hier1='';
 
-    # ################
-    while (my $record = <$fh1>) {
-      $id=""; $name=""; $namespace=""; my $hier1='';
+# ################
+while (my $record = <$fh1>) {
+   $id=""; $name=""; $namespace=""; my $hier1='';
 
    # ignore all non Term entries
    next if ($record !~ /\[Term\].*/ ) ;
@@ -67,25 +67,21 @@ if ( $filename eq "" )
         }
         if ($line =~ /^namespace.\W+(\w+)/) {
           $namespace=$1;
+          next;
         }
         if ($line =~ /^is_a:\W+GO:\d+\W+!\W+(.*)/ ) {
           $hier1 = $1;
-
-      #      print "END\t\tGO:$id\t$name\t$namespace\n";
-            print $id2hier "GO:$id\t$namespace\t$hier1\t$name\n";
-            #print $id2hier "GO:$id\t$name\t$hier1\t$namespace\n";
-            next;
-          } # if namespace
+          next;
+        }
 
     } # foreach $line
 
     # print values to file here
+    print $id2hier "GO:$id\t$namespace\t$hier1\t$name\n";
 
-            # set OLD again
-        $/="\n\n";
+    # set OLD again
+    $/="\n\n";
 
-  } # while $record
+} # while $record
 
-    # handle last record (before EOF)
-
-    exit 0;
+exit 0;
