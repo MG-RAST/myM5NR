@@ -38,9 +38,7 @@ my $fh1 = new IO::Uncompress::Gunzip ("$filename")
 
 open(my $md52id, '>', 'md52id.txt') or die ;
 open(my $md5seq, '>', 'md52seq.txt') or die ;
-open(my $id2func, '>', 'id2func.txt') or die ;
 open(my $md5func, '>', 'md52func.txt') or die ;
-open(my $id2tax, '>', 'id2tax.txt') or die ;
 open(my $md5tax, '>', 'md52tax.txt') or die ;
 open(my $id2hierarchy, '>', 'id2hierarchytxt') or die ;
 
@@ -58,16 +56,15 @@ while (<$fh1>) {
 
       # if we already have a sequence ...  ## need to take care of last record
        if ($seq ne "") {    # found the next record
-       
+         chomp $seq;
+         $seq = lc ($seq);
          $md5s = md5_hex($seq);
          
          # print the output
          print $md52id "$md5s\t$id\n";
          print $md5seq "$md5s\t$seq\n";
          print $md5func "$md5s\t$func\n";
-         print $id2func "$id\t$func\n";
- 	       print $md5tax   "$md5s\t$taxid\n";
-         print $id2tax "$id\t$taxid\n";
+ 	     print $md5tax  "$md5s\t$taxid\n";
 
          foreach  $subsys (split ';', $subsystems) { # print one entry per subsystem record we find
            print $id2hierarchy "$id\t$func\t$subsys\n";
