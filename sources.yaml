@@ -241,8 +241,8 @@ motuDB:
     download:
       - http://vm-lux.embl.de/~kultima/share/mOTU/mOTU.v${VERSION}.padded.tar.gz
     parser:
-      - tar xfz ${SOURCE_DIR}/mOTU.v${VERSION}.padded.tar.gz
-      - ${M5NR_BIN}/motudb.pl mOTU.v${VERSION}.padded
+      - tar -xzf ${SOURCE_DIR}/mOTU.v${VERSION}.padded.tar.gz -C ${SOURCE_DIR}
+      - ${M5NR_BIN}/motudb.pl ${SOURCE_DIR}/mOTU.v${VERSION}.padded
 
 PATRIC:
     category: protein
