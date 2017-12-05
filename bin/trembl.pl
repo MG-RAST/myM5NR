@@ -13,200 +13,176 @@
 # the parser is very brute force as bioperl and biopython will not extract all required fields
 # folker@anl.gov
 
+use strict;
+use warnings;
 
 use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
-use strict;
-use IO::Compress::Gzip qw(gzip $GzipError) ;
+use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
-my $filename=shift @ARGV;
+my $filename = shift @ARGV;
 
-if ( $filename eq "" )
-{
-  print STDERR "Usage: \ttrembl.pl <filename1> \n";
-  exit 1;
+if ( $filename eq "" ) {
+    print STDERR "Usage: \ttrembl.pl <filename1> \n";
+    exit 1;
 }
 
-my $fh1 = new IO::Uncompress::Gunzip ("$filename")
-       or die "Cannot open '$filename': $!\n" ;
+my $fh1 = new IO::Uncompress::Gunzip("$filename")
+  or die "Cannot open '$filename': $!\n";
 
-open(my $md52id, '>',    'md52id.txt') or die ;
-open(my $md52seq, '>',   'md52seq.txt') or die ;
-open(my $id2func, '>',   'id2func.txt') or die ;
-open(my $md52id_go, '>', 'md52id_go.txt') or die ;
-open(my $md52id_ipr, '>', 'md52id_ipr.txt') or die ;
-#open(my $md52tax, '>',  'md52tax_motudb.txt') or die ;
-#open(my $id2tax, '>',  'id2tax_motudb.txt') or die ;
-open(my $md52uni_func, '>', 'md52func.txt') or die ;
-open(my $md52id_pfam, '>', 'md52id_pfam.txt') or die ;
-open(my $md52id_kegg, '>', 'md52id_kegg.txt') or die ;
-open(my $md52id_cazy, '>', 'md52id_cazy.txt') or die ;
-open(my $md52id_ec, '>', 'md52id_ec_trembl.txt') or die ;
-open(my $md52id_eggnog, '>', 'md52id_eggnog.txt') or die ;
-open(my $md52id_cog, '>', 'md52id_cog.txt') or die ;
-open(my $md52tax, '>', 'md52taxid.txt') or die ;
+open( my $md52id,        '>', 'md52id.txt' )        or die;
+open( my $md52seq,       '>', 'md52seq.txt' )       or die;
+open( my $md52func,      '>', 'md52func.txt' )      or die;
+open( my $md52tax,       '>', 'md52taxid.txt' )     or die;
+open( my $md52id_go,     '>', 'md52id_go.txt' )     or die;
+open( my $md52id_ipr,    '>', 'md52id_ipr.txt' )    or die;
+open( my $md52id_pfam,   '>', 'md52id_pfam.txt' )   or die;
+open( my $md52id_kegg,   '>', 'md52id_kegg.txt' )   or die;
+open( my $md52id_cazy,   '>', 'md52id_cazy.txt' )   or die;
+open( my $md52id_ec,     '>', 'md52id_ec.txt' )     or die;
+open( my $md52id_eggnog, '>', 'md52id_eggnog.txt' ) or die;
+open( my $md52id_cog,    '>', 'md52id_cog.txt' )    or die;
 
+my (
+    $id,   $go,   $kegg, $md5s,   $pfam, $ipr,
+    $func, $cazy, $ec,   $eggnog, $tax,  $cog
+);
 
+$/ = "\n//";
 
-$/="\n//";
+while ( my $record = <$fh1> ) {
+    (
+        $id,   $go,   $kegg, $md5s,   $pfam, $ipr,
+        $func, $cazy, $ec,   $eggnog, $tax,  $cog
+    ) = ( '', '', '', '', '', '', '', '', '', '', '', '' );
 
-# now almost the same procedure for trembl
-while (my $record = <$fh1>) {
+    #print $record;
 
-    my $id; my $go=''; my $kegg=''; my $md5s; my $pfam=''; my $ipr=''; my $func='';
-    my $cazy=''; my $ec=''; my $eggnog=''; my $tax=''; my $cog='';
+    foreach my $line ( split /\n/, $record ) {
 
-    #  print $record;
+        #print $line."\n";
 
-      #unset EOL
-      $/='';
-
-      foreach my $line (split /\n/ ,$record) {
-    #   print $line."\n";
-
-        if ($line =~ /^ID\W+(\w+)/ ) {
-          $id=$1;       next;
+        if ( $line =~ /^ID\W+(\w+)/ ) {
+            $id = $1;
+            next;
         }
 
-        if  ($line =~ /^OX\W+NCBI_TaxID=(\w+)\W+/) {
-                 $tax=$1; next;
+        if ( $line =~ /^OX\W+NCBI_TaxID=(\w+)\W+/ ) {
+            $tax = $1;
+            next;
         }
 
-        if  ($line =~ /^DE\W+\w+Name:\W+Full=(.+);/) {
+        if ( $line =~ /^DE\W+\w+Name:\W+Full=(.+);/ ) {
             $func = $1;
             $func =~ s/\{\S+\|\S+\}$//;
-            if ($func =~ /^\| \/ /) {
-                $func = (split(/\//, $func))[1];
-            } elsif ($func =~ /^\| /) {
-                $func = (split(/\|/, $func))[1];
+            if ( $func =~ /^\| \/ / ) {
+                $func = ( split( /\//, $func ) )[1];
+            }
+            elsif ( $func =~ /^\| / ) {
+                $func = ( split( /\|/, $func ) )[1];
             }
             $func =~ s/^\s+//;
             $func =~ s/\s+$//;
-            print $func."\n";
+            print $func. "\n";
             next;
         }
 
-    # needs to push ids into an array
-        if  ($line =~ /^DR\W+InterPro\W+IPR(\w+)/) {
-            $ipr=$1;    next;
-        }
-
-
-    #    DR   CAZy; GT4; Glycosyltransferase Family 4.
-    #    DE   SubName: Full=CAZy families CE14 protein {ECO:0000313|EMBL:AIA83773.1};
-
-       # if  ($line =~ /^DR\W+CAZy;\W+(\w+);/) {
-        if  ($line =~ /^DR\W+CAZy;\W+(\w+);/) {
-            $cazy=$1;  next;
-        }
-        if  ($line =~ /^DE\W+SubName:\W+Full=CAZy\W+families\W+(\w+)/) {
-             $cazy=$1; next;
-         }
-
-    # needs to push ids into an array
-        if  ($line =~ /^DR\W+Pfam;\W+PF(\w+)/) {
-            $pfam="pfam".$1;  next;
-        }
-
-        if  ($line =~ /^DR\W+KEGG;\W+(\w+):(\w+)/) {
-            $kegg="$1:$2";   next;
-        }
-
-        # catch COG first
-        #trembl_short.dat:DR   eggNOG; COG0526; LUCA.
-        # remaining eggnog will be collected next
-        if  ($line =~ /^DR\W+eggNOG;\W+COG(\d+);\W+LUCA./) {
-          $cog="COG$1";  next;
-         }
-
-    if  ($line =~ /^DR\W+eggNOG;\W+(\w+);/) {
-         $eggnog="$1"; next;
-    }
-    #sprot_short.dat:DR   eggNOG; ENOG410J6YU; Eukaryota.
-       if  ($line =~ /^DR\W+eggNOG;\W+(\w+);/) {
-         if ( $eggnog ne '' ) {
-           $eggnog = "$eggnog,$1"
-           }
-         else { $eggnog="$1";
-              }
+        if ( $line =~ /^DR\W+InterPro\W+IPR(\w+)/ ) {
+            $ipr = $1;
             next;
         }
 
-    #DE            EC=3.2.1.1 {ECO:0000313|EMBL:AAC45663.1};
-    # needs to push ids into an array
-        if  ($line =~ /^DE\W+EC=(\w+).(\w+).(\w+).(\w+)\W+/) {
-    	$ec="$1.$2.$3.$4";
+        if ( $line =~ /^DR\W+CAZy;\W+(\w+);/ ) {
+            $cazy = $1;
+            next;
+        }
+        if ( $line =~ /^DE\W+SubName:\W+Full=CAZy\W+families\W+(\w+)/ ) {
+            $cazy = $1;
             next;
         }
 
-    # needs to push ids into an array
-        if  ($line =~ /^DR\W+GO;\W+GO:(\w+)/) {
-    	$go=$1;
-    	#print "GO:$go\n";
+        if ( $line =~ /^DR\W+Pfam;\W+PF(\w+)/ ) {
+            $pfam = "pfam" . $1;
             next;
         }
 
+        if ( $line =~ /^DR\W+KEGG;\W+(\w+):(\w+)/ ) {
+            $kegg = "$1:$2";
+            next;
+        }
 
-      # parse sequence, generate md5 and write outfiles
-      if  ($line =~ /^SQ/) {
+        if ( $line =~ /^DR\W+eggNOG;\W+COG(\d+);\W+LUCA./ ) {
+            $cog = "COG$1";
+            next;
+        }
 
-    	my @lines = split ('SQ ', $record);
-      #	print Dumper(@lines);
+        if ( $line =~ /^DR\W+eggNOG;\W+(\w+);/ ) {
+            $eggnog = "$1";
+            next;
+        }
 
-        # split the record at the correct position to catch the sequences
-        my $sequence = @lines[1];
-        # join lines, remove the first list as well as the record separator
-    	$sequence =~ s/^(.*\n)//;
-    	$sequence =~ tr / \n\/\///ds;
-      chomp $sequence;
-      $sequence = lc ($sequence);
+        if ( $line =~ /^DR\W+eggNOG;\W+(\w+);/ ) {
+            if ( $eggnog ne '' ) {
+                $eggnog = "$eggnog,$1";
+            }
+            else {
+                $eggnog = "$1";
+            }
+            next;
+        }
 
-      #	print "SEQ: $sequence\n";
-    	#print $sequence."\n\n\n";
+        if ( $line =~ /^DE\W+EC=(\w+).(\w+).(\w+).(\w+)\W+/ ) {
+            $ec = "$1.$2.$3.$4";
+            next;
+        }
 
-    	$md5s = md5_hex($sequence);
-    	#print "MD5 $md5\n";
+        if ( $line =~ /^DR\W+GO;\W+GO:(\w+)/ ) {
+            $go = $1;
+            next;
+        }
 
-      print $md52seq "$md5s\t$sequence\n";
-      print $md52uni_func "$md5s\t$func\n";
-    	print $md52tax "$md5s\t$tax\n";
+        if ( $line =~ /^SQ/ ) {
 
-      die "cannot find ID\n" if ( $id eq "");
+            my @lines = split( 'SQ ', $record );
 
-      print $md52id "$md5s\t$id\n" ;
-      print $md52id_ipr "$md5s\t$ipr\n"    	    if ( $ipr ne "" );
-      print $md52id_cog "$md5s\t$cog\n"         if ( $cog ne "" );
-      print $md52id_eggnog "$md5s\t$eggnog\n"   if ( $eggnog ne "" );
-      print $md52id_pfam "$md5s\t$pfam\n"       if ( $pfam ne "");
-      print $md52id_kegg "$md5s\t$kegg\n"     	if ( $kegg ne "" ) ;
-      print $md52id_go "$md5s\t$go\n"     	    if ( $go ne "");
-      print $md52id_cazy "$md5s\t$cazy\n"  	    if ( $cazy ne "" );
-      print $md52id_ec "$md5s\t$ec\n"     	    if ( $ec ne "" );
-      print $md52tax "$md5s\t$tax\n"     	      if ( $tax ne "" );
-    	# skip to next record
-    	next
-      } # end of SQ case
-    }
-          # reset EOL
-          $/="\n//";
+            # split the record at the correct position to catch the sequences
+            my $sequence = @lines[1];
 
+            # join lines, remove the first list as well as the record separator
+            $sequence =~ s/^(.*\n)//;
+            $sequence =~ tr / \n\/\///ds;
+            chomp $sequence;
+            $sequence = lc($sequence);
+            $md5s     = md5_hex($sequence);
+            next;
+        }    # end of SQ case
+    }    # end of record
+
+    print_record();
 }
+
 # print final record
-print $md52seq "$md5s\t$sequence\n";
-print $md52uni_func "$md5s\t$func\n";
-print $md52tax "$md5s\t$tax\n";
+print_record();
 
-die "cannot find ID\n" if ( $id eq "");
-
-print $md52id "$md5s\t$id\n" ;
-print $md52id_ipr "$md5s\t$ipr\n"    	    if ( $ipr ne "" );
-print $md52id_cog "$md5s\t$cog\n"         if ( $cog ne "" );
-print $md52id_eggnog "$md5s\t$eggnog\n"   if ( $eggnog ne "" );
-print $md52id_pfam "$md5s\t$pfam\n"       if ( $pfam ne "");
-print $md52id_kegg "$md5s\t$kegg\n"     	if ( $kegg ne "" ) ;
-print $md52id_go "$md5s\t$go\n"     	    if ( $go ne "");
-print $md52id_cazy "$md5s\t$cazy\n"  	    if ( $cazy ne "" );
-print $md52id_ec "$md5s\t$ec\n"     	    if ( $ec ne "" );
-print $md52tax "$md5s\t$tax\n"     	      if ( $tax ne "" );
 exit 0;
+
+sub print_record {
+    die "cannot find ID\n" if ( $id eq "" );
+
+    print $md52id "$md5s\t$id\n";
+    print $md52seq "$md5s\t$sequence\n";
+
+    print $md52func "$md5s\t$func\n";
+    if ( $func ne "" );
+    print $md52tax "$md5s\t$tax\n"          if ( $tax    ne "" );
+    print $md52id_ipr "$md5s\t$ipr\n"       if ( $ipr    ne "" );
+    print $md52id_cog "$md5s\t$cog\n"       if ( $cog    ne "" );
+    print $md52id_eggnog "$md5s\t$eggnog\n" if ( $eggnog ne "" );
+    print $md52id_pfam "$md5s\t$pfam\n"     if ( $pfam   ne "" );
+    print $md52id_kegg "$md5s\t$kegg\n"     if ( $kegg   ne "" );
+    print $md52id_go "$md5s\t$go\n"         if ( $go     ne "" );
+    print $md52id_cazy "$md5s\t$cazy\n"     if ( $cazy   ne "" );
+    print $md52id_ec "$md5s\t$ec\n"         if ( $ec     ne "" );
+    print $md52tax "$md5s\t$tax\n"          if ( $tax    ne "" );
+}
