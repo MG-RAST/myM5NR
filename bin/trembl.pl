@@ -45,17 +45,17 @@ open( my $md52id_eggnog, '>', 'md52id_eggnog.txt' ) or die;
 open( my $md52id_cog,    '>', 'md52id_cog.txt' )    or die;
 
 my (
-    $id,   $go,   $kegg, $md5s,   $pfam, $ipr,
-    $func, $cazy, $ec,   $eggnog, $tax,  $cog
+    $id,   $go, $kegg,   $md5s, $pfam, $ipr, $func,
+    $cazy, $ec, $eggnog, $tax,  $cog,  $sequence
 );
 
 $/ = "\n//";
 
 while ( my $record = <$fh1> ) {
     (
-        $id,   $go,   $kegg, $md5s,   $pfam, $ipr,
-        $func, $cazy, $ec,   $eggnog, $tax,  $cog
-    ) = ( '', '', '', '', '', '', '', '', '', '', '', '' );
+        $id,   $go, $kegg,   $md5s, $pfam, $ipr, $func,
+        $cazy, $ec, $eggnog, $tax,  $cog,  $sequence
+    ) = ( '', '', '', '', '', '', '', '', '', '', '', '', '' );
 
     #print $record;
 
@@ -147,7 +147,7 @@ while ( my $record = <$fh1> ) {
             my @lines = split( 'SQ ', $record );
 
             # split the record at the correct position to catch the sequences
-            my $sequence = @lines[1];
+            $sequence = @lines[1];
 
             # join lines, remove the first list as well as the record separator
             $sequence =~ s/^(.*\n)//;
