@@ -61,11 +61,13 @@ COG:
     depth: 3
     version: echo '-'
     depends:
+      - Swiss-Prot
       - TrEmble
     download:
       - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
     parser:
       - fgrep COG ../TrEmble/md52id_cog.txt > md52id.txt
+      - fgrep COG ../Swiss-Prot/md52id_cog.txt >> md52id.txt
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > id2func.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input id2func.txt > id2hierarchy.txt
     # the hierarchy is hardcoded in script
@@ -94,11 +96,13 @@ EggNOG:
     homepage: http://eggnogdb.embl.de
     version: curl --silent "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
     depends:
+      - Swiss-Prot
       - TrEmble
     download:
       - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
     parser:
       - fgrep ENOG ../TrEmble/md52id_eggnog.txt > md52id.txt
+      - fgrep ENOG ../Swiss-Prot/md52id_eggnog.txt >> md52id.txt
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > id2func.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input id2func.txt > id2hierarchy.txt
     # the hierarchy is hardcoded in script
@@ -150,12 +154,12 @@ KEGG:
     homepage: http://www.genome.jp/kegg/
     depth: 4
     no-download: true
-    parser:
-      - cp ../TrEmble/md52id_kegg.txt  md52id.txt
-      - cat ../Swiss-Prot/md52id_kegg.txt  >> md52id.txt
     depends:
       - Swiss-Prot
       - TrEmble
+    parser:
+      - cp ../TrEmble/md52id_kegg.txt md52id.txt
+      - cat ../Swiss-Prot/md52id_kegg.txt >> md52id.txt
     comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
     comment2: KO hierarchy from ???
 
