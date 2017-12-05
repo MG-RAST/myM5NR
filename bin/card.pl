@@ -23,23 +23,22 @@ use IO::Uncompress::Gunzip;
 # the main trick is to read the document record by record
 
 my $filename=shift @ARGV;
+my $taxonomy=shift @ARGV;
 
-if ( $filename eq "" )
+if ( $filename eq "" or $taxonomy eq "" )
 {
-  print STDERR "Usage: \tcard.pl <filename1> \n";
-  print STDERR " \te.g. card.pl card.fasta\n";
-  print STDERR " requires ncbi_taxomony.csv in same directory";
+  print STDERR "Usage: \tcard.pl <filename> <taxonomy>\n";
+  print STDERR " \te.g. card.pl card.fasta ncbi_taxonomy.csv\n";
   exit 1;
 }
 
 my $fh1 = new IO::Uncompress::Gunzip ("$filename")
        or die "Cannot open '$filename': $!\n" ;
 
-open (my $ncbitax, '<', 'ncbi_taxomony.csv' ) or die "cannot open ncbi_taxomony.csv";
+open (my $ncbitax, '<', $taxonomy ) or die "cannot open $taxonomy";
 
 open(my $md52id,  '>', 'md52id.txt') or die ;
 open(my $md52hier,'>', 'md52hier.txt' ) or die ;
-open(my $id2hier, '>', 'id2hier.txt' ) or die ;
 open(my $md52seq, '>', 'md52seq.txt') or die ;
 open(my $md52tax, '>', 'md52tax.txt') or die ;
 open(my $md52func,'>', 'md52func.txt') or die ;
@@ -74,7 +73,6 @@ while (<$fh1>) {
          print $md52seq "$md5s\t$seq\n";
          print $md52func "$md5s\t$func\n";
          print $md52hier "$md5s\t$card\n";
-         print $id2hier "$id\t$card\n";
          print $md52tax "$md5s\t$ncbihash{$tax}\n";  # convert via CARD provided translation table
 
          # reset the values for the next record
@@ -129,7 +127,6 @@ print $md52id "$md5s\t$id\n";
 print $md52seq "$md5s\t$seq\n";
 print $md52func "$md5s\t$func\n";
 print $md52hier "$md5s\t$card\n";
-print $id2hier "$id\t$card\n";
 print $md52tax "$md5s\t$ncbihash{$tax}\n";  # convert via CARD provided translation table
 
 

@@ -26,7 +26,7 @@ BacMet:
     download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
     parser:
       - unzip ${SOURCE_DIR}/BacMet1.1.zip
-      - ${M5NR_BIN}/bacmet.pl BacMet_EXP.704.fasta BacMet_Predicted.*.fasta
+      - ${M5NR_BIN}/bacmet.pl BacMet_EXP.704.fasta BacMet_PRE.*.fasta
 
 CARD:
     category: protein
@@ -35,10 +35,10 @@ CARD:
     version: curl --silent "https://card.mcmaster.ca/download" | grep ">CARD<" | grep -o ">[0-9][0-9\.]*<" | head -n1 |  grep -o "[0-9\.]*"
     download: https://card.mcmaster.ca/latest/data
     parser:
-      - cat ${SOURCE_DIR}/data | bunzip2 | tar xf -
-      - ${M5NR_BIN}/card.pl protein_fasta_protein_homolog_model.fasta
+      - tar -xjf ${SOURCE_DIR}/data -C ${SOURCE_DIR}
+      # note, file name 'ncbi_taxomony.csv' is misspelled in tarball, may have name changed in future
+      - ${M5NR_BIN}/card.pl ${SOURCE_DIR}/protein_fasta_protein_homolog_model.fasta ${SOURCE_DIR}/ncbi_taxomony.csv
       - ${M5NR_BIN}/obo2hierarchy.pl aro.obo
-      - rm -f ncbi* *.fasta snps.txt version.txt card.json aro* CARD* mo* ro*
 
 CAZy:
     category: protein
