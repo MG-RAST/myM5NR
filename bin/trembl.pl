@@ -23,7 +23,7 @@ use IO::Uncompress::Gunzip;
 
 my $filename = shift @ARGV;
 
-if ( $filename eq "" ) {
+unless ($filename) {
     print STDERR "Usage: \ttrembl.pl <filename1> \n";
     exit 1;
 }
@@ -168,7 +168,7 @@ close($fh1);
 exit 0;
 
 sub print_record {
-    if ( $md5 && $sequence && $id ) {
+    if ( $md5s && $sequence && $id ) {
         print $md52id "$md5s\t$id\n";
         print $md52seq "$md5s\t$sequence\n";
 
