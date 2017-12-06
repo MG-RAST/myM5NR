@@ -18,7 +18,7 @@ my $filename1 = shift @ARGV;
 my $filename2 = shift @ARGV;
 my $filename3 = shift @ARGV;
 
-if ( $filename1 eq "" || $filename2 eq "" || $filename3 eq "" ) {
+unless ( $filename1 && $filename2 && $filename3 ) {
     print STDERR "Usage: \tgenbank.pl <filename1> <filename2> <filename3>\n";
     exit 1;
 }
@@ -27,17 +27,19 @@ open( my $md52id,  '>', 'md52id.txt' )     or die;
 open( my $md52seq, '>', 'md52rnaseq.txt' ) or die;
 open( my $md52tax, '>', 'md52tax.txt' )    or die;
 
+my ( $id, $md5s, $tax, $sequence );
+
 read_file($filename1);
 read_file($filename2);
 read_file($filename3);
+
+exit 0;
 
 sub read_file {
     my $filename = shift(@_);
 
     my $fh1 = new IO::Uncompress::Gunzip("$filename")
       or die "Cannot open '$filename': $!\n";
-
-    my ( $id, $md5s, $tax, $sequence );
 
     # change EOL
     $/ = "\n//";
@@ -76,22 +78,22 @@ sub read_file {
             }    # end of ORIGIN case
         }    # end of record
 
-        if ( $md5 && $sequence && $id ) {
-            print $md52seq "$md5s\t$sequence\n";
-            print $md52tax "$md5s\t$tax\n";
-            print $md52id  "$md5s\t$id\n";
-        }
+        print_record();
     }    # end of file
+
+    # print final record
+    print_record();
 
     # reset EOL
     $/ = "\n";
 
-    # print final record
-    if ( $md5 && $sequence && $id ) {
-        print $md52seq "$md5s\t$sequence\n";
-        print $md52tax "$md5s\t$tax\n";
-        print $md52id  "$md5s\t$id\n";
-    }
+    close($fh1);
 }
 
-exit 0;
+sub print_record {
+    if ( $md5s && $sequence && $id ) {
+        print $md52seq "$md5s\t$sequence\n";
+        print $md52tax "$md5s\t$tax\n";
+        print $md52id "$md5s\t$id\n";
+    }
+}

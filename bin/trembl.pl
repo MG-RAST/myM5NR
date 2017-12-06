@@ -142,7 +142,6 @@ while ( my $record = <$fh1> ) {
         }
 
         if ( $line =~ /^SQ/ ) {
-
             my @lines = split( 'SQ ', $record );
 
             # split the record at the correct position to catch the sequences
@@ -159,10 +158,12 @@ while ( my $record = <$fh1> ) {
     }    # end of record
 
     print_record();
-}
+}    # end of file
 
 # print final record
 print_record();
+
+close($fh1);
 
 exit 0;
 

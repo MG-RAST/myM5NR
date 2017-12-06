@@ -22,7 +22,7 @@ use IO::Uncompress::Gunzip;
 
 my $dirname = shift @ARGV;
 
-if ( $dirname eq "" ) {
+unless ($dirname) {
     print STDERR "Usage: \trefseq.pl <DIRNAME>\n";
     exit 1;
 }
@@ -35,6 +35,8 @@ open( my $md52tax,  '>', 'md52tax.txt' )  or die;
 # FOR EACH FILE IN THE DIRECTORY
 opendir( DIR, $dirname ) or die "Could not open $dirname\n";
 
+my ( $id, $md5s, $func, $tax, $sequence );
+
 while ( my $filename = readdir(DIR) ) {
 
     next if $filename !~ /.*\.gpff.gz/;
@@ -42,8 +44,6 @@ while ( my $filename = readdir(DIR) ) {
 
     my $fh1 = new IO::Uncompress::Gunzip("$dirname/$filename")
       or die "Cannot open $dirname/$filename': $!\n";
-
-    my ( $id, $md5s, $func, $tax, $sequence );
 
     # change EOL
     $/ = "//\n";
@@ -76,38 +76,39 @@ while ( my $filename = readdir(DIR) ) {
             if ( $line =~ /^ORIGIN/ ) {
                 my @lines = split( 'ORIGIN', $record );
 
-                # split the record at the correct position to catch the sequences
+               # split the record at the correct position to catch the sequences
                 $sequence = $lines[1];
 
-                # join lines, remove the first list as well as the record separator
+             # join lines, remove the first list as well as the record separator
                 $sequence =~ s/^(.*\n)//;
                 $sequence =~ tr / \n\/\/[0-9]//ds;
                 chomp $sequence;
                 $sequence = lc($sequence);
-                $md5      = md5_hex($sequence);
+                $md5s     = md5_hex($sequence);
                 next;
             }    # end of ORIGIN case
         }    # end of record
 
-        if ( $md5 && $sequence && $id && $func ) {
-            print $md52seq  "$md5s\t$sequence\n";
-            print $md52func "$md5\t$func\n";
-            print $md52tax  "$md5s\t$tax\n";
-            print $md52id   "$md5s\t$id\n";
-        }
+        print_record();
     }    # end of file
+
+    # print final record
+    print_record();
 
     # reset EOL
     $/ = "\n";
 
-    # print final record
-    if ( $md5 && $sequence && $id && $func ) {
-        print $md52seq  "$md5s\t$sequence\n";
-        print $md52func "$md5\t$func\n";
-        print $md52tax  "$md5s\t$tax\n";
-        print $md52id   "$md5s\t$id\n";
-    }
+    close($fh1);
 
 }    # end of read dir
 
 exit 0;
+
+sub print_record {
+    if ( $md5s && $sequence && $id ) {
+        print $md52seq "$md5s\t$sequence\n";
+        print $md52func "$md5s\t$func\n";
+        print $md52tax "$md5s\t$tax\n";
+        print $md52id "$md5s\t$id\n";
+    }
+}

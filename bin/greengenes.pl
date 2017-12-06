@@ -8,76 +8,71 @@
 #
 # folker@anl.gov
 
+use strict;
+use warnings;
 
 use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
-use strict;
-use IO::Compress::Gzip qw(gzip $GzipError) ;
+use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
 # the main trick is to read the document record by record
 
-my $filename=shift @ARGV;
+my $filename = shift @ARGV;
 
-if ( $filename eq "" )
-{
-  print STDERR "Usage: \tgreengenes.pl <filename1> \n";
-  exit 1;
+unless ($filename) {
+    print STDERR "Usage: \tgreengenes.pl <filename1> \n";
+    exit 1;
 }
 
-my $fh1 = new IO::Uncompress::Gunzip ("$filename")
-       or die "Cannot open '$filename': $!\n" ;
+my $fh1 = new IO::Uncompress::Gunzip("$filename")
+  or die "Cannot open '$filename': $!\n";
 
-open(my $md52id, '>',    'md52id.txt') or die ;
-open(my $md52seq, '>',   'md52rnaseq.txt') or die ;
-open(my $id2tax, '>',   'id2tax.txt') or die ;
+open( my $md52id,  '>', 'md52id.txt' )     or die;
+open( my $md52seq, '>', 'md52rnaseq.txt' ) or die;
+open( my $md52tax, '>', 'md52tax.txt' )    or die;
 
+my ( $id, $md5s, $tax, $seq );
 
-# ################# ################# ################# ################
-# ################# ################# ################# ################
-# ################# ################# ################# ################
-my $header=''; my $id; my $md5s=''; my $tax='';   my $seq='';
 while (<$fh1>) {
 
-  # for every header line
-    if (/>/) {
+    # for every header line
+    if (/^>/) {
 
-      # if we already have a sequence ...  ## need to take care of last record
-       if ($seq ne "") {    # found the next record
-        chomp $seq;
-        $seq=lc($seq)  ;
-         $md5s = md5_hex($seq);
+        # if we already have a sequence ...  ## need to take care of last record
+        if ($seq) {
+            process_record();
+        }
 
-         # print the output
-         print $md52id "$md5s\t$id\n";
-         print $md52seq "$md5s\t$seq\n";
-         print $id2tax "$id\t$tax\n";
+# >14 AF068820.2 hydrothermal vent clone VC2.1 Arc13 k__Archaea; p__Euryarchaeota; c__Thermoplasmata; o__Thermoplasmatales; f__Aciduliprofundaceae; otu_204
+        ( $id, $tax ) = (/>(\d+)\W+\w+.\d+\W+(.*)/);
+    }
+    else {
+        s/\s+//g;    # remove whitespace
+        $seq .= $_;  # add sequence
+    }
+}
 
-         # reset the values for the next record
-         $id='';  $md5s='';  $tax='';
-       }
+# print final record
+if ($seq) {
+    process_record();
+}
 
+close($fh1);
 
-#  >14 AF068820.2 hydrothermal vent clone VC2.1 Arc13 k__Archaea; p__Euryarchaeota; c__Thermoplasmata; o__Thermoplasmatales; f__Aciduliprofundaceae; otu_204
+exit 0;
 
-    my $line = $_;
-#    $line =~ s/>//g;
+sub process_record {
+    $seq  = lc($seq);
+    $md5s = md5_hex($seq);
 
-      my @words = split ( / /, $line)  ;
-      $id = substr(@words[0],1);
+    # print the output
+    if ( $id && $tax ) {
+        print $md52id "$md5s\t$id\n";
+        print $md52seq "$md5s\t$seq\n";
+        print $md52tax "$md5s\t$tax\n";
+    }
 
-   #   print "ID\t$id\n";
-      ($tax) = ($line =~ />\d+\W+\w+.\d+\W+(.*)/);
-  #    print "TAX\t$tax\n";
-
-      $seq = ""; # clear out old sequence
-   }
-   else {
-      s/\s+//g; # remove whitespace
-      $seq .= $_; # add sequence
-   }
-}  # end of line
-
-
-
-close ($fh1);
+    # reset the values for the next record
+    ( $id, $md5s, $tax, $seq ) = ( '', '', '', '' );
+}

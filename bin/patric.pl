@@ -14,88 +14,89 @@
 #
 # folker@anl.gov
 
+use strict;
+use warnings;
 
 use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
-use strict;
-use IO::Compress::Gzip qw(gzip $GzipError) ;
-use IO::Uncompress::Gunzip;
 
-# the main trick is to read the document record by record
+my $dirname = shift @ARGV;
 
-my $dirname=shift @ARGV;
-
-if ( $dirname eq "" )
-{
-  print STDERR "Usage: \tpatric.pl <DIRNAME>\n";
-  exit 1;
+unless ($dirname) {
+    print STDERR "Usage: \tpatric.pl <DIRNAME>\n";
+    exit 1;
 }
 
-
-open(my $md52id, '>',    'md52id.txt') or die ;
-open(my $md52seq, '>',   'md52seq.txt') or die ;
-open(my $md52func, '>',   'md52func.txt') or die ;
-open(my $md52tax, '>',   'md52tax.txt') or die ;
+open( my $md52id,   '>', 'md52id.txt' )   or die;
+open( my $md52seq,  '>', 'md52seq.txt' )  or die;
+open( my $md52func, '>', 'md52func.txt' ) or die;
+open( my $md52tax,  '>', 'md52tax.txt' )  or die;
 
 # FOR EACH FILE IN THE DIRECTORY
-opendir(DIR, $dirname) or die "Could not open $dirname\n";
+opendir( DIR, $dirname ) or die "Could not open $dirname\n";
 
-while (my $filename = readdir(DIR)) {
+my ( $id, $md5s, $func, $tax, $seq );
 
-  next if $filename !~ /.*\.faa/ ;
-#  print "WORKING ON: $filename\n";
+while ( my $filename = readdir(DIR) ) {
 
-  open (my $fh1, '<', "$dirname/$filename") or die "Cannot open $dirname/$filename: $!\n" ;
+    next if $filename !~ /.*\.faa/;
 
-      # ################# ################# ################# ################
-      # ################# ################# ################# ################
-      # ################# ################# ################# ################
-      my $header=''; my $id; my $md5s=''; my $func='';   my $seq=''; my $tax;
-      while (<$fh1>) {
+    open( my $fh1, '<', "$dirname/$filename" )
+      or die "Cannot open $dirname/$filename: $!\n";
+
+    while (<$fh1>) {
 
         # for every header line
-          if (/>/) {
+        if (/^>/) {
 
-            # if we already have a sequence ...  ## need to take care of last record
-             if ($seq ne "") {    # found the next record
-              chomp $seq;
-              $seq= lc ($seq);
+        # if we already have a sequence ...  ## need to take care of last record
+            if ($seq) {
+                process_record();
+            }
 
-               $md5s = md5_hex($seq);
+#>WP_003131952.1 30S ribosomal protein S18 [Lactococcus lactis]
+#>fig|101571.178.peg.5|   hypothetical protein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
 
-               # print the output
-               print $md52id "$md5s\t$id\n";
-               print $md52seq "$md5s\t$seq\n";
-               print $md52func "$md5s\t$func\n";
-               print $md52tax "$md5s\t$tax\n";
+            my $line = $_;
+            my @parts = split( /\|/, $line );
+            $id = "fig|" . $parts[1];
 
-               # reset the values for the next record
-               $id='';  $md5s='';  $func=''; $tax='';
-             }
+            ( $func, $tax ) = split( /\[/, $parts[2] );
 
-      #>WP_003131952.1 30S ribosomal protein S18 [Lactococcus lactis]
-      #>fig|101571.178.peg.5|   hypothetical protein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
-          
-          my $line = $_;
+            $func =~ s/^\s+|\s+$//g;
+            $tax  =~ s/^\s+|\s+$//g;
+        }
+        else {
+            s/\s+//g;    # remove whitespace
+            $seq .= $_;  # add sequence
+        }
+    }    # end of file
 
-          my @parts = split(/\|/, $line);
-          $id = "fig|".$parts[1];
-          
-          ($func, $tax) = split(/\[/, $parts[2]);
-          
-          $func =~ s/^\s+|\s+$//g
-          $tax =~ s/^\s+|\s+$//g
-          $seq = ""; # clear out old sequence
-         
-         }
-         else {
-            s/\s+//g; # remove whitespace
-            $seq .= $_; # add sequence
-         }
-      }  # end of line
+    # print final record
+    if ($seq) {
+        process_record();
+    }
 
-      close ($fh1);
+    close($fh1);
 
-} # of while readdir
+}    # end of read dir
 
 closedir(DIR);
+
+exit 0;
+
+sub process_record {
+    $seq  = lc($seq);
+    $md5s = md5_hex($seq);
+
+    # print the output
+    if ( $id && $func && $tax ) {
+        print $md52id "$md5s\t$id\n";
+        print $md52seq "$md5s\t$seq\n";
+        print $md52func "$md5s\t$func\n";
+        print $md52tax "$md5s\t$tax\n";
+    }
+
+    # reset the values for the next record
+    ( $id, $md5s, $func, $tax, $seq ) = ( '', '', '', '', '' );
+}

@@ -7,92 +7,57 @@
 #47326e4716f40d23d3d5a899ca6ef11e        fig|340185.3.peg.4788   Zinc resistance-associated protein              Subsystems      Virulence       Resistance to antibiotics
 #and toxic compounds   Zinc resistance Zinc resistance-associated protein      MSKNDSLPAAGESFLLVYHARLPVISAFHRWHGRCNTRSKTTTGGLTMKRNTKIALVMMALSAMAMGSTSAFAHGGHGMWQQNAAPLTSEQQ
 #TAWQKIHNDFYAQSSALQQQLVTKRYEYNALLAANPPDSSKINAVAKEMENLRQSLDELRVKRDIAMAEAGIPRGTGMGMGYGGCGGGGHMGMGHW
-
-
 #
 # folker@anl.gov
 
+use strict;
+use warnings;
 
 use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 use strict;
-use IO::Compress::Gzip qw(gzip $GzipError) ;
-use IO::Uncompress::Gunzip;
 
-# the main trick is to read the document record by record
+my $dirname = shift @ARGV;
 
-my $dirname=shift @ARGV;
-
-if ( $dirname eq "" )
-{
-  print STDERR "Usage: \tsubsystems.pl <DIRNAME>\n";
-  exit 1;
+unless ($dirname) {
+    print STDERR "Usage: \tsubsystems.pl <DIRNAME>\n";
+    exit 1;
 }
 
-
-open(my $md52id, '>',    'md52id.txt') or die ;
-open(my $md52seq, '>',   'md52seq.txt') or die ;
-open(my $md52hierarchy, '>',   'md52hierarchy.txt') or die ;
-open(my $id2hierarchy, '>',   'id2hierarchy.txt') or die ;
+open( my $md52id,        '>', 'md52id.txt' )        or die;
+open( my $md52seq,       '>', 'md52seq.txt' )       or die;
+open( my $md52hierarchy, '>', 'md52hierarchy.txt' ) or die;
+open( my $id2hierarchy,  '>', 'id2hierarchy.txt' )  or die;
 
 # FOR EACH FILE IN THE DIRECTORY
-opendir(my $dirh, $dirname) or die "Could not open $dirname\n";
+opendir( my $dirh, $dirname ) or die "Could not open $dirname\n";
 
-while (defined (my $filename = readdir($dirh)) ) {
+while ( defined( my $filename = readdir($dirh) ) ) {
 
-  next if $filename !~ /subsystems_.*/ ;
-  # print "WORKING ON: $filename\n";
+    next if $filename !~ /subsystems_.*/;
 
-  open (my $fh1, '<', "$dirname/$filename") or die "Cannot open $dirname/$filename: $!\n" ;
+    open( my $fh1, '<', "$dirname/$filename" )
+      or die "Cannot open $dirname/$filename: $!\n";
 
-      # ################# ################# ################# ################
-      # ################# ################# ################# ################
-      # ################# ################# ################# ################
-  my $header=''; my $id; my $md5=''; my $func='';  my $seq=''; my $subsystem1; my $subsystem2; my $subsystem3;
+    while ( my $line = <$fh1> ) {
 
-  while (my $line=<$fh1>) {
+        chomp $line;
+        my ( $md5, $id, undef, undef, undef, $ss1, $ss2, $ss3, $role, $seq ) = split( /\t/, $line );
 
-    # for every header line
-    #print "LINE:\t$line\n";
+        unless ($ss2) {
+            $ss2 = '-';
+        }
 
-      #    $line =~ s/>//g;
-      my @words = split ( /\t/, $line)  ;
-      $md5 = @words[0];
-      $id = @words[1];
-      my $len=scalar @words;
-      $seq = @words[$len-1];
-      $func= @words[2];
-      $subsystem1= @words[5];
-      $subsystem2= @words[6];
-      $subsystem3= @words[7];
+        # print the output
+        if ( $md5 && $id && $ss1 && $ss2 && $ss3 && $role && $seq ) {
+            print $md52id "$md5\t$id\n";
+            print $md52seq "$md5\t$seq\n";
+            print $md52hierarchy "$md5\t$ss1\t$ss2\t$ss3\t$role\n";
+            print $id2hierarchy "$id\t$ss1\t$ss2\t$ss3\t$role\n";
+        }
+    }    # end of file
+    close($fh1);
 
-      if ($subsystem2 eq ''){
-        $subsystem2 = '-';
-      }
-
-      chomp $seq;
-      #print "ID\t$id\n";
-      #print "MD5\t$md5\n";
-      #print "SEQ\t$seq\n";
-      #print "FUNC:\t$func\n";
-      #print "Subsystems: [1] $subsystem1\t[2] $subsystem2 \t[3] $subsystem3 \n";
-
-      chomp $func;
-      # if we already have a sequence ...  ## need to take care of last record
-
-      # print the output
-      print $md52id "$md5\t$id\n";
-      print $md52seq "$md5\t$seq\n";
-      print $md52hierarchy "$md5\t$subsystem1\t$subsystem2\t$subsystem3\t$func\n";
-      print $id2hierarchy "$id\t$subsystem1\t$subsystem2\t$subsystem3\t$func\n";
-
-   # reset the values for the next record
-   $id='';  $md5='';  $func=''; $subsystem1='';$subsystem2=''; $subsystem3='';
-
-  } # while <$fh1>
-    close ($fh1);
-
-
-} # of while readdir
+}    # end of read dir
 
 closedir($dirh);
