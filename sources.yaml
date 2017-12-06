@@ -244,6 +244,16 @@ motuDB:
       - tar -xzf ${SOURCE_DIR}/mOTU.v${VERSION}.padded.tar.gz -C ${SOURCE_DIR}
       - ${M5NR_BIN}/motudb.pl ${SOURCE_DIR}/mOTU.v${VERSION}.padded
 
+NCBI-Taxonomy:
+    category: output
+    type: Taxonomy
+    homepage: https://www.ncbi.nlm.nih.gov/taxonomy
+    version: echo ${TODAY}
+    download:
+      - http://purl.obolibrary.org/obo/ncbitaxon.obo
+    parser:
+      - echo "no parser yet"  
+
 PATRIC:
     category: protein
     type: Functional annotation
@@ -284,9 +294,6 @@ RDP:
     homepage: http://rdp.cme.msu.edu
     version: curl --silent 'http://rdp.cme.msu.edu/download/releaseREADME.txt'
     download:
-      - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.fa.gz
-      - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.fa.gz
-      - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.fa.gz
       - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
       - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
       - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
