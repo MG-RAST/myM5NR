@@ -62,10 +62,10 @@ sub read_file {
             if ( $line =~ /^ORIGIN/ ) {
                 my @lines = split( 'ORIGIN', $record );
 
-               # split the record at the correct position to catch the sequences
+                # split the record at the correct position to catch the sequences
                 $sequence = @lines[1];
 
-             # join lines, remove the first list as well as the record separator
+                # join lines, remove the first list as well as the record separator
                 $sequence =~ s/^(.*\n)//;
                 $sequence =~ tr /[0-9] \n\///ds;
                 chomp $sequence;
@@ -75,19 +75,22 @@ sub read_file {
             }    # end of ORIGIN case
         }    # end of record
 
-        print $md52seq "$md5s\t$sequence\n";
-        print $md52tax "$md5s\t$tax\n";
-        print $md52id "$md5s\t$id\n";
-
+        if ( $md5 && $sequence && $id ) {
+            print $md52seq "$md5s\t$sequence\n";
+            print $md52tax "$md5s\t$tax\n";
+            print $md52id "$md5s\t$id\n";
+        }
     }    # end of file
 
     # reset EOL
     $/ = "\n";
 
     # print final record
-    print $md52seq "$md5s\t$sequence\n";
-    print $md52tax "$md5s\t$tax\n";
-    print $md52id "$md5s\t$id\n";
+    if ( $md5 && $sequence && $id ) {
+        print $md52seq "$md5s\t$sequence\n";
+        print $md52tax "$md5s\t$tax\n";
+        print $md52id "$md5s\t$id\n";
+    }
 }
 
 exit 0;
