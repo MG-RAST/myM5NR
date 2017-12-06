@@ -6,9 +6,11 @@
 # the parser is very brute force as bioperl and biopython will not extract all required fields
 # folker@anl.gov
 
+use strict;
+use warnings;
+
 use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
-use strict;
 use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
@@ -35,14 +37,13 @@ sub read_file {
     my $fh1 = new IO::Uncompress::Gunzip("$filename")
       or die "Cannot open '$filename': $!\n";
 
-    my ( $id, $md5s, $func, $tax, $sequence );
+    my ( $id, $md5s, $tax, $sequence );
 
-    # switch EOL
+    # change EOL
     $/ = "\n//";
 
-    # now almost the same procedure for trembl
     while ( my $record = <$fh1> ) {
-        ( $id, $md5s, $func, $tax, $sequence ) = ( '', '', '', '', '' );
+        ( $id, $md5s, $tax, $sequence ) = ( '', '', '', '' );
 
         foreach my $line ( split /\n/, $record ) {
 
@@ -58,12 +59,12 @@ sub read_file {
                 next;
             }
 
-            # parse sequence, generate md5 and write outfiles
+            # parse sequence, generate md5
             if ( $line =~ /^ORIGIN/ ) {
                 my @lines = split( 'ORIGIN', $record );
 
                 # split the record at the correct position to catch the sequences
-                $sequence = @lines[1];
+                $sequence = $lines[1];
 
                 # join lines, remove the first list as well as the record separator
                 $sequence =~ s/^(.*\n)//;
@@ -78,7 +79,7 @@ sub read_file {
         if ( $md5 && $sequence && $id ) {
             print $md52seq "$md5s\t$sequence\n";
             print $md52tax "$md5s\t$tax\n";
-            print $md52id "$md5s\t$id\n";
+            print $md52id  "$md5s\t$id\n";
         }
     }    # end of file
 
@@ -89,7 +90,7 @@ sub read_file {
     if ( $md5 && $sequence && $id ) {
         print $md52seq "$md5s\t$sequence\n";
         print $md52tax "$md5s\t$tax\n";
-        print $md52id "$md5s\t$id\n";
+        print $md52id  "$md5s\t$id\n";
     }
 }
 
