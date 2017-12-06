@@ -21,7 +21,7 @@ docker build -t mgrast/m5nr-build .
 
 Example for manual invocation:
 ```bash
-docker run -ti --name m5nr -v/var/tmp/m5nr:/m5nr_data mgrast/m5nr-build
+docker run -ti --name m5nr -v /var/tmp/m5nr:/m5nr_data mgrast/m5nr-build
 ```
 
 From now steps execute inside the container
@@ -34,11 +34,18 @@ mkdir -p /m5nr_data/Parsed
 
 To initiate the download (you can use --force to delete old _part directories)
 ```bash
-cd /m5nr_data/Sources/
+cd /m5nr_data
 /myM5NR/bin/m5nr_compiler.py download --debug 2>&1 | tee /m5nr_data/Sources/logfile.txt
 ```
 
-To initiate the build (work in progress)
+To initiate the parsing (work in progress)
 ```bash
-/myM5NR/bin/source2ach.sh 4 /m5nr_data/Sources /m5nr_data/Parsed 2>&1 | tee /m5nr_data/Parsed/logfile.txt
+cd /m5nr_data
+/myM5NR/bin/m5nr_compiler.py parse --debug 2>&1 | tee /m5nr_data/Parsed/logfile.txt
+```
+
+To view status
+```bash
+cd /m5nr_data
+/myM5NR/bin/m5nr_compiler.py status --debug
 ```
