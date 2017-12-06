@@ -252,7 +252,7 @@ NCBI-Taxonomy:
     download:
       - http://purl.obolibrary.org/obo/ncbitaxon.obo
     parser:
-      - echo "no parser yet"  
+      - echo "no parser yet"
 
 PATRIC:
     category: protein

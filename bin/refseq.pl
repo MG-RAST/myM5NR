@@ -83,7 +83,7 @@ while ( my $filename = readdir(DIR) ) {
                 $sequence =~ s/^(.*\n)//;
                 $sequence =~ tr / \n\/\/[0-9]//ds;
                 chomp $sequence;
-                $sequence = lc($sequence);
+                $sequence = uc($sequence);
                 $md5s     = md5_hex($sequence);
                 next;
             }    # end of ORIGIN case

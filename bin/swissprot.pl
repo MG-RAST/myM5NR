@@ -127,7 +127,7 @@ while ( my $record = <$fh1> ) {
             $sequence =~ s/^(.*\n)//;
             $sequence =~ tr / \n\/\///ds;
             chomp $sequence;
-            $sequence = lc($sequence);
+            $sequence = uc($sequence);
             $md5s     = md5_hex($sequence);
             next;
         }    # end of SQ case

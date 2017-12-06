@@ -86,7 +86,7 @@ closedir(DIR);
 exit 0;
 
 sub process_record {
-    $seq  = lc($seq);
+    $seq  = uc($seq);
     $md5s = md5_hex($seq);
 
     # print the output

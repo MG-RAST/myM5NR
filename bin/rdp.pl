@@ -72,7 +72,7 @@ sub read_file {
                 $sequence =~ s/^(.*\n)//;
                 $sequence =~ tr /[0-9] \n\///ds;
                 chomp $sequence;
-                $sequence = lc($sequence);
+                $sequence = uc($sequence);
                 $md5s     = md5_hex($sequence);
                 next;
             }    # end of ORIGIN case
