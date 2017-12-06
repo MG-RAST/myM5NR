@@ -640,11 +640,12 @@ def status(sources_directory, parses_directory):
         
         if os.path.exists(download_timestamp_file):
             with open(download_timestamp_file) as x:
-                download_timestamp = x.read()
+                download_timestamp = x.read().strip().split(".")[0]
+                
         
         if os.path.exists(parsing_timestamp_file):
             with open(parsing_timestamp_file) as x:
-                parsing_timestamp = x.read()
+                parsing_timestamp = x.read().strip().split(".")[0]
         
         summary_table.add_row([source, remote_version, current_version, download_success, download_timestamp, source_dir_size_mb_int, d_message, parsing_success, parsing_timestamp, p_message ])
     
