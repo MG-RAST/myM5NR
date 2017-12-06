@@ -167,20 +167,20 @@ print_record();
 exit 0;
 
 sub print_record {
-    die "cannot find ID\n" if ( $id eq "" );
+    if ( $md5 && $sequence && $id ) {
+        print $md52id "$md5s\t$id\n";
+        print $md52seq "$md5s\t$sequence\n";
 
-    print $md52id "$md5s\t$id\n";
-    print $md52seq "$md5s\t$sequence\n";
-
-    print $md52func "$md5s\t$func\n"        if ( $func   ne "" );
-    print $md52tax "$md5s\t$tax\n"          if ( $tax    ne "" );
-    print $md52id_ipr "$md5s\t$ipr\n"       if ( $ipr    ne "" );
-    print $md52id_cog "$md5s\t$cog\n"       if ( $cog    ne "" );
-    print $md52id_eggnog "$md5s\t$eggnog\n" if ( $eggnog ne "" );
-    print $md52id_pfam "$md5s\t$pfam\n"     if ( $pfam   ne "" );
-    print $md52id_kegg "$md5s\t$kegg\n"     if ( $kegg   ne "" );
-    print $md52id_go "$md5s\t$go\n"         if ( $go     ne "" );
-    print $md52id_cazy "$md5s\t$cazy\n"     if ( $cazy   ne "" );
-    print $md52id_ec "$md5s\t$ec\n"         if ( $ec     ne "" );
-    print $md52tax "$md5s\t$tax\n"          if ( $tax    ne "" );
+        print $md52func "$md5s\t$func\n"        if ( $func   ne "" );
+        print $md52tax "$md5s\t$tax\n"          if ( $tax    ne "" );
+        print $md52id_ipr "$md5s\t$ipr\n"       if ( $ipr    ne "" );
+        print $md52id_cog "$md5s\t$cog\n"       if ( $cog    ne "" );
+        print $md52id_eggnog "$md5s\t$eggnog\n" if ( $eggnog ne "" );
+        print $md52id_pfam "$md5s\t$pfam\n"     if ( $pfam   ne "" );
+        print $md52id_kegg "$md5s\t$kegg\n"     if ( $kegg   ne "" );
+        print $md52id_go "$md5s\t$go\n"         if ( $go     ne "" );
+        print $md52id_cazy "$md5s\t$cazy\n"     if ( $cazy   ne "" );
+        print $md52id_ec "$md5s\t$ec\n"         if ( $ec     ne "" );
+        print $md52tax "$md5s\t$tax\n"          if ( $tax    ne "" );
+    }
 }
