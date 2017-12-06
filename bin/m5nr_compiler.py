@@ -30,7 +30,8 @@ remote_versions_file = "remote_versions.dat"
 class MyException(Exception):
     pass
     
-    
+class DependencyMissingException(Exception):
+    pass
 
 def execute_command(command, env):
     global args
@@ -272,7 +273,7 @@ def parse_source(directory, source_name, source_directory):
         dep_dir = os.path.normpath(os.path.join(directory, "..", dep))
         dep_version_file = os.path.join(dep_dir, "version.txt")
         if not os.path.exists(dep_version_file):
-            raise MyException("dependency %s missing" % (dep))
+            raise DependencyMissingException("dependency %s missing" % (dep))
     
     version_file = os.path.join(source_directory, "version.txt")
     version = 'NA'
@@ -397,7 +398,9 @@ def parse_sources(parsings_dir , sources, sources_directory):
         if do_stop:
             sys.exit(1)
             
-            
+    
+    success_status = 0
+    
     for source in sources:
         print("\n")
         print("Parse %s: " % (source))
@@ -405,7 +408,8 @@ def parse_sources(parsings_dir , sources, sources_directory):
         
         parse_dir_part = os.path.join(parsings_dir , source+"_part")
         parse_dir = os.path.join(parsings_dir , source)
-        success_after_parsing = False    
+        success_after_parsing = False
+        error_message = ""
             
         if os.path.isdir(parse_dir):
             print("Parse directory exists, skip it. (%s, source=%s)" % (parse_dir, source))
@@ -429,22 +433,24 @@ def parse_sources(parsings_dir , sources, sources_directory):
             try:
                 parse_source(parse_dir_part, source, source_directory)
                 success_after_parsing = True
-            except Exception as e:
-                print("parsing %s failed: %s" % (source, str(e)) , file=sys.stderr)
+            except DependencyMissingException as e:
+                success_status = 42
                 error_message = str(e)
-                error_file = os.path.join(parse_dir_part , 'error.txt')
-                with open(error_file, 'wt') as f:
-                    f.write(error_message)
+            except Exception as e:
+                success_status = 1
+                error_message = str(e)
 
             if success_after_parsing:
                 print("parsing successful")
                 os.rename(parse_dir_part, parse_dir)
+            else:
+                print("parsing %s failed: %s" % (source, error_message) , file=sys.stderr)
+                error_file = os.path.join(parse_dir_part , 'error.txt')
+                with open(error_file, 'wt') as f:
+                    f.write(error_message)
     
-           
-                
-            
     os.chdir(current_dir)
-    
+    return success_status
             
             
 
@@ -475,6 +481,8 @@ def download_sources(sources_dir , sources):
             
         if do_stop:
             sys.exit(1)
+    
+    success_status = 0
     
     for source in sources:
         print("\n")
@@ -522,8 +530,9 @@ def download_sources(sources_dir , sources):
                 download_source(source_dir_part, source)
                 success_after_download = True
             except Exception as e:
-                print("download failed: %s" % (str(e)) , file=sys.stderr)
+                success_status = 1
                 error_message = str(e)
+                print("download failed: %s" % (error_message) , file=sys.stderr)
                 error_file = os.path.join(source_dir_part , 'error.txt')
                 with open(error_file, 'wt') as f:
                     f.write(error_message)
@@ -534,11 +543,9 @@ def download_sources(sources_dir , sources):
         if success_after_download:
             print("download success.")
             os.rename(source_dir_part, source_dir)
-        
-            
-            
-    os.chdir(current_dir)
     
+    os.chdir(current_dir)
+    return success_status
     
 
 def get_dir_size(start_path):
@@ -585,26 +592,23 @@ def status(sources_directory, parses_directory):
         
         
         
-        # get current version (version file inidcates success)
+        # get current version (version file indicates success)
         current_version = ''
         version_file = os.path.join(source_dir, "version.txt")
         parsing_version_file = os.path.join(parse_dir, "version.txt")
         download_error_file = os.path.join(source_dir_part, "error.txt")
         parse_error_file = os.path.join(parse_dir_part, "error.txt")
         
-        
         if (not os.path.isdir(source_dir)) and os.path.exists(download_error_file):
-            with open(download_error_file) as x: 
+            with open(download_error_file) as x:
                 download_error_message = x.read()
         
         if (not os.path.isdir(parse_dir)) and os.path.exists(parse_error_file):
-            with open(parse_error_file) as x: 
+            with open(parse_error_file) as x:
                 parsing_error_message = x.read()
         
-        
-        
         if os.path.exists(version_file):
-            with open(version_file) as x: 
+            with open(version_file) as x:
                 current_version = x.read()
         
         if current_version != "" :
@@ -622,17 +626,30 @@ def status(sources_directory, parses_directory):
         if len(p_message) == 30:
             p_message += "..."
         
-        
         if os.path.exists(parsing_version_file):
             parsing_success = True
         
         if source_dir_size_mb_int == 0:
             source_dir_size_mb_int = ''
         
-        summary_table.add_row([source, remote_version, current_version, download_success, source_dir_size_mb_int, d_message, parsing_success, p_message ])
+        # get current timestamps
+        download_timestamp = ""
+        parsing_timestamp = ""
+        download_timestamp_file = os.path.join(source_dir, "timestamp.txt")
+        parsing_timestamp_file = os.path.join(parse_dir, "timestamp.txt")
+        
+        if os.path.exists(download_timestamp_file):
+            with open(download_timestamp_file) as x:
+                download_timestamp = x.read()
+        
+        if os.path.exists(parsing_timestamp_file):
+            with open(parsing_timestamp_file) as x:
+                parsing_timestamp = x.read()
+        
+        summary_table.add_row([source, remote_version, current_version, download_success, download_timestamp, source_dir_size_mb_int, d_message, parsing_success, parsing_timestamp, p_message ])
     
     
-    summary_table.field_names = ['Database', 'Remote Version', 'Local Version', 'Download Success', 'Size (MB)', 'Download Error','Parsing Success', 'Parsing Error']
+    summary_table.field_names = ['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Timestamp', 'Size (MB)', 'Download Error','Parsing Success', 'Parsing Timestamp', 'Parsing Error']
     summary_table.align = "l"
     
     
@@ -733,23 +750,21 @@ if args.commands == "download":
     
     #old_list=["SEED-Annotations", "SEED-Subsystems", "PATRIC", "InterPro","UniProt","RefSeq","GenBank","PhAnToMe","CAZy","KEGG","EggNOG","IMG","SILVA-SSU", "SILVA-LSU","Greengenes","RDP","FungiDB"] 
     
-        
-    download_sources(sources_directory, sources)
+    success_status = download_sources(sources_directory, sources)
 
     status(sources_directory, parses_directory)
     
-    sys.exit(0)
-
+    sys.exit(success_status)
+    
 if args.commands == "parse":
     
-    parse_sources(parses_directory, sources, sources_directory)
+    success_status = parse_sources(parses_directory, sources, sources_directory)
 
     status(sources_directory, parses_directory)
     
-    sys.exit(0)
+    sys.exit(success_status)
     
 if args.commands == "status":
-    
     
     status(sources_directory, parses_directory)
     
