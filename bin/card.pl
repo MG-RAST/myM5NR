@@ -73,7 +73,7 @@ while (<$fh1>) {
         my @fields = split(/\|/, $line);
         $id   = $fields[1];
         $card = $fields[2];
-        my @parts = = split(/ \[/, $fields[3]);
+        my @parts = split(/ \[/, $fields[3]);
         $func = $parts[0];
         $tax  = $parts[1];
         $tax =~ s/\]//;
