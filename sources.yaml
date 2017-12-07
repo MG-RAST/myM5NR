@@ -27,6 +27,7 @@ BacMet:
     parser:
       - unzip ${SOURCE_DIR}/BacMet1.1.zip
       - ${M5NR_BIN}/bacmet.pl BacMet_EXP.704.fasta BacMet_PRE.*.fasta
+      - rm -f BacMet-Scan BacMet_*
 
 CARD:
     category: protein

@@ -318,6 +318,9 @@ def parse_source(directory, source_name, source_directory):
         source_version_file = os.path.join(source_directory, "version.txt")
         copyfile(source_version_file, os.path.join(directory, "version.txt"))
         
+        with open(os.path.join(directory, 'timestamp.txt'), 'wt') as f:
+            f.write(datetime.datetime.now().isoformat())
+        
     else:
         raise MyException("Field \"parser\" not found in config.")    
             
