@@ -70,6 +70,7 @@ while (<$fh1>) {
 # >gb|AAP74657.1|ARO:3000600|Erm(34) [Bacillus clausii]
 
         my $line = $_;
+        chomp $line;
         my @fields = split(/\|/, $line);
         $id   = $fields[1];
         $card = $fields[2];
