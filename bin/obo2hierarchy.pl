@@ -38,15 +38,15 @@ while ( my $record = <$fh1> ) {
 
     foreach my $line ( split /\n/, $record ) {
 
-        if ( $line =~ /^id.\W+(\w):(\d+)/ ) {
+        if ( $line =~ /^id:\W+(\w+):(\d+)/ ) {
             $id = "$1:$2";
             next;
         }
-        if ( $line =~ /^name.\W+(.*)/ ) {
+        if ( $line =~ /^name:\W+(.*)/ ) {
             $name = $1;
             next;
         }
-        if ( $line =~ /^namespace.\W+(\w+)/ ) {
+        if ( $line =~ /^namespace:\W+(\w+)/ ) {
             $namespace = $1;
             next;
         }
