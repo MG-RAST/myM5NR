@@ -26,7 +26,7 @@ BacMet:
     download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
     parser:
       - unzip ${SOURCE_DIR}/BacMet1.1.zip -d ${SOURCE_DIR}
-      - ${M5NR_BIN}/bacmet.pl BacMet_EXP.704.fasta BacMet_PRE.*.fasta
+      - ${M5NR_BIN}/bacmet.pl ${SOURCE_DIR}/BacMet_EXP.704.fasta ${SOURCE_DIR}/BacMet_PRE.*.fasta
 
 CARD:
     category: protein

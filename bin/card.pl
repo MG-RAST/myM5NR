@@ -70,10 +70,13 @@ while (<$fh1>) {
 # >gb|AAP74657.1|ARO:3000600|Erm(34) [Bacillus clausii]
 
         my $line = $_;
-        my @fields = ( split '\|', $line );
+        my @fields = split(/\|/, $line);
         $id   = $fields[1];
         $card = $fields[2];
-        ( $func, $tax ) = ( $fields[3] =~ /^(\S+)\s\[(.+)\]$/ );
+        my @parts = = split(/ \[/, $fields[3]);
+        $func = $parts[0];
+        $tax  = $parts[1];
+        $tax =~ s/\]//;
     }
     else {
         s/\s+//g;    # remove whitespace
