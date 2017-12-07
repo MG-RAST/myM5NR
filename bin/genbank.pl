@@ -46,15 +46,15 @@ while (<$fh1>) {
 
         # >WP_003131952.1 30S ribosomal protein S18 [Lactococcus lactis]
         my $line = $_;
+        $line =~ s/^>//;
 
         # we only read the first record, they are ^A separated
         my $maxlen = index( $line, "\x01" );
-
-        my @words = split( / /, substr( $line, 0, $maxlen ) );
-        $id = substr( $words[0], 1 );
-        my $pos = index( $line, '[' );
-        my $len = length($id);
-        $func = substr( $line, $len + 1, $pos - $len );
+        my $first  = (split(/ \[/, substr($line, 0, $maxlen)))[0];
+        my @words  = split(/ /, $first);
+        
+        $id = shift @words;
+        $func = join(" ", @words);
         $func =~ s/MULTISPECIES:\ //g;
         $func =~ s/RecName:\ Full=//g;
         $func =~ s/Short=.*//g;
