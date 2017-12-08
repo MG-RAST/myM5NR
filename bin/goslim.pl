@@ -63,7 +63,7 @@ while ( my $record = <$fh1> ) {
     }    # end of record
 
     if ( $id && $namespace && $hier1 && $name ) {
-        print $id2hier "$id\t$namespace\t$hier1\t$name\n";
+        print $id2hier "GO:$id\t$namespace\t$hier1\t$name\n";
     }
 
 }    # end of file
