@@ -4,14 +4,6 @@
 #
 # extract md52id, md52seq.
 #
-#>fig|101571.178.peg.1|WL35_01530|   Proteins incorrectly called adenylate cyclase   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
-#>fig|101571.178.peg.2|WL35_01535|   Ferredoxin reductase   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
-#>fig|101571.178.peg.3|WL35_01540|   COG4339 metal-dependent phosphohydrolase, HD superfamily   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
-#>fig|101571.178.peg.4|WL35_01545|   hypothetical protein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
-#>fig|101571.178.peg.5|   hypothetical protein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
-#>fig|101571.178.peg.6|WL35_01550|   Putative outer membrane lipoprotein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
-
-#
 # folker@anl.gov
 
 use strict;
@@ -54,17 +46,20 @@ while ( my $filename = readdir(DIR) ) {
                 process_record();
             }
 
-#>WP_003131952.1 30S ribosomal protein S18 [Lactococcus lactis]
 #>fig|101571.178.peg.5|   hypothetical protein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
+#>fig|101571.178.peg.6|WL35_01550|   Putative outer membrane lipoprotein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
+#>fig|79879.3.peg.5883|   hypothetical protein   [[Bacillus] clarkii strain DSM 8720 | 79879.3]
+#>fig|1494590.3.peg.2363|ATN84_09125|   4-[[4-(2-aminoethyl)phenoxy]-methyl]-2-furanmethanamine-glutamate synthase   [Paramesorhizobium deserti strain A-3-E | 1494590.3]
+#>fig|911117.5.peg.997|   4-[[4-(2-aminoethyl)phenoxy]-methyl]-2-furanmethanamine-glutamate synthase   [Methanobrevibacter smithii TS145B | 911117.5]
 
             my $line = $_;
-            my @parts = split( /\|/, $line );
-            $id = "fig|" . $parts[1];
+            chomp $line;
+            
+            ($id, $func, $tax) = ($line =~ /^>(.+)\|\s+(.+)\s+\[(.+?) \| \d+\.\d+]$/);
 
-            ( $func, $tax ) = split( /\[/, $parts[2] );
-
+            $id   = "fig|" . ( split( /\|/, $id ) )[1];
             $func =~ s/^\s+|\s+$//g;
-            $tax  =~ s/^\s+|\s+$//g;
+            $tax  =~ s/\[|\]//g;
         }
         else {
             s/\s+//g;    # remove whitespace
