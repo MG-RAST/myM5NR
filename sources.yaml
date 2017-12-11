@@ -281,7 +281,7 @@ PhAnToMe:
     type: Functional annotation
     homepage: http://www.phantome.org
     env:
-        TIMESTAMP: curl ${CURL_OPTS} http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
+        TIMESTAMP: curl -s http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
     version: date -d @${TIMESTAMP} +"%Y%m%d"
     download:
       - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz
