@@ -306,7 +306,7 @@ RefSeq:
     type: Functional annotation
     version: curl ${CURL_OPTS} ftp://ftp.ncbi.nih.gov/refseq/release/RELEASE_NUMBER
     env:
-        COUNT: curl ${CURL_OPTS} ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
+        COUNT: curl -s ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
     download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.gpff.gz
     resume-download: true
     parser:
