@@ -102,7 +102,7 @@ def create_environment(source_obj):
     
     new_environment['TODAY'] = datetime.date.today().isoformat()
     new_environment['M5NR_BIN'] = bin_dir
-    
+    new_environment['CURL_OPTS'] = '--silent --connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 -L'
     
         
     return new_environment
