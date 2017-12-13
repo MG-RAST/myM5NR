@@ -4,7 +4,7 @@ import os
 import re
 import sys
 import json
-from optparse import OptionParser
+import argparse
 from collections import defaultdict
 
 nodes = {}
@@ -47,9 +47,9 @@ def getDescendents(nid):
 
 def main(args):
     global nodes
-    parser = OptionParser(usage="usage: %prog [options] -i <input file> -o <output file>")
-    parser.add_option("-i", "--input", dest="input", default=None, help="input taxonomy.dat file")
-    parser.add_option("-o", "--output", dest="output", default=None, help="output: .json file")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input", dest="input", default=None, help="input taxonomy.dat file")
+    parser.add_argument("-o", "--output", dest="output", default=None, help="output json file")
     
     (opts, args) = parser.parse_args()
     if not (opts.input and os.path.isfile(opts.input)):
