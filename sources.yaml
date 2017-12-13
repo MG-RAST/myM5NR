@@ -13,7 +13,6 @@
 #   download: [<url>] uses curl by default. For wget and scripts specify an explicit command in field "download-command".
 #   download-command: <command> or [<command>]
 #   parser: <command> or [<command>]
-
 #
 # SORT ALPHABETICALLY
 #
@@ -251,9 +250,10 @@ NCBI-Taxonomy:
     homepage: https://www.ncbi.nlm.nih.gov/taxonomy
     version: echo ${TODAY}
     download:
-      - http://purl.obolibrary.org/obo/ncbitaxon.obo
+      - ftp://ftp.ebi.ac.uk/pub/databases/taxonomy/taxonomy.dat
     parser:
-      - echo "no parser yet"
+      - ${M5NR_BIN}/parse_taxonomy.py -i ${SOURCE_DIR}/taxonomy.dat -o ${SOURCE_DIR}/taxonomy.json
+      - ${M5NR_BIN}/clean_taxonomy.py -r -f tsv -i ${SOURCE_DIR}/taxonomy.json -o taxonomy.txt
 
 PATRIC:
     category: protein
