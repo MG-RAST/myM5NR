@@ -189,7 +189,7 @@ M5functions:
       - Swiss-Prot
       - TrEmble
     parser:
-      - cut -f2 ../*/md52func.txt | sort -u > unique_func.txt
+      - cut -f2 ../*/md52func.txt | sort -T . -u > unique_func.txt
 
 #M5nr.fasta
 M5nr:
@@ -217,7 +217,7 @@ M5nr:
       - Swiss-Prot
       - TrEmble
     parser:
-      - cat ../*/md52seq.txt | sort -u | ${M5NR_BIN}/tab2fasta.pl > m5nr.fasta
+      - cat ../*/md52seq.txt | sort -T . -u | ${M5NR_BIN}/tab2fasta.pl > m5nr.fasta
 
 #M5rna.fasta
 M5rna:
@@ -230,7 +230,7 @@ M5rna:
       - RDP
       - Greengenes
     parser:
-      - cat ../*/md52rnaseq.txt | sort -u | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
+      - cat ../*/md52rnaseq.txt | sort -T . -u | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
 
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)
 motuDB:
