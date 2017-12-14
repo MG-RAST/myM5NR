@@ -50,14 +50,14 @@ def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", dest="input", default=None, help="input taxonomy.dat file")
     parser.add_argument("-o", "--output", dest="output", default=None, help="output json file")
+    args = parser.parse_args()
     
-    (opts, args) = parser.parse_args()
-    if not (opts.input and os.path.isfile(opts.input)):
+    if not (args.input and os.path.isfile(args.input)):
         parser.error("missing input")
-    if not opts.output:
+    if not args.output:
         parser.error("missing output")
     
-    taxaFile = open(opts.input, 'r')
+    taxaFile = open(args.input, 'r')
     domains = []
     nodeCount = 0
     
@@ -115,7 +115,7 @@ def main(args):
     for nid in domains:
         data['nodes'].update( getDescendents(nid) )
     
-    json.dump(data, open(opts.output, 'w'), indent=4, separators=(', ', ': '))
+    json.dump(data, open(args.output, 'w'), indent=4, separators=(', ', ': '))
 
 
 if __name__ == "__main__":
