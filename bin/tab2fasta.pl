@@ -2,19 +2,14 @@
 
 use strict;
 use warnings;
-use IO::Handle;
- 
-STDIN->blocking(0);
 
-my $line = <STDIN>;
-if (defined $line) {
-    process_line($line);
+if (-t STDIN) {
+    print STDERR "usage: tabbed_file < $0 > fasta_file\n";
+    exit 1;
+} else {
     foreach my $line (<STDIN>) {
         process_line($line);
     }
-} else {
-    print STDERR "usage: tabbed_file < $0 > fasta_file";
-    exit 1;
 }
 
 exit 0;
