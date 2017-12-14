@@ -110,8 +110,8 @@ def getDescendents(nodes, nid):
 
 def pruneTree(nodes, root_id, prune):
     pruneParents = set()
+    total = 0
     for p in prune:
-        i = 0
         if p not in nodes:
             continue
         for pn in nodes[p]['parentNodes']:
@@ -120,9 +120,9 @@ def pruneTree(nodes, root_id, prune):
         toDelete = set(decendents)
         for d in toDelete:
             if d in nodes:
-                i += 1
+                total += 1
                 del nodes[d]
-        print "root %s: pruned %s, %d decendents removed"%(root_id, p, i)
+    print "root %s: pruned %d nodes, %d decendents removed"%(root_id, len(prune), total)
     for pp in pruneParents:
         if pp not in nodes:
             continue

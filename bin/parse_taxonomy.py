@@ -59,6 +59,7 @@ def main(args):
     
     taxaFile = open(opts.input, 'r')
     domains = []
+    nodeCount = 0
     
     # infinite loop to go through the file.
     # breaks when the node returned is empty, indicating end of file
@@ -70,7 +71,6 @@ def main(args):
             break
         try:
             nodeID = node['ID'][0]
-            print nodeID
             
             # each ID will have two arrays of parents and children
             if nodeID not in nodes:
@@ -79,6 +79,8 @@ def main(args):
             nodes[nodeID]['rank'] = node['RANK'][0]
             nodes[nodeID]['label'] = node['SCIENTIFIC NAME'][0]
             nodes[nodeID]['parentNodes'] = node['PARENT ID']
+            
+            nodeCount += 1
             
             # rank fix
             if nodes[nodeID]['rank'] == 'superkingdom':
@@ -94,6 +96,8 @@ def main(args):
         except:
             # continue if node is broken
             continue
+    
+    print "[status] %d nodes parsed\n"
     
     data = {
         'rootNode' : '1',
