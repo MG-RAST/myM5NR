@@ -26,7 +26,6 @@ unless ($dirname) {
 
 open( my $md52id,        '>', 'md52id.txt' )        or die;
 open( my $md52seq,       '>', 'md52seq.txt' )       or die;
-open( my $md52hierarchy, '>', 'md52hierarchy.txt' ) or die;
 open( my $id2hierarchy,  '>', 'id2hierarchy.txt' )  or die;
 
 # FOR EACH FILE IN THE DIRECTORY
@@ -52,7 +51,6 @@ while ( defined( my $filename = readdir($dirh) ) ) {
         if ( $md5 && $id && $ss1 && $ss2 && $ss3 && $role && $seq ) {
             print $md52id "$md5\t$id\n";
             print $md52seq "$md5\t$seq\n";
-            print $md52hierarchy "$md5\t$ss1\t$ss2\t$ss3\t$role\n";
             print $id2hierarchy "$id\t$ss1\t$ss2\t$ss3\t$role\n";
         }
     }    # end of file
