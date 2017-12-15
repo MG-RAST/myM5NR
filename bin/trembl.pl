@@ -101,8 +101,8 @@ while ( my $record = <$fh1> ) {
             next;
         }
 
-        if ( $line =~ /^DR\W+Pfam;\W+PF(\w+)/ ) {
-            $pfam = "pfam" . $1;
+        if ( $line =~ /^DR\W+Pfam;\W+(PF\w+)/ ) {
+            $pfam = $1;
             next;
         }
 
