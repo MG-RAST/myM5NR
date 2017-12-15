@@ -87,7 +87,7 @@ while ( my $record = <$fh1> ) {
             next;
         }
 
-        if ( $line =~ /^DR\W+InterPro\W+IPR(\w+)/ ) {
+        if ( $line =~ /^DR\W+InterPro\W+(IPR\w+)/ ) {
             $ipr = $1;
             next;
         }
