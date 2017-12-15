@@ -172,6 +172,7 @@ def main(args):
     parser.add_argument("--root", dest="root", default=None, help="id of root node to be created if mutiple inputs used")
     parser.add_argument("--no_id", dest="no_id", action="store_true", default=False, help="remove 'id' from struct to reduce size")
     parser.add_argument("--no_parents", dest="no_parents", action="store_true", default=False, help="remove 'parentNodes' from struct to reduce size")
+    parser.add_argument("--header", dest="header", action="store_true", default=False, help="print header, 'tsv' format only")
     args = parser.parse_args()
     
     if len(args.input) == 0:
@@ -262,7 +263,8 @@ def main(args):
         json.dump(data, ofile, separators=(',',':'))
     else:
         print "[status] printing to tsv ... "
-        ofile.write("taxid\t%s\n"%("\t".join(RANKS)))
+        if args.header:
+            ofile.write("taxid\t%s\n"%("\t".join(RANKS)))
         for r in data[root]['childNodes']:
             printBranches(data, r, ofile)
     ofile.close()
