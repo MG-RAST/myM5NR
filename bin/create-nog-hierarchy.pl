@@ -29,7 +29,7 @@ my $nog = {
     P => ["METABOLISM", "Inorganic ion transport and metabolism"],
     Q => ["METABOLISM", "Secondary metabolites biosynthesis, transport and catabolism"],
     R => ["POORLY CHARACTERIZED", "General function prediction only"],
-    S => ["POORLY CHARACTERIZED", "Function unknown"]  
+    S => ["POORLY CHARACTERIZED", "Function unknown"]
 };
 
 my $usage = "$0 --input <tabbed file: ID, key, function>\n";

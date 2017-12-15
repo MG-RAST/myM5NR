@@ -42,9 +42,9 @@ CARD:
 
 CAZy:
     category: protein
-    homepage: http://www.cazy.org
     type: hierarchical function annotation
     depth: 2
+    homepage: http://www.cazy.org
     no-download: true
     depends:
       - TrEmble
@@ -68,8 +68,9 @@ COG:
     parser:
       - fgrep COG ../TrEmble/md52id_cog.txt > md52id.txt
       - fgrep COG ../Swiss-Prot/md52id_cog.txt >> md52id.txt
-      - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > id2func.txt
-      - ${M5NR_BIN}/create-nog-hierarchy.pl --input id2func.txt > id2hierarchy.txt
+      - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > ${SOURCE_DIR}/id_mapper.txt
+      - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
+      - cut -f1,4 id2hierarchy.txt > id2func.txt
     # the hierarchy is hardcoded in script
 
 EC:
@@ -88,6 +89,7 @@ EC:
       - cp ../TrEmble/md52id_ec.txt md52id.txt
       - cat ../Swiss-Prot/md52id_ec.txt >> md52id.txt
       - ${M5NR_BIN}/create-ec-hierarchy.pl --class ${SOURCE_DIR}/enzclass.txt --input ${SOURCE_DIR}/enzyme.dat > id2hierarchy.txt
+      - cut -f1,5 id2hierarchy.txt > id2func.txt
 
 EggNOG:
     category: protein
@@ -103,8 +105,9 @@ EggNOG:
     parser:
       - fgrep ENOG ../TrEmble/md52id_eggnog.txt > md52id.txt
       - fgrep ENOG ../Swiss-Prot/md52id_eggnog.txt >> md52id.txt
-      - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > id2func.txt
-      - ${M5NR_BIN}/create-nog-hierarchy.pl --input id2func.txt > id2hierarchy.txt
+      - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > ${SOURCE_DIR}/id_mapper.txt
+      - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
+      - cut -f1,4 id2hierarchy.txt > id2func.txt
     # the hierarchy is hardcoded in script
 
 GenBank:
@@ -131,6 +134,7 @@ goslim:
       - cp ../TrEmble/md52id_go.txt md52id.txt
       - cat ../Swiss-Prot/md52id_go.txt >> md52id.txt
       - ${M5NR_BIN}/goslim.pl ${SOURCE_DIR}/goslim_metagenomics.obo
+      - cut -f1,4 id2hierarchy.txt > id2func.txt
 
 Greengenes:
     category: rna
@@ -144,7 +148,7 @@ Greengenes:
 
 InterPro:
     category: protein
-    type: hierarchical function annotation
+    type: function annotation
     version: curl ${CURL_OPTS} ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
     depends:
       - Swiss-Prot
@@ -197,7 +201,7 @@ M5functions:
       - Swiss-Prot
       - TrEmble
     parser:
-      - cut -f2 ../*/md52func.txt | sort -T . -u > unique_func.txt
+      - cat ../*/md52func.txt ../*/id2func.txt | cut -f2 | sort -T . -u > unique_func.txt
 
 #M5nr.fasta
 M5nr:
@@ -346,6 +350,7 @@ SEED-Subsystems:
     resume-download: true
     parser:
       - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
+      - cut -f1,5 id2hierarchy.txt > id2func.txt
 
 # no suitable download mechanism other than manual, does not seem to be updated
 #FOAM:
