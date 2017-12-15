@@ -136,7 +136,7 @@ while ( my $record = <$fh1> ) {
             next;
         }
 
-        if ( $line =~ /^DR\W+GO;\W+GO:(\w+)/ ) {
+        if ( $line =~ /^DR\W+GO;\W+(GO:\w+)/ ) {
             $go = $1;
             next;
         }
