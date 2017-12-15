@@ -42,10 +42,15 @@ while ( defined( my $filename = readdir($dirh) ) ) {
 
         chomp $line;
         my ( $md5, $id, undef, undef, undef, $ss1, $ss2, $ss3, $role, $seq ) = split( /\t/, $line );
-
+        
         unless ($ss2) {
             $ss2 = '-';
         }
+        
+        $ss1 =~ s/^\s+|\s+$//g;
+        $ss2 =~ s/^\s+|\s+$//g;
+        $ss3 =~ s/^\s+|\s+$//g;
+        $role =~ s/^\s+|\s+$//g;
 
         # print the output
         if ( $md5 && $id && $ss1 && $ss2 && $ss3 && $role && $seq ) {
