@@ -31,7 +31,7 @@ unless ( $filename ) {
 $/ = "\n\n";
 
 open (my $fh1, '<', $filename) or die;
-open( my $id2hier, '>', 'id2hierachy.txt' ) or die;
+open( my $id2hier, '>', 'id2hierarchy.txt' ) or die;
 
 my ( $id, $name, $namespace, $hier1 );
 
@@ -43,7 +43,7 @@ while ( my $record = <$fh1> ) {
     
     foreach my $line ( split /\n/, $record ) {
 
-        if ( $line =~ /^id.\W+GO:(\d+)/ ) {
+        if ( $line =~ /^id.\W+(GO:\d+)/ ) {
             $id = $1;
             next;
         }
@@ -63,7 +63,7 @@ while ( my $record = <$fh1> ) {
     }    # end of record
 
     if ( $id && $namespace && $hier1 && $name ) {
-        print $id2hier "GO:$id\t$namespace\t$hier1\t$name\n";
+        print $id2hier "$id\t$namespace\t$hier1\t$name\n";
     }
 
 }    # end of file
