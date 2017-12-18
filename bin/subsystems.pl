@@ -67,7 +67,7 @@ print STDOUT "$fcount files parsed.\n";
 print STDOUT "Retreiving unique subsystems ...\n";
 my @hierarchy = `cut -f2,3,4,5 md52hierarchy.txt | sort -u`;
 chomp @hierarchy;
-print STDOUT scalar(@hierarchy) . " subsystem branches found\.n";
+print STDOUT scalar(@hierarchy) . " subsystem branches found.\n";
 
 my $count = 1;
 my $s_map = {};
