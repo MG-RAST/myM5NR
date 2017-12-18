@@ -76,7 +76,7 @@ print STDOUT "Creating md52id and id2hierarchy files ...\n";
 
 open( IDHIER, '>id2hierarchy.txt' ) or die;
 foreach my $s (@hierarchy) {
-    my $num = $count =~ /\d/g;
+    my $num = () = $count =~ /\d/g;
     my $sid = "SS" . "0" x ( 5 - $num ) . $count;
     $s_map->{$s} = $sid;
     $count += 1;
