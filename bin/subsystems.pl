@@ -62,7 +62,7 @@ while ( defined( my $filename = readdir($dirh) ) ) {
 closedir($dirh);
 close(MD5SEQ);
 close(MD5HIER);
-print STDOUT "$fount files parsed.\n";
+print STDOUT "$fcount files parsed.\n";
 
 print STDOUT "Retreiving unique subsystems ...\n";
 my @hierarchy = `cut -f2,3,4,5 md52hierarchy.txt | sort -u`;
@@ -86,7 +86,7 @@ close(IDHIER);
 
 open( MD5HIER, '<md52hierarchy.txt' ) or die;
 open( MD5ID,   '>md52id.txt' )        or die;
-while ( my $line = <$md52hierarchy> ) {
+while ( my $line = <MD5HIER> ) {
     chomp $line;
     my ( $md5, $branch ) = split( /\t/, $line, 2 );
     if ( exists $s_map->{$branch} ) {
