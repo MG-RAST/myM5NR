@@ -23,7 +23,7 @@ unless ($dirname) {
     exit 1;
 }
 
-open( MD5SEQ, '>md52seq.txt' ) or die;
+open( MD5SEQ, '| uniq > md52seq.txt' ) or die;
 open( MD5HIER, '| uniq > md52hierarchy.txt' ) or die;
 
 print STDOUT "Parsing files in $dirname ...\n";
