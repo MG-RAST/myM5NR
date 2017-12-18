@@ -351,7 +351,6 @@ SEED-Subsystems:
     parser:
       - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
       - cut -f1,5 id2hierarchy.txt > id2func.txt
-      - cut -f2,3,4,5 id2hierarchy.txt | sort -u > hierarchy.txt
 
 # no suitable download mechanism other than manual, does not seem to be updated
 #FOAM:

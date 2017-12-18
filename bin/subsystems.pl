@@ -14,8 +14,7 @@ use strict;
 use warnings;
 
 use Data::Dumper qw(Dumper);
-use Digest::MD5 qw (md5_hex);
-use strict;
+use Digest::MD5 qw(md5_hex);
 
 my $dirname = shift @ARGV;
 
@@ -24,43 +23,79 @@ unless ($dirname) {
     exit 1;
 }
 
-open( my $md52id,        '>', 'md52id.txt' )        or die;
-open( my $md52seq,       '>', 'md52seq.txt' )       or die;
-open( my $id2hierarchy,  '>', 'id2hierarchy.txt' )  or die;
+open( MD5SEQ, '>md52seq.txt' ) or die;
+open( MD5HIER, '| uniq > md52hierarchy.txt' ) or die;
+
+print STDOUT "Parsing files in $dirh ...\n";
+my $fcount = 0;
 
 # FOR EACH FILE IN THE DIRECTORY
 opendir( my $dirh, $dirname ) or die "Could not open $dirname\n";
-
 while ( defined( my $filename = readdir($dirh) ) ) {
 
     next if $filename !~ /subsystems_.*/;
-
-    open( my $fh1, '<', "$dirname/$filename" )
-      or die "Cannot open $dirname/$filename: $!\n";
+    open( my $fh1, '<', "$dirname/$filename" ) or die "Cannot open $dirname/$filename: $!\n";
+    $fcont += 1;
 
     while ( my $line = <$fh1> ) {
-
         chomp $line;
-        my ( $md5, $id, undef, undef, undef, $ss1, $ss2, $ss3, $role, $seq ) = split( /\t/, $line );
-        
+        my ( $md5, undef, undef, undef, undef, $ss1, $ss2, $ss3, $role, $seq ) = split( /\t/, $line );
+
         unless ($ss2) {
             $ss2 = '-';
         }
-        
-        $ss1 =~ s/^\s+|\s+$//g;
-        $ss2 =~ s/^\s+|\s+$//g;
-        $ss3 =~ s/^\s+|\s+$//g;
+
+        $ss1  =~ s/^\s+|\s+$//g;
+        $ss2  =~ s/^\s+|\s+$//g;
+        $ss3  =~ s/^\s+|\s+$//g;
         $role =~ s/^\s+|\s+$//g;
 
         # print the output
-        if ( $md5 && $id && $ss1 && $ss2 && $ss3 && $role && $seq ) {
-            print $md52id "$md5\t$id\n";
-            print $md52seq "$md5\t$seq\n";
-            print $id2hierarchy "$id\t$ss1\t$ss2\t$ss3\t$role\n";
+        if ( $md5 && $ss1 && $ss2 && $ss3 && $role && $seq ) {
+            print MD5SEQ "$md5\t$seq\n";
+            print MD5HIER "$md5\t$ss1\t$ss2\t$ss3\t$role\n";
         }
     }    # end of file
     close($fh1);
 
 }    # end of read dir
-
 closedir($dirh);
+close(MD5SEQ);
+close(MD5HIER);
+print STDOUT "$fount files parsed.\n";
+
+print STDOUT "Retreiving unique subsystems ...\n";
+my @hierarchy = `cut -f2,3,4,5 md52hierarchy.txt | sort -u`;
+chomp @hierarchy;
+print STDOUT scalar(@hierarchy)." subsystem branches found\.n";
+
+my $count = 1;
+my $s_map = {};
+
+print STDOUT "Creating md52id and id2hierarchy files ...\n";
+
+open( IDHIER, '>id2hierarchy.txt' ) or die;
+foreach my $s (@hierarchy) {
+    my $num = $count =~ /\d/g;
+    my $sid = "SS" . "0" x ( 5 - $num ) . $count;
+    $s_map->{$s} = $sid;
+    $count += 1;
+    print IDHIER "$sid\t$s\n";
+}
+close (IDHIER);
+
+open( MD5HIER, '<md52hierarchy.txt' ) or die;
+open( MD5ID, '>md52id.txt' ) or die;
+while ( my $line = <$md52hierarchy> ) {
+    chomp $line;
+    my ($md5, $branch) = split(/\t/, $line, 2);
+    if (exists $s_map->{$branch}) {
+        print MD5ID "$md5\t".$s_map->{$branch}."\n";
+    }
+}
+close(MD5ID);
+close(MD5HIER);
+
+print STDOUT "Done.\n";
+
+exit 0;
