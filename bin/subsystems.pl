@@ -26,7 +26,7 @@ unless ($dirname) {
 open( MD5SEQ, '>md52seq.txt' ) or die;
 open( MD5HIER, '| uniq > md52hierarchy.txt' ) or die;
 
-print STDOUT "Parsing files in $dirh ...\n";
+print STDOUT "Parsing files in $dirname ...\n";
 my $fcount = 0;
 
 # FOR EACH FILE IN THE DIRECTORY
@@ -35,7 +35,7 @@ while ( defined( my $filename = readdir($dirh) ) ) {
 
     next if $filename !~ /subsystems_.*/;
     open( my $fh1, '<', "$dirname/$filename" ) or die "Cannot open $dirname/$filename: $!\n";
-    $fcont += 1;
+    $fcount += 1;
 
     while ( my $line = <$fh1> ) {
         chomp $line;
@@ -67,7 +67,7 @@ print STDOUT "$fount files parsed.\n";
 print STDOUT "Retreiving unique subsystems ...\n";
 my @hierarchy = `cut -f2,3,4,5 md52hierarchy.txt | sort -u`;
 chomp @hierarchy;
-print STDOUT scalar(@hierarchy)." subsystem branches found\.n";
+print STDOUT scalar(@hierarchy) . " subsystem branches found\.n";
 
 my $count = 1;
 my $s_map = {};
@@ -82,15 +82,15 @@ foreach my $s (@hierarchy) {
     $count += 1;
     print IDHIER "$sid\t$s\n";
 }
-close (IDHIER);
+close(IDHIER);
 
 open( MD5HIER, '<md52hierarchy.txt' ) or die;
-open( MD5ID, '>md52id.txt' ) or die;
+open( MD5ID,   '>md52id.txt' )        or die;
 while ( my $line = <$md52hierarchy> ) {
     chomp $line;
-    my ($md5, $branch) = split(/\t/, $line, 2);
-    if (exists $s_map->{$branch}) {
-        print MD5ID "$md5\t".$s_map->{$branch}."\n";
+    my ( $md5, $branch ) = split( /\t/, $line, 2 );
+    if ( exists $s_map->{$branch} ) {
+        print MD5ID "$md5\t" . $s_map->{$branch} . "\n";
     }
 }
 close(MD5ID);
