@@ -74,7 +74,7 @@ while ( my $record = <$fh1> ) {
 
         if ( $line =~ /^DE\W+\w+Name:\W+Full=(.+);/ ) {
             $func = $1;
-            $func =~ s/\{\S+\|\S+\}$//;
+            $func =~ s/\{.+?\}$//;q
             if ( $func =~ /^\| \/ / ) {
                 $func = ( split( /\//, $func ) )[1];
             }
