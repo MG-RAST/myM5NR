@@ -27,6 +27,8 @@ BacMet:
     parser:
       - unzip ${SOURCE_DIR}/BacMet1.1.zip -d ${SOURCE_DIR}
       - ${M5NR_BIN}/bacmet.pl ${SOURCE_DIR}/BacMet_EXP.704.fasta ${SOURCE_DIR}/BacMet_PRE.*.fasta
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 CARD:
     category: protein
@@ -39,6 +41,8 @@ CARD:
       # note, file name 'ncbi_taxomony.csv' is misspelled in tarball, may have name changed in future
       - ${M5NR_BIN}/card.pl ${SOURCE_DIR}/protein_fasta_protein_homolog_model.fasta ${SOURCE_DIR}/ncbi_taxomony.csv
       - ${M5NR_BIN}/obo2hierarchy.pl ${SOURCE_DIR}/aro.obo
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 CAZy:
     category: protein
@@ -66,8 +70,8 @@ COG:
     download:
       - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
     parser:
-      - fgrep COG ../TrEmble/md52id_cog.txt > md52id.txt
-      - fgrep COG ../Swiss-Prot/md52id_cog.txt >> md52id.txt
+      - cp ../TrEmble/md52id_cog.txt md52id.txt
+      - cat ../Swiss-Prot/md52id_cog.txt >> md52id.txt
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > ${SOURCE_DIR}/id_mapper.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
       - cut -f1,4 id2hierarchy.txt > id2func.txt
@@ -103,8 +107,8 @@ EggNOG:
     download:
       - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
     parser:
-      - fgrep ENOG ../TrEmble/md52id_eggnog.txt > md52id.txt
-      - fgrep ENOG ../Swiss-Prot/md52id_eggnog.txt >> md52id.txt
+      - cp ../TrEmble/md52id_eggnog.txt md52id.txt
+      - cat ../Swiss-Prot/md52id_eggnog.txt >> md52id.txt
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > ${SOURCE_DIR}/id_mapper.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
       - cut -f1,4 id2hierarchy.txt > id2func.txt
@@ -118,6 +122,8 @@ GenBank:
     version: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
     parser:
       - ${M5NR_BIN}/genbank.pl ${SOURCE_DIR}/nr.gz
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 goslim:
     category: protein
@@ -145,6 +151,8 @@ Greengenes:
       - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
     parser:
       - ${M5NR_BIN}/greengenes.pl ${SOURCE_DIR}/current_GREENGENES_gg16S_unaligned.fasta.gz
+      - sort -T . -u md52rnaseq.txt > md52rnaseq.txt.sort
+      - mv md52rnaseq.txt.sort md52rnaseq.txt
 
 InterPro:
     category: protein
@@ -229,7 +237,7 @@ M5nr:
       - Swiss-Prot
       - TrEmble
     parser:
-      - cat ../*/md52seq.txt | sort -T . -u | ${M5NR_BIN}/tab2fasta.pl > m5nr.fasta
+      - cat ../*/md52seq.txt | sort -T . -m -u | ${M5NR_BIN}/tab2fasta.pl > m5nr.fasta
 
 #M5rna.fasta
 M5rna:
@@ -242,7 +250,7 @@ M5rna:
       - RDP
       - Greengenes
     parser:
-      - cat ../*/md52rnaseq.txt | sort -T . -u | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
+      - cat ../*/md52rnaseq.txt | sort -T . -m -u | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
 
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)
 motuDB:
@@ -255,6 +263,8 @@ motuDB:
     parser:
       - tar -xzf ${SOURCE_DIR}/mOTU.v${VERSION}.padded.tar.gz -C ${SOURCE_DIR}
       - ${M5NR_BIN}/motudb.pl ${SOURCE_DIR}/mOTU.v${VERSION}.padded
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 NCBI-Taxonomy:
     category: taxonomy
@@ -275,6 +285,8 @@ PATRIC:
     download-command: ${M5NR_BIN}/download_PATRIC.sh
     parser:
       - ${M5NR_BIN}/patric.pl ${SOURCE_DIR}/
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 PFAM:
     category: protein
@@ -303,6 +315,8 @@ PhAnToMe:
     comment: curl ${CURL_OPTS} "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
     parser:
       - ${M5NR_BIN}/phantome.pl ${SOURCE_DIR}/phage_proteins_${TIMESTAMP}.fasta.gz
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 RDP:
     category: rna
@@ -318,6 +332,8 @@ RDP:
       - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
     parser:
       - ${M5NR_BIN}/rdp.pl ${SOURCE_DIR}/current_Fungi_unaligned.gb.gz ${SOURCE_DIR}/current_Bacteria_unaligned.gb.gz ${SOURCE_DIR}/current_Archaea_unaligned.gb.gz
+      - sort -T . -u md52rnaseq.txt > md52rnaseq.txt.sort
+      - mv md52rnaseq.txt.sort md52rnaseq.txt
 
 RefSeq:
     category: protein
@@ -329,6 +345,8 @@ RefSeq:
     resume-download: true
     parser:
       - ${M5NR_BIN}/refseq.pl ${SOURCE_DIR}
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 SEED-Annotations:
     category: protein
@@ -339,6 +357,8 @@ SEED-Annotations:
     resume-download: true
     parser:
       - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 SEED-Subsystems:
     category: protein
@@ -351,6 +371,8 @@ SEED-Subsystems:
     parser:
       - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
       - cut -f1,5 id2hierarchy.txt > id2func.txt
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 # no suitable download mechanism other than manual, does not seem to be updated
 #FOAM:
@@ -372,13 +394,11 @@ SILVA-LSU:
     homepage: http://www.arb-silva.de
     version: curl ${CURL_OPTS} -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
     download:
-      - ftp://ftp.arb-silva.de/current/Exports/README.txt
       - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
-      - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz.md5
-      - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz
-      - ftp://ftp.arb-silva.de/current/Exports/rast/SILVA_${VERSION}_LSURef.rast.gz.md5
     parser:
       - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
+      - sort -T . -u md52rnaseq.txt > md52rnaseq.txt.sort
+      - mv md52rnaseq.txt.sort md52rnaseq.txt
 
 SILVA-SSU:
     category: rna
@@ -387,9 +407,10 @@ SILVA-SSU:
     version: curl ${CURL_OPTS} -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
     download:
       - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
-      - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz.md5
     parser:
       - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
+      - sort -T . -u md52rnaseq.txt > md52rnaseq.txt.sort
+      - mv md52rnaseq.txt.sort md52rnaseq.txt
 
 Swiss-Prot:
     category: protein
@@ -398,7 +419,9 @@ Swiss-Prot:
       - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
     version: curl ${CURL_OPTS} ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "Swiss-Prot" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
     parser:
-      - ${M5NR_BIN}/swissprot.pl ${SOURCE_DIR}/uniprot_sprot.dat.gz
+      - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_sprot.dat.gz
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
 
 TrEmble:
     category: protein
@@ -407,4 +430,6 @@ TrEmble:
       - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
     version: curl ${CURL_OPTS} ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
     parser:
-      - ${M5NR_BIN}/trembl.pl ${SOURCE_DIR}/uniprot_trembl.dat.gz
+      - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_trembl.dat.gz
+      - sort -T . -u md52seq.txt > md52seq.txt.sort
+      - mv md52seq.txt.sort md52seq.txt
