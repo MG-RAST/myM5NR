@@ -19,7 +19,7 @@ my $filename2 = shift @ARGV;
 my $filename3 = shift @ARGV;
 
 unless ( $filename1 && $filename2 && $filename3 ) {
-    print STDERR "Usage: \tgenbank.pl <filename1> <filename2> <filename3>\n";
+    print STDERR "Usage: \trdp.pl <filename1> <filename2> <filename3>\n";
     exit 1;
 }
 
@@ -47,35 +47,31 @@ sub read_file {
     while ( my $record = <$fh1> ) {
         ( $id, $md5s, $tax, $sequence ) = ( '', '', '', '' );
 
-        foreach my $line ( split /\n/, $record ) {
-
-            # LOCUS       S000494589               454 bp    rRNA    linear   BCT 15-Jun-2007
-            if ( $line =~ /^LOCUS\s+(\w+)\W+.*/ ) {
+        chomp $record;
+        my @lines = split(/\n/, $record);
+    
+        for (my $i = 0; $i < scalar(@lines); $i++) {
+            my $line = $lines[$i];
+            
+            if ( $line =~ /^LOCUS\s+(\w+)\W+/ ) {
                 $id = $1;
                 next;
             }
 
-            # /db_xref="taxon:77133"
-            if ( $line =~ /^\W+\/db_xref="taxon:(\w+)"/ ) {
+            if ( $line =~ /^\W+\/db_xref="taxon:(\d+)"/ ) {
                 $tax = $1;
                 next;
             }
 
-            # parse sequence, generate md5
             if ( $line =~ /^ORIGIN/ ) {
-                my @lines = split( 'ORIGIN', $record );
-
-                # split the record at the correct position to catch the sequences
-                $sequence = $lines[1];
-
-                # join lines, remove the first list as well as the record separator
-                $sequence =~ s/^(.*\n)//;
-                $sequence =~ tr /[0-9] \n\///ds;
-                chomp $sequence;
+                # get remaining lines from record and end loop
+                $sequence = join("", splice(@lines, $i+1));
+                $sequence =~ s/\s+//g;
+                $sequence =~ s/[0-9]+//g;
                 $sequence = uc($sequence);
                 $md5s     = md5_hex($sequence);
-                next;
-            }    # end of ORIGIN case
+                last;
+            }
         }    # end of record
 
         print_record();

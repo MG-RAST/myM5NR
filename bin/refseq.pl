@@ -1,13 +1,9 @@
 #!/usr/bin/perl
 
-# refseq
+# generic genbank parser
 #
-# extract md52id, md52seq.id2tax, md52tax
-#
-# >WP_027747122.1 S-(hydroxymethyl)mycothiol dehydrogenase [Streptomyces sp. CNH287]
-#MAQEVRGVIAPGKDEPVRTETIVVPDPGPGEAVVEVRACGVCHTDLHYRQGGINDEFPFLLGHEAAGVVESVGEGVTEVA
-
-#
+# extract seq, func, tax, id
+# the parser is very brute force as bioperl and biopython will not extract all required fields
 # folker@anl.gov
 
 use strict;
@@ -17,8 +13,6 @@ use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
-
-# the main trick is to read the document record by record
 
 my $dirname = shift @ARGV;
 
@@ -40,10 +34,7 @@ my ( $id, $md5s, $func, $tax, $sequence );
 while ( my $filename = readdir(DIR) ) {
 
     next if $filename !~ /.*\.gpff.gz/;
-    print "WORKING ON: $filename\n";
-
-    my $fh1 = new IO::Uncompress::Gunzip("$dirname/$filename")
-      or die "Cannot open $dirname/$filename': $!\n";
+    my $fh1 = new IO::Uncompress::Gunzip("$dirname/$filename") or die "Cannot open $dirname/$filename': $!\n";
 
     # change EOL
     $/ = "//\n";
@@ -53,40 +44,39 @@ while ( my $filename = readdir(DIR) ) {
 
         # find definition (might be multi line)
         if ( $record =~ /\nDEFINITION\W+(.*)\[.*\]\./s ) {
+            $func =~ s/^\s+//;
+            $func =~ s/\s+$//;
             $func = $1;
         }
         else {
             my $len = length($record);
             if ( $len == 1 ) { next; }
         }
+        
+        chomp $record;
+        my @lines = split(/\n/, $record);
+    
+        for (my $i = 0; $i < scalar(@lines); $i++) {
 
-        foreach my $line ( split /\n/, $record ) {
-
-            if ( $line =~ /^LOCUS\W+(\w+)/ ) {
+            if ( $line =~ /^LOCUS\W+(\w+)\W+/ ) {
                 $id = $1;
                 next;
             }
 
-            if ( $line =~ /\W+.db_xref=\"taxon:(\d+)"+/ ) {
+            if ( $line =~ /^\W+\/db_xref="taxon:(\d+)"/ ) {
                 $tax = $1;
                 next;
             }
-
-            # parse sequence, generate md5
+            
             if ( $line =~ /^ORIGIN/ ) {
-                my @lines = split( 'ORIGIN', $record );
-
-               # split the record at the correct position to catch the sequences
-                $sequence = $lines[1];
-
-             # join lines, remove the first list as well as the record separator
-                $sequence =~ s/^(.*\n)//;
-                $sequence =~ tr / \n\/\/[0-9]//ds;
-                chomp $sequence;
+                # get remaining lines from record and end loop
+                $sequence = join("", splice(@lines, $i+1));
+                $sequence =~ s/\s+//g;
+                $sequence =~ s/[0-9]+//g;
                 $sequence = uc($sequence);
                 $md5s     = md5_hex($sequence);
-                next;
-            }    # end of ORIGIN case
+                last;
+            }
         }    # end of record
 
         print_record();

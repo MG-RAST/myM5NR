@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-# uniprot2many --  convert Uniprot flat files into as many MD5nr input files as possible
+# uniprot --  convert uniprot flat files into as many MD5nr input files as possible
 # no parameters, expects to be run from directory with *.dat files.
 # all files created are two colum tables
 #
 # naming convention md52id_<source>.txt
+#                   id2func_<source>.txt
+#                   id2hierarchy_<source>.txt
 #
 # obtain: uniprot sequence, uniprot function, uniprot taxonomy, EC, CAZy, eggnog, pfam, interpro, go
 #
@@ -22,12 +24,11 @@ use IO::Uncompress::Gunzip;
 my $filename = shift @ARGV;
 
 unless ($filename) {
-    print STDERR "Usage: \tswissprot.pl <filename1> \n";
+    print STDERR "Usage: \tuniprot.pl <filename> \n";
     exit 1;
 }
 
-my $fh1 = new IO::Uncompress::Gunzip("$filename")
-  or die "Cannot open '$filename': $!\n";
+my $fh1 = new IO::Uncompress::Gunzip("$filename") or die "Cannot open '$filename': $!\n";
 
 open( my $md52id,        '>', 'md52id.txt' )        or die;
 open( my $md52seq,       '>', 'md52seq.txt' )       or die;
@@ -50,16 +51,15 @@ my (
 $/ = "\n//";
 
 while ( my $record = <$fh1> ) {
-
     (
         $id,   $go, $kegg,   $md5s, $pfam, $ipr, $func,
         $cazy, $ec, $eggnog, $tax,  $cog,  $sequence
     ) = ( '', '', '', '', '', '', '', '', '', '', '', '', '' );
 
     chomp $record;
-    my @lines = split(/\n/, $record);
-    
-    for (my $i = 0; $i < scalar(@lines); $i++) {
+    my @lines = split( /\n/, $record );
+
+    for ( my $i = 0 ; $i < scalar(@lines) ; $i++ ) {
         my $line = $lines[$i];
 
         if ( $line =~ /^ID\W+(\w+)\W+/ ) {
@@ -71,8 +71,8 @@ while ( my $record = <$fh1> ) {
             $tax = $1;
             next;
         }
-        
-        if ( $line =~ /^DE\W+RecName:\W+Full=(.+);/ ) {
+
+        if ( $line =~ /^DE\W+\w+Name:\W+Full=(.+);/ ) {
             $func = $1;
             $func =~ s/\{\S+\|\S+\}$//;
             if ( $func =~ /^\| \/ / ) {
@@ -85,7 +85,7 @@ while ( my $record = <$fh1> ) {
             $func =~ s/\s+$//;
             next;
         }
-        
+
         if ( $line =~ /^DR\W+InterPro\W+(IPR\w+)/ ) {
             $ipr = $1;
             next;
@@ -100,23 +100,23 @@ while ( my $record = <$fh1> ) {
             $pfam = $1;
             next;
         }
-        
+
         if ( $line =~ /^DR\W+KEGG;\W+(\w+):(\w+)/ ) {
             $kegg = "$1:$2";
             next;
         }
-        
+
         if ( $line =~ /^DR\W+eggNOG;\W+(COG\d+);/ ) {
             $cog = $1;
             next;
         }
-        
+
         if ( $line =~ /^DR\W+eggNOG;\W+(ENOG\w+);/ ) {
             $eggnog = $1;
             next;
         }
 
-        if ( $line =~ /^DE\W+EC=(\w+).(\w+).(\w+).(\w+)\W+/ ) {
+        if ( $line =~ /^DE\W+EC=(\d+).(\d+).(\d+).(\d+)\W+/ ) {
             $ec = "$1.$2.$3.$4";
             next;
         }
@@ -128,7 +128,7 @@ while ( my $record = <$fh1> ) {
 
         if ( $line =~ /^SQ/ ) {
             # get remaining lines from record and end loop
-            $sequence = join("", splice(@lines, $i+1));
+            $sequence = join( "", splice( @lines, $i + 1 ) );
             $sequence =~ s/\s+//g;
             $sequence = uc($sequence);
             $md5s     = md5_hex($sequence);
