@@ -25,7 +25,7 @@ BacMet:
     version: curl ${CURL_OPTS} "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "Database Statistics (version [0-9\.]*)" | grep -o [0-9\.]*
     download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
     parser:
-      - unzip ${SOURCE_DIR}/BacMet1.1.zip -d ${SOURCE_DIR}
+      - unzip -o ${SOURCE_DIR}/BacMet1.1.zip -d ${SOURCE_DIR}
       - ${M5NR_BIN}/bacmet.pl ${SOURCE_DIR}/BacMet_EXP.704.fasta ${SOURCE_DIR}/BacMet_PRE.*.fasta
       - sort -T . -u md52seq.txt > md52seq.txt.sort
       - mv md52seq.txt.sort md52seq.txt
