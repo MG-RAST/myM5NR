@@ -57,6 +57,7 @@ while ( my $filename = readdir(DIR) ) {
         my @lines = split(/\n/, $record);
     
         for (my $i = 0; $i < scalar(@lines); $i++) {
+            my $line = $lines[$i];
 
             if ( $line =~ /^LOCUS\W+(\w+)\W+/ ) {
                 $id = $1;
