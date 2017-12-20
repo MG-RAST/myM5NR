@@ -44,9 +44,9 @@ while ( my $filename = readdir(DIR) ) {
 
         # find definition (might be multi line)
         if ( $record =~ /\nDEFINITION\W+(.*)\[.*\]\./s ) {
+            $func = $1;
             $func =~ s/^\s+//;
             $func =~ s/\s+$//;
-            $func = $1;
         }
         else {
             my $len = length($record);

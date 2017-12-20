@@ -74,23 +74,15 @@ while ( my $record = <$fh1> ) {
 
         if ( $line =~ /^DE\W+\w+Name:\W+Full=(.+);/ ) {
             $func = $1;
+            # remove embedded IDs or organisms at end
             $func =~ s/\{.+?\}$//;
             $func =~ s/\[.+?\]$//;
-            if ( $func =~ /^\| \/ / ) {
-                $func = ( split( /\//, $func ) )[1];
+            # do we have non-informative descriptions
+            if ($func =~ /\|/) {
+                $func = '';
+                next;
             }
-            elsif ( $func =~ /^\| / ) {
-                $func = ( split( /\|/, $func ) )[1];
-            }
-            if ($func =~ /gi\|/) {
-                $func = ( split( /\|/, $func ) )[-1];
-            }
-            if ($func =~ /^ORF /) {
-                my @parts = split( /type:/, $func );
-                if (scalar(@parts) > 1) {
-                    $func = $parts[1];
-                }
-            }
+            # whitespace cleanup
             $func =~ s/^\s+//;
             $func =~ s/\s+$//;
             next;
