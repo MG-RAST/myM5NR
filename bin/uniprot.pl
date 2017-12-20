@@ -75,11 +75,21 @@ while ( my $record = <$fh1> ) {
         if ( $line =~ /^DE\W+\w+Name:\W+Full=(.+);/ ) {
             $func = $1;
             $func =~ s/\{.+?\}$//;
+            $func =~ s/\[.+?\]$//;
             if ( $func =~ /^\| \/ / ) {
                 $func = ( split( /\//, $func ) )[1];
             }
             elsif ( $func =~ /^\| / ) {
                 $func = ( split( /\|/, $func ) )[1];
+            }
+            if ($func =~ /gi\|/) {
+                $func = ( split( /\|/, $func ) )[-1];
+            }
+            if ($func =~ /^ORF /) {
+                my @parts = split( /type:/, $func );
+                if (scalar(@parts) > 1) {
+                    $func = $parts[1];
+                }
             }
             $func =~ s/^\s+//;
             $func =~ s/\s+$//;
