@@ -51,12 +51,13 @@ while ( my $filename = readdir(DIR) ) {
             $func =~ s/MULTISPECIES://g;
             $func =~ s/RecName://g;
             $func =~ s/Short=.*//g;
+            # whitespace cleanup
+            $func =~ s/^\s+//;
+            $func =~ s/\s+$//;
             # remove embedded brackets at end
             $func =~ s/\{.+?\}$//;
             $func =~ s/\[.+?\]$//;
             $func =~ s/\(.+?\)$//;
-            # whitespace cleanup
-            $func =~ s/^\s+//;
             $func =~ s/\s+$//;
         }
         else {
