@@ -16,6 +16,8 @@ import pprint
 from prettytable import PrettyTable
 import datetime
 
+CURL_OPTS = '--silent --connect-timeout 10 -L'
+
 bin_dir = os.path.dirname(os.path.realpath(__file__))
 
 repo_dir = os.path.normpath(os.path.join(bin_dir, "..", "sources.yaml"))
@@ -102,7 +104,7 @@ def create_environment(source_obj):
     
     new_environment['TODAY'] = datetime.date.today().isoformat()
     new_environment['M5NR_BIN'] = bin_dir
-    new_environment['CURL_OPTS'] = '--silent --connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 -L'
+    new_environment['CURL_OPTS'] = CURL_OPTS
     
         
     return new_environment
