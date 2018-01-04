@@ -43,8 +43,19 @@ while ( my $filename = readdir(DIR) ) {
         ( $id, $md5s, $func, $tax, $sequence ) = ( '', '', '', '', '' );
 
         # find definition (might be multi line)
-        if ( $record =~ /\nDEFINITION\W+(.*)\[.*\]\./s ) {
+        if ( $record =~ /\nDEFINITION\W+(.*?)\[.*\]\./s ) {
             $func = $1;
+            # collapse whitespace, remove newlines
+            $func =~ s/\s+/ /gs;
+            # clean terms
+            $func =~ s/MULTISPECIES://g;
+            $func =~ s/RecName://g;
+            $func =~ s/Short=.*//g;
+            # remove embedded brackets at end
+            $func =~ s/\{.+?\}$//;
+            $func =~ s/\[.+?\]$//;
+            $func =~ s/\(.+?\)$//;
+            # whitespace cleanup
             $func =~ s/^\s+//;
             $func =~ s/\s+$//;
         }
