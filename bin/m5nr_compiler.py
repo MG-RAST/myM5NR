@@ -64,7 +64,7 @@ def execute_command(command, env):
         #print('loop')
         output = process.stdout.readline()
         rc = process.poll()
-        if output == '' and process.poll() is not None:
+        if (not output) and (process.poll() is not None):
             #print("Cond 1")
             break
         
@@ -80,7 +80,7 @@ def execute_command(command, env):
         print(last_line)
         
     if process.returncode:
-        raise MyException("Command failed (return code %d, command: %s): %s" % (process.returncode, command, last_line[0:500]))    
+        raise MyException("Command failed (return code %d, command: %s): %s" % (process.returncode, command, last_line[0:500]))
         
     return last_line
 
@@ -367,13 +367,15 @@ def get_remote_versions(sources):
         try:
             new_environment = create_environment(source_obj)
         except Exception as e:
-            raise MyException("create_environment failed: %s" % (e))
+            raise MyException("create_environment failed: %s" % (str(e)))
         
         command  = source_obj['version']
         try:
             version = execute_command(command, new_environment)
         except Exception as e:
-            raise MyException("execute_command failed: %s" % (e))
+            version = '-'
+            print("execute_command failed: %s" % (str(e)))
+            print("skipping %s" % (source_name))
           
         remote_versions_hashed[source_name] = version
     
