@@ -48,6 +48,7 @@ while ( my $filename = readdir(DIR) ) {
 
 #>fig|101571.178.peg.5|   hypothetical protein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
 #>fig|101571.178.peg.6|WL35_01550|   Putative outer membrane lipoprotein   [Burkholderia ubonensis strain MSMB2104WGS | 101571.178]
+#>fig|611304.3.peg.4028|MtubK8_010100008408|VBIMycTub343819_4028|   (2E,6Z)-farnesyl diphosphate synthase (EC 2.5.1.68)   [Mycobacterium africanum K85 | 611304.3]
 #>fig|79879.3.peg.5883|   hypothetical protein   [[Bacillus] clarkii strain DSM 8720 | 79879.3]
 #>fig|1494590.3.peg.2363|ATN84_09125|   4-[[4-(2-aminoethyl)phenoxy]-methyl]-2-furanmethanamine-glutamate synthase   [Paramesorhizobium deserti strain A-3-E | 1494590.3]
 #>fig|911117.5.peg.997|   4-[[4-(2-aminoethyl)phenoxy]-methyl]-2-furanmethanamine-glutamate synthase   [Methanobrevibacter smithii TS145B | 911117.5]
@@ -55,11 +56,25 @@ while ( my $filename = readdir(DIR) ) {
             my $line = $_;
             chomp $line;
             
-            ($id, $func, $tax) = ($line =~ /^>(.+)\|\s+(.+)\s+\[(.+?) \| \d+\.\d+]$/);
+            ($id, $func, $tax) = split(/   /, $line);
 
-            $id   = "fig|" . ( split( /\|/, $id ) )[1];
+            $id = "fig|" . (split( /\|/, $id ))[1];
+            
+            # function cleanup
+            $func =~ s/\s+/ /g;
             $func =~ s/^\s+|\s+$//g;
-            $tax  =~ s/\[|\]//g;
+            $func =~ s/^'|'$//g;
+            $func =~ s/^"|"$//g;
+            $func =~ s/^\s+|\s+$//g;
+            $func =~ s/\{.+?\}$//;
+            $func =~ s/\[.+?\]$//;
+            $func =~ s/\(.+?\)$//;
+            $func =~ s/\s+$//;
+            
+            # tax cleanup
+            $tax = (split( /\|/, $tax ))[0];
+            $tax =~ s/^\[//;
+            $tax =~ s/^\s+|\s+$//g;
         }
         else {
             s/\s+//g;    # remove whitespace
@@ -85,7 +100,7 @@ sub process_record {
     $md5s = md5_hex($seq);
 
     # print the output
-    if ( $id && $func && $tax ) {
+    if ( $seq && $id && $func && $tax ) {
         print $md52id "$md5s\t$id\n";
         print $md52seq "$md5s\t$seq\n";
         print $md52func "$md5s\t$func\n";

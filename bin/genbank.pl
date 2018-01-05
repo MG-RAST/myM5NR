@@ -55,9 +55,18 @@ while (<$fh1>) {
         
         $id = shift @words;
         $func = join(" ", @words);
+        $func =~ s/\s+/ /g;
         $func =~ s/MULTISPECIES:\ //g;
         $func =~ s/RecName:\ Full=//g;
         $func =~ s/Short=.*//g;
+        $func =~ s/^\s+|\s+$//g
+        $func =~ s/^'|'$//g;
+        $func =~ s/^"|"$//g;
+        $func =~ s/^\s+|\s+$//g;
+        $func =~ s/\{.+?\}$//;
+        $func =~ s/\[.+?\]$//;
+        $func =~ s/\(.+?\)$//;
+        $func =~ s/\s+$//;
 
 # we still need to split off some CTRL-A tails ; should have been caught before but isn't
         $func =~ s/\x01.*//g;
@@ -82,7 +91,7 @@ sub process_record {
     $md5s = md5_hex($seq);
 
     # print the output
-    if ( $id && $func ) {
+    if ( $seq && $id && $func ) {
         print $md52id "$md5s\t$id\n";
         print $md52seq "$md5s\t$seq\n";
         print $md52func "$md5s\t$func\n";

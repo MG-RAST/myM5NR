@@ -51,10 +51,11 @@ while ( my $filename = readdir(DIR) ) {
             $func =~ s/MULTISPECIES://g;
             $func =~ s/RecName://g;
             $func =~ s/Short=.*//g;
-            # whitespace cleanup
-            $func =~ s/^\s+//;
-            $func =~ s/\s+$//;
-            # remove embedded brackets at end
+            # function cleanup
+            $func =~ s/^\s+|\s+$//g;
+            $func =~ s/^'|'$//g;
+            $func =~ s/^"|"$//g;
+            $func =~ s/^\s+|\s+$//g;
             $func =~ s/\{.+?\}$//;
             $func =~ s/\[.+?\]$//;
             $func =~ s/\(.+?\)$//;
@@ -108,7 +109,7 @@ while ( my $filename = readdir(DIR) ) {
 exit 0;
 
 sub print_record {
-    if ( $md5s && $sequence && $id ) {
+    if ( $md5s && $sequence && $id && $func ) {
         print $md52seq "$md5s\t$sequence\n";
         print $md52func "$md5s\t$func\n";
         print $md52tax "$md5s\t$tax\n";

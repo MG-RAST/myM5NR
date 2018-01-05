@@ -31,6 +31,17 @@ while ( my $line = <$fh1> ) {
 
     chomp $line;
     my ( $md5, $id, $func, undef, undef, $seq ) = split( /\t/, $line );
+    
+    # function cleanup
+    $func =~ s/\s+/ /g;
+    $func =~ s/^\s+|\s+$//g;
+    $func =~ s/^'|'$//g;
+    $func =~ s/^"|"$//g;
+    $func =~ s/^\s+|\s+$//g;
+    $func =~ s/\{.+?\}$//;
+    $func =~ s/\[.+?\]$//;
+    $func =~ s/\(.+?\)$//;
+    $func =~ s/\s+$//;
 
     # print the output
     if ( $md5 && $id && $func && $seq ) {

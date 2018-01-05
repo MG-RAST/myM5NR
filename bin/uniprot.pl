@@ -83,8 +83,10 @@ while ( my $record = <$fh1> ) {
                 next;
             }
             # whitespace cleanup
-            $func =~ s/^\s+//;
-            $func =~ s/\s+$//;
+            $func =~ s/^\s+|\s+$//g;
+            $func =~ s/^'|'$//g;
+            $func =~ s/^"|"$//g;
+            $func =~ s/^\s+|\s+$//g;
             next;
         }
 
