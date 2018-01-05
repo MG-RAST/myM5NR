@@ -49,6 +49,9 @@ while ( defined( my $filename = readdir($dirh) ) ) {
         $ss2  =~ s/^\s+|\s+$//g;
         $ss3  =~ s/^\s+|\s+$//g;
         $role =~ s/^\s+|\s+$//g;
+        $role =~ s/^'|'$//g;
+        $role =~ s/^"|"$//g;
+        $role =~ s/^\s+|\s+$//g;
 
         # print the output
         if ( $md5 && $ss1 && $ss2 && $ss3 && $role && $seq ) {
