@@ -59,7 +59,7 @@ while (<$fh1>) {
         $func =~ s/MULTISPECIES:\ //g;
         $func =~ s/RecName:\ Full=//g;
         $func =~ s/Short=.*//g;
-        $func =~ s/^\s+|\s+$//g
+        $func =~ s/^\s+|\s+$//g;
         $func =~ s/^'|'$//g;
         $func =~ s/^"|"$//g;
         $func =~ s/^\s+|\s+$//g;
