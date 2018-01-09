@@ -21,7 +21,7 @@ docker build -t mgrast/m5nr-build .
 
 Example for manual invocation:
 ```bash
-docker run -ti --name m5nr -v /var/tmp/m5nr:/m5nr_data mgrast/m5nr-build
+docker run -t -d --name m5nr -v /var/tmp/m5nr:/m5nr_data mgrast/m5nr-build bash
 ```
 
 From now steps execute inside the container
