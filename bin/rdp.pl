@@ -27,7 +27,7 @@ open( my $md52id,  '>', 'md52id.txt' )     or die;
 open( my $md52seq, '>', 'md52rnaseq.txt' ) or die;
 open( my $md52tax, '>', 'md52taxid.txt' )  or die;
 
-my ( $id, $md5s, $tax, $sequence );
+my ( $id, $md5s, $taxid, $sequence );
 
 read_file($filename1);
 read_file($filename2);
