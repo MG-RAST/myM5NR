@@ -97,6 +97,7 @@ def cleanRank(nodes, root_id):
 def cleanLeaf(nodes, root_id):
     removed = defaultdict(int)
     changed = defaultdict(int)
+    skip = 0
     nodeIds = nodes.keys()
     for nid in nodeIds:
         if nid not in nodes:
@@ -104,26 +105,35 @@ def cleanLeaf(nodes, root_id):
         # skip root
         if root_id and (nid == root_id):
             continue
+        n = nodes[nid]
         # skip non-leaf
-        if len(nodes[nid]['childNodes']) > 0:
+        if len(n['childNodes']) > 0:
+            skip += 1
             continue  
         # make sure leaf rank is correct
         # assume parent rank is correct
-        currRank = nodes[nid]['rank']
+        currRank = n['rank']
         if currRank in RANKS:
             continue
-        pNode = nodes[nid]['parentNodes'][0]
-        pRankIdx = RANKS.index(nodes[pNode]['rank'])
+        pRankIdx = RANKS.index(nodes[n['parentNodes'][0]]['rank'])
         if pRankIdx == 7:
+            # update child lists of parents
+            for p in n['parentNodes']:
+                if p in nodes:
+                    temp = list(set(nodes[p]['childNodes'] + n['childNodes']))
+                    temp.remove(nid)
+                    nodes[p]['childNodes'] = temp
             del nodes[nid]
             removed[currRank] += 1
         else:
             nodes[nid]['rank'] = RANKS[pRankIdx+1]
             changed[currRank] += 1
+    print "skipped nodes: %d"%(skip)
     for r in removed.keys():
         print "root %s: removed rank: %s, %d nodes"%(root_id, r, removed[r])
     for c in changed.keys():
         print "root %s: changed rank: %s, %d nodes"%(root_id, c, changed[c])
+    return nodes
 
 def getDescendents(nodes, nid):
     decendents = []
@@ -165,7 +175,7 @@ def printBranches(nodes, nid, ofile):
         # sanity check
         if rank not in RANKS:
             print "[error] nodeID (%s) rank (%s)"%(nid, rank)
-            return
+            sys.exit(1)
         curDepth = RANKS.index(rank)
         # set global variables
         curRanks[curDepth][1] = nodes[nid]['label']
@@ -249,7 +259,7 @@ def main(args):
             nodes[i]['nodes'] = cleanRank(n['nodes'], n['rootNode'])
         print "[status] cleaning leaf rank ... "
         for i, n in enumerate(nodes):
-            nodes[i]['nodes'] = cleanRank(n['nodes'], n['rootNode'])
+            nodes[i]['nodes'] = cleanLeaf(n['nodes'], n['rootNode'])
     
     # description cleanup
     if args.desc:
@@ -284,7 +294,7 @@ def main(args):
             data[root]['childNodes'].append(n['rootNode'])
             data[n['rootNode']]['parentNodes'] = [root]
     else:
-        data = n['nodes']
+        data = nodes[0]['nodes']
     
     # output
     ofile = open(args.output, 'w')
