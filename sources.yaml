@@ -38,8 +38,7 @@ CARD:
     download: https://card.mcmaster.ca/latest/data
     parser:
       - tar -xjf ${SOURCE_DIR}/data -C ${SOURCE_DIR}
-      # note, file name 'ncbi_taxomony.csv' is misspelled in tarball, may have name changed in future
-      - ${M5NR_BIN}/card.pl ${SOURCE_DIR}/protein_fasta_protein_homolog_model.fasta ${SOURCE_DIR}/ncbi_taxomony.csv
+      - ${M5NR_BIN}/card.pl ${SOURCE_DIR}/protein_fasta_protein_homolog_model.fasta
       - ${M5NR_BIN}/obo2hierarchy.pl ${SOURCE_DIR}/aro.obo
       - sort -T . -u md52seq.txt > md52seq.txt.sort
       - mv md52seq.txt.sort md52seq.txt
