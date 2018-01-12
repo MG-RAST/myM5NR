@@ -25,7 +25,7 @@ unless ( $filename1 && $filename2 && $filename3 ) {
 
 open( my $md52id,  '>', 'md52id.txt' )     or die;
 open( my $md52seq, '>', 'md52rnaseq.txt' ) or die;
-open( my $md52tax, '>', 'md52tax.txt' )    or die;
+open( my $md52tax, '>', 'md52taxid.txt' )  or die;
 
 my ( $id, $md5s, $tax, $sequence );
 
@@ -45,7 +45,7 @@ sub read_file {
     $/ = "\n//";
 
     while ( my $record = <$fh1> ) {
-        ( $id, $md5s, $tax, $sequence ) = ( '', '', '', '' );
+        ( $id, $md5s, $taxid, $sequence ) = ( '', '', '', '' );
 
         chomp $record;
         my @lines = split(/\n/, $record);
@@ -59,7 +59,7 @@ sub read_file {
             }
 
             if ( $line =~ /^\W+\/db_xref="taxon:(\d+)"/ ) {
-                $tax = $1;
+                $taxid = $1;
                 next;
             }
 
@@ -87,9 +87,9 @@ sub read_file {
 }
 
 sub print_record {
-    if ( $md5s && $sequence && $id ) {
+    if ( $md5s && $sequence && $id && $taxid ) {
         print $md52seq "$md5s\t$sequence\n";
-        print $md52tax "$md5s\t$tax\n";
+        print $md52tax "$md5s\t$taxid\n";
         print $md52id "$md5s\t$id\n";
     }
 }
