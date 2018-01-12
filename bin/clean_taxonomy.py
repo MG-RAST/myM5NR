@@ -96,6 +96,7 @@ def cleanRank(nodes, root_id):
 
 def cleanLeaf(nodes, root_id):
     removed = defaultdict(int)
+    changed = defaultdict(int)
     nodeIds = nodes.keys()
     for nid in nodeIds:
         if nid not in nodes:
@@ -108,17 +109,21 @@ def cleanLeaf(nodes, root_id):
             continue  
         # make sure leaf rank is correct
         # assume parent rank is correct
-        if nodes[nid]['rank'] in RANKS:
+        currRank = nodes[nid]['rank']
+        if currRank in RANKS:
             continue
         pNode = nodes[nid]['parentNodes'][0]
         pRankIdx = RANKS.index(nodes[pNode]['rank'])
         if pRankIdx == 7:
             del nodes[nid]
-            removed[n['rank']] += 1
+            removed[currRank] += 1
         else:
             nodes[nid]['rank'] = RANKS[pRankIdx+1]
+            changed[currRank] += 1
     for r in removed.keys():
         print "root %s: removed rank: %s, %d nodes"%(root_id, r, removed[r])
+    for c in changed.keys():
+        print "root %s: changed rank: %s, %d nodes"%(root_id, c, changed[c])
 
 def getDescendents(nodes, nid):
     decendents = []
