@@ -2,8 +2,6 @@
 
 # seed annotations
 #
-# extract md52id, md52seq. md52id, id2func
-#
 #a6e173167c03943a8709615b16285845        fig|470865.2.peg.20     Phage protein   44AHJD-like phages Staphylococcus phage SAP-2   SEED    MTEFEEIVKPDDKEPTEEPTEEPTEEPTEDKTVETIEEENKNKLEP..
 #
 # folker@anl.gov
@@ -21,9 +19,10 @@ unless ($filename) {
     exit 1;
 }
 
-open( my $md52id,   '>', 'md52id.txt' )   or die;
-open( my $md52seq,  '>', 'md52seq.txt' )  or die;
-open( my $md52func, '>', 'md52func.txt' ) or die;
+open( my $md52id,   '>', 'md52id.txt' )    or die;
+open( my $md52seq,  '>', 'md52seq.txt' )   or die;
+open( my $md52func, '>', 'md52func.txt' )  or die;
+open( my $md5tax,   '>', 'md52taxid.txt' ) or die;
 
 open( my $fh1, '<', "$filename" ) or die "Cannot open $filename: $!\n";
 
@@ -31,6 +30,8 @@ while ( my $line = <$fh1> ) {
 
     chomp $line;
     my ( $md5, $id, $func, undef, undef, $seq ) = split( /\t/, $line );
+    
+    my $taxid = (split(/\./, (split(/\|/, $id))[1]))[0];
     
     # function cleanup
     $func =~ s/\s+/ /g;
@@ -48,6 +49,7 @@ while ( my $line = <$fh1> ) {
         print $md52id "$md5\t$id\n";
         print $md52seq "$md5\t$seq\n";
         print $md52func "$md5\t$func\n";
+        print $md5tax "$md5\t$taxid\n";
     }
 }
 

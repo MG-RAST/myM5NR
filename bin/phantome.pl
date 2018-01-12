@@ -32,13 +32,12 @@ unless ($filename) {
 my $fh1 = new IO::Uncompress::Gunzip("$filename")
   or die "Cannot open '$filename': $!\n";
 
-open( my $md52id,       '>', 'md52id.txt' )      or die;
-open( my $md5seq,       '>', 'md52seq.txt' )     or die;
-open( my $md5func,      '>', 'md52func.txt' )    or die;
-open( my $md5tax,       '>', 'md52tax.txt' )     or die;
-open( my $id2hierarchy, '>', 'id2hierarchytxt' ) or die;
+open( my $md52id,       '>', 'md52id.txt' )    or die;
+open( my $md5seq,       '>', 'md52seq.txt' )   or die;
+open( my $md5func,      '>', 'md52func.txt' )  or die;
+open( my $md5tax,       '>', 'md52taxid.txt' ) or die;
 
-my ( $id, $md5s, $func, $subsystems, $taxid, $seq );
+my ( $id, $md5s, $func, $taxid, $seq );
 
 while (<$fh1>) {
 
@@ -56,11 +55,10 @@ while (<$fh1>) {
         $line =~ s/^>//g;
         $line =~ s/\]//g;
 
-        my @parts   = split( / \[/, $line );
-        $id         = $parts[0];
-        $func       = $parts[1];
-        $subsystems = $parts[2];
-        $taxid      = $parts[3];
+        my @parts = split(/ \[/, $line);
+        $id       = $parts[0];
+        $func     = $parts[1];
+        $taxid    = (split(/\./, $parts[3]))[0];
     }
     else {
         s/\s+//g;    # remove whitespace
@@ -89,11 +87,6 @@ sub process_record {
         print $md5tax "$md5s\t$taxid\n";
     }
 
-    # print one entry per subsystem record we find
-    foreach my $ss ( split( /; /, $subsystems ) ) {
-        print $id2hierarchy "$id\t$ss\t$func\n";
-    }
-
     # reset the values for the next record
-    ( $id, $md5s, $func, $subsystems, $taxid, $seq ) = ( '', '', '', '', '', '' );
+    ( $id, $md5s, $func, $taxid, $seq ) = ( '', '', '', '', '' );
 }

@@ -19,15 +19,15 @@ unless ($dirname) {
     exit 1;
 }
 
-open( my $md52id,   '>', 'md52id.txt' )   or die;
-open( my $md52seq,  '>', 'md52seq.txt' )  or die;
-open( my $md52func, '>', 'md52func.txt' ) or die;
-open( my $md52tax,  '>', 'md52tax.txt' )  or die;
+open( my $md52id,   '>', 'md52id.txt' )    or die;
+open( my $md52seq,  '>', 'md52seq.txt' )   or die;
+open( my $md52func, '>', 'md52func.txt' )  or die;
+open( my $md52tax,  '>', 'md52taxid.txt' ) or die;
 
 # FOR EACH FILE IN THE DIRECTORY
 opendir( DIR, $dirname ) or die "Could not open $dirname\n";
 
-my ( $id, $md5s, $func, $tax, $seq );
+my ( $id, $md5s, $func, $taxid, $seq );
 
 while ( my $filename = readdir(DIR) ) {
 
@@ -56,9 +56,12 @@ while ( my $filename = readdir(DIR) ) {
             my $line = $_;
             chomp $line;
             
-            ($id, $func, $tax) = split(/   /, $line);
+            ($id, $func, undef) = split(/   /, $line);
 
-            $id = "fig|" . (split( /\|/, $id ))[1];
+            my @subids = split( /\|/, $id );
+            
+            $id = "fig|" . $subids[1];
+            $taxid = (split( /\./, $subids[1] ))[0];
             
             # function cleanup
             $func =~ s/\s+/ /g;
@@ -70,11 +73,6 @@ while ( my $filename = readdir(DIR) ) {
             $func =~ s/\[.+?\]$//;
             $func =~ s/\(.+?\)$//;
             $func =~ s/\s+$//;
-            
-            # tax cleanup
-            $tax = (split( /\|/, $tax ))[0];
-            $tax =~ s/^\[//;
-            $tax =~ s/^\s+|\s+$//g;
         }
         else {
             s/\s+//g;    # remove whitespace
@@ -100,13 +98,13 @@ sub process_record {
     $md5s = md5_hex($seq);
 
     # print the output
-    if ( $seq && $id && $func && $tax ) {
+    if ( $id && $func && $taxid ) {
         print $md52id "$md5s\t$id\n";
         print $md52seq "$md5s\t$seq\n";
         print $md52func "$md5s\t$func\n";
-        print $md52tax "$md5s\t$tax\n";
+        print $md52tax "$md5s\t$taxid\n";
     }
 
     # reset the values for the next record
-    ( $id, $md5s, $func, $tax, $seq ) = ( '', '', '', '', '' );
+    ( $id, $md5s, $func, $taxid, $seq ) = ( '', '', '', '', '' );
 }
