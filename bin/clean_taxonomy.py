@@ -65,17 +65,13 @@ def cleanRank(nodes, root_id):
     for nid in nodeIds:
         if nid not in nodes:
             continue
+        # skip root
         if root_id and (nid == root_id):
             continue
+        # skip leaf nodes
+        if len(nodes[nid]['childNodes']) == 0:
+            continue
         n = nodes[nid]
-        # special case fix strain / species
-        if (len(n['childNodes']) == 0) and (len(n['parentNodes']) == 1) and ('rank' in nodes[n['parentNodes'][0]]):
-            if nodes[n['parentNodes'][0]]['rank'] == 'species':
-                nodes[nid]['rank'] = 'strain'
-                continue
-            if nodes[n['parentNodes'][0]]['rank'] == 'genus':
-                nodes[nid]['rank'] = 'species'
-                continue
         key = checkRank(n)
         if not key:
             continue
@@ -95,8 +91,34 @@ def cleanRank(nodes, root_id):
         del nodes[nid]
         removed[key] += 1
     for r in removed.keys():
-        print "root %s: removed prefix: %s, %d nodes"%(root_id, r, removed[r])
+        print "root %s: removed rank: %s, %d nodes"%(root_id, r, removed[r])
     return nodes
+
+def cleanLeaf(nodes, root_id):
+    removed = defaultdict(int)
+    nodeIds = nodes.keys()
+    for nid in nodeIds:
+        if nid not in nodes:
+            continue
+        # skip root
+        if root_id and (nid == root_id):
+            continue
+        # skip non-leaf
+        if len(nodes[nid]['childNodes']) > 0:
+            continue  
+        # make sure leaf rank is correct
+        # assume parent rank is correct
+        if nodes[nid]['rank'] in RANKS:
+            continue
+        pNode = nodes[nid]['parentNodes'][0]
+        pRankIdx = RANKS.index(nodes[pNode]['rank'])
+        if pRankIdx == 7:
+            del nodes[nid]
+            removed[n['rank']] += 1
+        else:
+            nodes[nid]['rank'] = RANKS[pRankIdx+1]
+    for r in removed.keys():
+        print "root %s: removed rank: %s, %d nodes"%(root_id, r, removed[r])
 
 def getDescendents(nodes, nid):
     decendents = []
@@ -217,7 +239,10 @@ def main(args):
     
     # rank cleanup
     if args.rank:
-        print "[status] cleaning rank ... "
+        print "[status] cleaning ranks ... "
+        for i, n in enumerate(nodes):
+            nodes[i]['nodes'] = cleanRank(n['nodes'], n['rootNode'])
+        print "[status] cleaning leaf rank ... "
         for i, n in enumerate(nodes):
             nodes[i]['nodes'] = cleanRank(n['nodes'], n['rootNode'])
     
