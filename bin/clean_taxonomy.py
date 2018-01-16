@@ -234,6 +234,21 @@ def main(args):
     if len(args.input) > 1:
         root = args.root
     
+    # rank cleanup
+    if args.rank:
+        print "[status] cleaning ranks ... "
+        for i, n in enumerate(nodes):
+            nodes[i]['nodes'] = cleanRank(n['nodes'], n['rootNode'])
+        print "[status] cleaning leaf rank ... "
+        for i, n in enumerate(nodes):
+            nodes[i]['nodes'] = cleanLeaf(n['nodes'], n['rootNode'])
+    
+    # description cleanup
+    if args.desc:
+        print "[status] cleaning descriptions ... "
+        for i, n in enumerate(nodes):
+            nodes[i]['nodes'] = cleanDesc(n['nodes'], n['rootNode'])
+    
     # remove messy branches
     # 'unclassified'
     # 'environmental samples'
@@ -251,21 +266,6 @@ def main(args):
     for i, n in enumerate(nodes):
         print "[status] pruning ... "
         nodes[i]['nodes'] = pruneTree(n['nodes'], n['rootNode'], prune)
-    
-    # rank cleanup
-    if args.rank:
-        print "[status] cleaning ranks ... "
-        for i, n in enumerate(nodes):
-            nodes[i]['nodes'] = cleanRank(n['nodes'], n['rootNode'])
-        print "[status] cleaning leaf rank ... "
-        for i, n in enumerate(nodes):
-            nodes[i]['nodes'] = cleanLeaf(n['nodes'], n['rootNode'])
-    
-    # description cleanup
-    if args.desc:
-        print "[status] cleaning descriptions ... "
-        for i, n in enumerate(nodes):
-            nodes[i]['nodes'] = cleanDesc(n['nodes'], n['rootNode'])
     
     # trim if needed
     if args.no_id:
