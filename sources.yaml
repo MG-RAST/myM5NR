@@ -274,7 +274,7 @@ NCBI-Taxonomy:
       - ftp://ftp.ebi.ac.uk/pub/databases/taxonomy/taxonomy.dat
     parser:
       - ${M5NR_BIN}/parse_taxonomy.py --input ${SOURCE_DIR}/taxonomy.dat --output ${SOURCE_DIR}/taxonomy.json
-      - ${M5NR_BIN}/clean_taxonomy.py --header --rank --format tsv --input ${SOURCE_DIR}/taxonomy.json --output id2hierachy.txt
+      - ${M5NR_BIN}/clean_taxonomy.py --rank --format both --input ${SOURCE_DIR}/taxonomy.json --output taxonomy
 
 PATRIC:
     category: protein

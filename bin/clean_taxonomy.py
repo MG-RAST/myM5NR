@@ -201,8 +201,8 @@ def printBranches(nodes, nid, ofile):
 def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", dest="input", default=[], help="one or more input .json file", action='append')
-    parser.add_argument("-o", "--output", dest="output", default=None, help="output file")
-    parser.add_argument("-f", "--format", dest="format", default='json', help="output format, one of: json, tsv")
+    parser.add_argument("-o", "--output", dest="output", default=None, help="output file prefix")
+    parser.add_argument("-f", "--format", dest="format", default='json', help="output format, one of: json, tsv, both")
     parser.add_argument("-d", "--desc", dest="desc", action="store_true", default=False, help="remove all nodes with no descrption, walk tree from leaf nodes up")
     parser.add_argument("-r", "--rank", dest="rank", action="store_true", default=False, help="remove all nodes without valid rank, connect childern to grandparents")
     parser.add_argument("-p", "--prune", dest="prune", default=None, help="comma seperated list of ids, those ids and all their descendents will be removed from output")
@@ -297,18 +297,21 @@ def main(args):
         data = nodes[0]['nodes']
     
     # output
-    ofile = open(args.output, 'w')
-    if args.format == 'json':
-        print "[status] printing to json ... "
+    if (args.format == 'json') or (args.format == 'both'):
+        ofile = open(args.output+'.json', 'w')
+        print "[status] printing to %s.json ... "%(args.output)
         json.dump(data, ofile, separators=(',',':'))
-    else:
-        print "[status] printing to tsv ... "
+        ofile.close()
+    if (args.format == 'tsv') or (args.format == 'both'):
+        ofile = open(args.output+'.tsv', 'w')
+        print "[status] printing to %s.tsv ... "%(args.output)
         if args.header:
             ofile.write("taxid\t%s\n"%("\t".join(RANKS)))
         for r in data[root]['childNodes']:
             printBranches(data, r, ofile)
-    ofile.close()
-
+        ofile.close()
+    
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
