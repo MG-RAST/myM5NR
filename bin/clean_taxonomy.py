@@ -174,7 +174,7 @@ def printBranches(nodes, nid, ofile):
         rank = nodes[nid]['rank']
         # sanity check
         if rank not in RANKS:
-            print "[error] nodeID (%s) rank (%s)"%(nid, rank)
+            sys.stderr.write("[error] nodeID (%s) rank (%s)\n"%(nid, rank))
             sys.exit(1)
         curDepth = RANKS.index(rank)
         # set global variables
