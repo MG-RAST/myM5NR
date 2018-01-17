@@ -114,7 +114,9 @@ def main(args):
     
     # process set of taxids per md5
     for line in ihdl:
-        (md5, tid) = line.strip().split("\t")
+        parts = line.strip().split("\t")
+        if len(parts) != 2:
+            continue
         if curr is None:
             curr = md5
         if curr != md5:
@@ -126,6 +128,7 @@ def main(args):
             curr = md5
             tids = set()
         tids.add(tid)
+    
     if len(tids) > 0:
         mnum += 1
         lcaStr, lcaId, lvl = getLca(tids)
