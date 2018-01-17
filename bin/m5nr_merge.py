@@ -85,8 +85,11 @@ def main(args):
         sys.stderr.write("directory %s is missing\n"%(parseDir))
         sys.exit(1)
     
+    print "loading taxonomy map"
     taxaMap = json.load(open(args.taxa, 'r'))
+    print "loading function map"
     funcMap = loadFunc(args.func)
+    print "loading levelDB"
     db = leveldb.LevelDB(args.db)
     
     for info in sources:
