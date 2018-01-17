@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
   unzip \
   make \
   python-biopython  \
+  python-leveldb \
   vim \
   curl \
   python3 \ 

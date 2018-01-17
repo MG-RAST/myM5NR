@@ -16,7 +16,7 @@
 #
 # SORT ALPHABETICALLY
 #
-##### protein
+#####
 
 BacMet:
     category: protein
@@ -182,7 +182,7 @@ KEGG:
     comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
     comment2: KO hierarchy from ???
 
-#unique_func.txt
+#id2func.txt
 M5functions:
     category: function
     type: protein
@@ -211,6 +211,7 @@ M5functions:
       - cat ../*/md52func.txt ../*/id2func.txt | cut -f2 | sort -T . -u -o unique_func.txt
       - COUNT=0; while read FUNC; do ((COUNT++)); echo -e "${COUNT}\t${FUNC}"; done < unique_func.txt > id2func.txt
 
+#md52lca.txt
 M5lca:
     category: lca
     type: hierarchical organism annotation
@@ -227,6 +228,19 @@ M5lca:
     parser:
       - cat ../*/md52taxid.txt | sort -T . -u -o md52taxid.txt
       - ${M5NR_BIN}/md52lca.py --taxa ../NCBI-Taxonomy/taxonomy.json --input md52taxid.txt --output md52lca.txt
+
+M5merge:
+    category: all
+    type: all
+    no-download: true
+    depends:
+      - M5functions
+      - M5lca
+      - NCBI-Taxonomy
+      - M5nr
+      - M5rna
+    parser:
+      - ${M5NR_BIN}/m5nr_merge.py --taxa ../NCBI-Taxonomy/taxonomy.json --func ../M5functions/id2func.txt --lca ../M5lca/md52lca.txt --rna_source Greengenes,RDP,SILVA-LSU,SILVA-SSU --protein_source BacMet,CARD,CAZy,COG,EC,EggNOG,GenBank,InterPro,KEGG,PATRIC,PFAM,PhAnToMe,RefSeq,SEED-Annotations,SEED-Subsystems,Swiss-Prot,TrEmble,goslim,motuDB
 
 #M5nr.fasta
 M5nr:
@@ -283,6 +297,7 @@ motuDB:
       - sort -T . -u md52seq.txt > md52seq.txt.sort
       - mv md52seq.txt.sort md52seq.txt
 
+#taxonomy.tsv
 NCBI-Taxonomy:
     category: taxonomy
     type: hierarchical organism annotation
