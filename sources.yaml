@@ -210,6 +210,23 @@ M5functions:
     parser:
       - cat ../*/md52func.txt ../*/id2func.txt | cut -f2 | sort -T . -u -o unique_func.txt
 
+M5lca:
+    category: lca
+    type: hierarchical organism annotation
+    no-download: true
+    depends:
+      - NCBI-Taxonomy
+      - PATRIC
+      - PhAnToMe
+      - RDP
+      - RefSeq
+      - SEED-Annotations
+      - Swiss-Prot
+      - TrEmble
+    parser:
+      - cat ../*/md52taxid.txt | sort -T . -u -o md52taxid.txt
+      - ${M5NR_BIN}/md52lca.py --taxa ../NCBI-Taxonomy/taxonomy.json --input md52taxid.txt --output md52lca.txt
+
 #M5nr.fasta
 M5nr:
     category: fasta
