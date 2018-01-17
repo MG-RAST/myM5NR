@@ -69,16 +69,18 @@ def main(args):
         parser.error("missing taxa")
     if not (args.func and os.path.isfile(args.func)):
         parser.error("missing func")
-    if not (args.rna_source or args.protein_source):
-        parser.error("missing sources")
     if not os.path.isdir(args.db):
         parser.error("invalid dir for LevelDB")
     
     sources = []
-    for rs in args.rna_source.split(","):
-        sources.append((rs, False))
-    for ps in args.protein_source.split(","):
-        sources.append((ps, True))
+    if args.rna_source:
+        for rs in args.rna_source.split(","):
+            sources.append((rs, False))
+    if args.protein_source:
+        for ps in args.protein_source.split(","):
+            sources.append((ps, True))
+    if len(sources) == 0:
+        parser.error("missing sources")
     
     parseDir = os.path.join(os.getcwd(), "Parsed")
     if not os.path.isdir(parseDir):
