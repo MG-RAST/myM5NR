@@ -45,7 +45,7 @@ TAXFILE  = 'md52taxid.txt'
 def loadFunc(ffile):
     func = {}
     fhdl = open(ffile)
-    for line in ihdl:
+    for line in fhdl:
         parts = line.strip().split("\t")
         if len(parts) != 2:
             continue
