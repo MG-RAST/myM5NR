@@ -209,6 +209,7 @@ M5functions:
       - TrEmble
     parser:
       - cat ../*/md52func.txt ../*/id2func.txt | cut -f2 | sort -T . -u -o unique_func.txt
+      - COUNT=0; while read FUNC; do ((COUNT++)); echo -e "${COUNT}\t${FUNC}"; done < unique_func.txt > id2func.txt
 
 M5lca:
     category: lca
