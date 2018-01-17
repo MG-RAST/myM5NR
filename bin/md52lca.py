@@ -43,8 +43,7 @@ def gapFill(branch):
                 filled.append(('unknown '+branch[taxaPos-1]['label'], None))
         return filled
     except:
-        print "[error] can not map branch to ranks"
-        print branch
+        sys.stderr.write("[error] can not map branch to ranks\n")
         sys.exit(1)
 
 def getLca(tids):
@@ -83,15 +82,14 @@ def getLca(tids):
                 break
         return ";".join(lca), tid, lvl
     except:
-        print "[error] with: "+", ".join(tids)
-        print branches
+        sys.stderr.write("[error] with: %s\n"%(", ".join(tids)))
         sys.exit(1)
 
 def main(args):
     global taxa, root
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", dest="input", default=None, help="input file: md5 \\t taxid, sorted by md5")
-    parser.add_argument("-o", "--output", dest="output", default=None, help="output file: md5 \\t lca \\t depth")
+    parser.add_argument("-o", "--output", dest="output", default=None, help="output file: md5 \\t taxid \\t lca \\t depth")
     parser.add_argument("-t", "--taxa", dest="taxa", default=None, help="json format taxonomy file")
     parser.add_argument("-r", "--root", dest="root", action="store_true", default=False, help="if true keep root node in lca, skip otherwise")
     args = parser.parse_args()
@@ -117,6 +115,7 @@ def main(args):
         parts = line.strip().split("\t")
         if len(parts) != 2:
             continue
+        (md5, tid) = parts
         if curr is None:
             curr = md5
         if curr != md5:
