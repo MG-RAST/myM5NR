@@ -63,6 +63,7 @@ def main(args):
     parser.add_argument("-r", "--rna_source", dest="rna_source", default=None, help="list of rna sources to merge")
     parser.add_argument("-p", "--protein_source", dest="protein_source", default=None, help="list of protein sources to merge")
     parser.add_argument("-d", "--db", dest="db", default=".", help="Directory to store LevelDB, default CWD")
+    parser.add_argument("--parsedir", dest="parsedir", default="../", help="Directory containing parsed source dirs")
     args = parser.parse_args()
     
     if not (args.taxa and os.path.isfile(args.taxa)):
@@ -71,6 +72,8 @@ def main(args):
         parser.error("missing func")
     if not os.path.isdir(args.db):
         parser.error("invalid dir for LevelDB")
+    if not os.path.isdir(args.parsedir):
+        parser.error("invalid dir for parsed source dirs")
     
     sources = []
     if args.rna_source:
@@ -81,11 +84,6 @@ def main(args):
             sources.append((ps, True))
     if len(sources) == 0:
         parser.error("missing sources")
-    
-    parseDir = os.path.join(os.getcwd(), "Parsed")
-    if not os.path.isdir(parseDir):
-        sys.stderr.write("directory %s is missing\n"%(parseDir))
-        return 1
     
     print "loading taxonomy map"
     taxaMap = json.load(open(args.taxa, 'r'))
@@ -102,7 +100,7 @@ def main(args):
         (source, isProt) = info
         md5Count = 0
         print "processing source "+source
-        sourceDir = os.path.join(parseDir, source)
+        sourceDir = os.path.join(args.parsedir, source)
         if not os.path.isdir(sourceDir):
             sys.stderr.write("source directory %s is missing, skipping\n"%(sourceDir))
             continue
