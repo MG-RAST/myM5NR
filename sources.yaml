@@ -182,7 +182,7 @@ KEGG:
     comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
     comment2: KO hierarchy from ???
 
-#id2func.txt
+# id2func.txt
 M5functions:
     category: function
     type: protein
@@ -211,7 +211,7 @@ M5functions:
       - cat ../*/md52func.txt ../*/id2func.txt | cut -f2 | sort -T . -u -o unique_func.txt
       - COUNT=0; while read FUNC; do ((COUNT++)); echo -e "${COUNT}\t${FUNC}"; done < unique_func.txt > id2func.txt
 
-#md52lca.txt
+# md52lca.txt
 M5lca:
     category: lca
     type: hierarchical organism annotation
@@ -242,7 +242,7 @@ M5merge:
     parser:
       - ${M5NR_BIN}/m5nr_merge.py --taxa ../NCBI-Taxonomy/taxonomy.json --func ../M5functions/id2func.txt --lca ../M5lca/md52lca.txt --rna_source Greengenes,RDP,SILVA-LSU,SILVA-SSU --protein_source BacMet,CARD,CAZy,COG,EC,EggNOG,GenBank,InterPro,KEGG,PATRIC,PFAM,PhAnToMe,RefSeq,SEED-Annotations,SEED-Subsystems,Swiss-Prot,TrEmble,goslim,motuDB
 
-#M5nr.fasta
+# M5nr.fasta
 M5nr:
     category: fasta
     type: protein
@@ -264,13 +264,12 @@ M5nr:
       - RefSeq
       - SEED-Annotations
       - SEED-Subsystems
-#     - singlecopygenes
       - Swiss-Prot
       - TrEmble
     parser:
       - sort -T . -m -u ../*/md52seq.txt | ${M5NR_BIN}/tab2fasta.pl > m5nr.fasta
 
-#M5rna.fasta
+# M5rna.fasta
 M5rna:
     category: fasta
     type: rna
@@ -297,7 +296,7 @@ motuDB:
       - sort -T . -u md52seq.txt > md52seq.txt.sort
       - mv md52seq.txt.sort md52seq.txt
 
-#taxonomy.tsv
+# taxonomy.tsv taxonomy.json
 NCBI-Taxonomy:
     category: taxonomy
     type: hierarchical organism annotation
@@ -405,20 +404,6 @@ SEED-Subsystems:
       - cut -f1,5 id2hierarchy.txt > id2func.txt
       - sort -T . -u md52seq.txt > md52seq.txt.sort
       - mv md52seq.txt.sort md52seq.txt
-
-# no suitable download mechanism other than manual, does not seem to be updated
-#FOAM:
-#    category: protein
-#    homepage: http://cbb.pnnl.gov/portal/software/FOAM.html
-#    type: hierarchical function annotation
-#    download:
-#      - http://cbb.pnnl.gov/portal/software/FOAM.html
-
-# not enabeled for now
-#singlecopygenes:
-#    category: protein
-#    type: filter set
-#    comment: From Will
 
 SILVA-LSU:
     category: rna
