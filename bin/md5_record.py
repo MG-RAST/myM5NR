@@ -9,7 +9,7 @@ import argparse
 def main(args):
     global taxa, root
     parser = argparse.ArgumentParser()
-    parser.add_argument('md5', dest="md5", default=None, help='md5 to lookup in LevelDB')
+    parser.add_argument('md5', default=None, help='md5 to lookup in LevelDB')
     parser.add_argument("-d", "--db", dest="db", default=".", help="Directory to store LevelDB, default CWD")
     args = parser.parse_args()
     
