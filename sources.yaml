@@ -229,6 +229,7 @@ M5lca:
       - cat ../*/md52taxid.txt | sort -T . -u -o md52taxid.txt
       - ${M5NR_BIN}/md52lca.py --taxa ../NCBI-Taxonomy/taxonomy.json --input md52taxid.txt --output md52lca.txt
 
+# levelDB store
 M5merge:
     category: all
     type: all
