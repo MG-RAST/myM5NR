@@ -85,14 +85,18 @@ def main(args):
     parseDir = os.path.join(os.getcwd(), "Parsed")
     if not os.path.isdir(parseDir):
         sys.stderr.write("directory %s is missing\n"%(parseDir))
-        sys.exit(1)
+        return 1
     
     print "loading taxonomy map"
     taxaMap = json.load(open(args.taxa, 'r'))
     print "loading function map"
     funcMap = loadFunc(args.func)
     print "loading levelDB"
-    db = leveldb.LevelDB(args.db)
+    try:
+        db = leveldb.LevelDB(args.db)
+    except:
+        sys.stderr.write("unable to open LevelDB at %s\n"%(args.db))
+        return 1
     
     for info in sources:
         (source, isProt) = info
