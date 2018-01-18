@@ -25,7 +25,7 @@ def main(args):
         return 1
     
     try:
-        val = db.Get(args.md5)
+        val = json.loads(db.Get(args.md5))
         print json.dumps(val, sort_keys=True, indent=4)
     except KeyError:
         print "md5 %s is not in %s"%(args.md5, args.db)
