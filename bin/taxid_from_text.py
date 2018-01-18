@@ -62,7 +62,7 @@ def main(args):
             tid = taxaStr[name]
         else:
             nameParts = name.split()
-            if nameParts > 1:
+            if len(nameParts) > 1:
                 # try species
                 species = nameParts[0]+' '+nameParts[1]
                 if species in taxaStr:
