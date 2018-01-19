@@ -66,7 +66,7 @@ while (<$fh1>) {
         ( $id, $tax ) = ( $line =~ /^>(\S+)\s(.+)$/ );
         
         # get NCBI taxid
-        my $org = split(/;/, $tax)[-1];
+        my $org = (split(/;/, $tax))[-1];
         if (exists $taxamap{$org}) {
             $taxid = $taxamap{$org};
         } else {

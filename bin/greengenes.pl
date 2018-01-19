@@ -77,7 +77,7 @@ while (<$fh1>) {
                 $taxid = $taxamap{$genus};
             }
         } else {
-            my $org = split(/\s+/, $tax)[0];
+            my $org = (split(/\s+/, $tax))[0];
             if (exists $taxamap{$org}) {
                 $taxid = $taxamap{$org};
             }
