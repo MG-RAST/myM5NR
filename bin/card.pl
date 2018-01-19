@@ -35,11 +35,10 @@ my $fh1 = new IO::Uncompress::Gunzip("$filename")
   or die "Cannot open '$filename': $!\n";
 
 open( my $md52id,   '>', 'md52id.txt' )   or die;
-open( my $md52hier, '>', 'md52hier.txt' ) or die;
 open( my $md52seq,  '>', 'md52seq.txt' )  or die;
 open( my $md52func, '>', 'md52func.txt' ) or die;
 
-my ( $id, $md5s, $func, $card, $seq );
+my ( $id, $md5s, $func, $seq );
 
 while (<$fh1>) {
 
@@ -59,9 +58,10 @@ while (<$fh1>) {
 
         my $line = $_;
         chomp $line;
+        
         my @fields = split(/\|/, $line);
-        $id   = $fields[1];
-        $card = $fields[2];
+        $id = $fields[2];
+        
         my @parts = split(/ \[/, $fields[3]);
         $func = $parts[0];
     }
@@ -85,13 +85,12 @@ sub process_record {
     $md5s = md5_hex($seq);
 
     # print the output
-    if ( $id && $func && $card ) {
+    if ( $id && $func ) {
         print $md52id "$md5s\t$id\n";
         print $md52seq "$md5s\t$seq\n";
         print $md52func "$md5s\t$func\n";
-        print $md52hier "$md5s\t$card\n";
     }
 
     # reset the values for the next record
-    ( $id, $md5s, $func, $card, $seq ) = ( '', '', '', '', '' );
+    ( $id, $md5s, $func, $seq ) = ( '', '', '', '' );
 }
