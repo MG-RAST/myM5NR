@@ -167,7 +167,7 @@ close($fh1);
 exit 0;
 
 sub print_record {
-    if ( $md5s && $sequence && $id && $func && $tax && exists($taxamap{$taxid}) ) {
+    if ( $md5s && $sequence && $id && $func && $tax && exists($taxamap{$tax}) ) {
         print $md52id "$md5s\t$id\n";
         print $md52seq "$md5s\t$sequence\n";
         print $md52func "$md5s\t$func\n";

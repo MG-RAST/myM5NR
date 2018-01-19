@@ -125,7 +125,7 @@ while ( my $filename = readdir(DIR) ) {
 exit 0;
 
 sub print_record {
-    if ( $md5s && $sequence && $id && $func && exists($taxamap{$taxid}) ) {
+    if ( $md5s && $sequence && $id && $func && $tax && exists($taxamap{$tax}) ) {
         print $md52seq "$md5s\t$sequence\n";
         print $md52func "$md5s\t$func\n";
         print $md52tax "$md5s\t$tax\n";
