@@ -16,7 +16,7 @@ Files required:
 Files processed from Source dir:
 
 md52id.txt (required)
-md52func.txt
+md52func.txt or id2func.txt
 md52taxid.txt
 
 Output record:
@@ -40,9 +40,10 @@ md5 : {
 
 IDFILE   = 'md52id.txt'
 FUNCFILE = 'md52func.txt'
+FIDFILE  = 'id2func.txt'
 TAXFILE  = 'md52taxid.txt'
 
-def loadFunc(ffile):
+def loadFunc(ffile, id_key=False):
     func = {}
     fhdl = open(ffile)
     for line in fhdl:
@@ -50,7 +51,10 @@ def loadFunc(ffile):
         if len(parts) != 2:
             continue
         (fid, name) = parts
-        func[name] = int(fid)
+        if id_key:
+            func[fid] = name
+        else:
+            func[name] = int(fid)
     fhdl.close()
     return func
 
@@ -88,7 +92,7 @@ def main(args):
     print "loading taxonomy map"
     taxaMap = json.load(open(args.taxa, 'r'))
     print "loading function map"
-    funcMap = loadFunc(args.func)
+    funcMap = loadFunc(args.func, False)
     print "loading levelDB"
     try:
         db = leveldb.LevelDB(args.db)
@@ -99,6 +103,9 @@ def main(args):
     for info in sources:
         (source, isProt) = info
         md5Count = 0
+        funCount = 0
+        taxCount = 0
+        
         print "processing source "+source
         sourceDir = os.path.join(args.parsedir, source)
         if not os.path.isdir(sourceDir):
@@ -107,11 +114,17 @@ def main(args):
         
         idFile   = os.path.join(sourceDir, IDFILE)
         funcFile = os.path.join(sourceDir, FUNCFILE)
+        fidFile  = os.path.join(sourceDir, FIDFILE)
         taxFile  = os.path.join(sourceDir, TAXFILE)
         
         if not os.path.isfile(idFile):
             sys.stderr.write("md52id file %s is missing, skipping\n"%(idFile))
             continue
+        
+        idFuncMap = {}
+        if (not os.path.isfile(funcFile)) and os.path.isfile(fidFile):
+            print "loading "+fidFile
+            idFuncMap = loadFunc(fidFile, True)
         
         print "loading "+idFile
         ihdl = open(idFile)
@@ -121,6 +134,7 @@ def main(args):
                 continue
             (md5, srcId) = parts
             data = None
+            hasIdFunc = True if (srcId in idFuncMap) and (idFuncMap[srcId] in funcMap) else False
             try:
                 val = db.Get(md5)
             except KeyError:
@@ -135,11 +149,19 @@ def main(args):
                     if a['source'] == source:
                         hasSource = True
                         data['annotation'][i]['accession'].append(srcId)
+                        if hasIdFunc:
+                            if 'function' in a:
+                                data['annotation'][i]['function'].append(idFuncMap[srcId])
+                                data['annotation'][i]['funid'].append(funcMap[idFuncMap[srcId]])
+                            else:
+                                data['annotation'][i]['function'] = [idFuncMap[srcId]]
+                                data['annotation'][i]['funid'] = [funcMap[idFuncMap[srcId]]]
                 if not hasSource:
-                    data['annotation'].append({
-                        'source': source,
-                        'accession': [srcId]
-                    })
+                    ann = { 'source': source, 'accession': [srcId] }
+                    if hasIdFunc:
+                        ann['function'] = [idFuncMap[srcId]]
+                        ann['funid'] = [funcMap[idFuncMap[srcId]]]
+                    data['annotation'].append(ann)
                 data['is_aa'] = isProt
             else:
                 # create new entry
@@ -150,8 +172,13 @@ def main(args):
                         'accession': [srcId]
                     }]
                 }
+                if hasIdFunc:
+                    data['annotation'][0]['function'] = [idFuncMap[srcId]]
+                    data['annotation'][0]['funid'] = [funcMap[idFuncMap[srcId]]]
             if data:
                 md5Count += 1
+                if hasIdFunc:
+                    funCount += 1
                 db.Put(md5, json.dumps(data))
         ihdl.close()
         
@@ -183,6 +210,7 @@ def main(args):
                                 data['annotation'][i]['function'] = [funcName]
                                 data['annotation'][i]['funid'] = [funcMap[funcName]]
                 if data:
+                    funCount += 1
                     db.Put(md5, json.dumps(data))
             fhdl.close()
         
@@ -214,9 +242,12 @@ def main(args):
                                 data['annotation'][i]['organism'] = [taxaMap[taxId]['label']]
                                 data['annotation'][i]['taxid'] = [int(taxId)]
                 if data:
+                    taxCount += 1
                     db.Put(md5, json.dumps(data))
             thdl.close()
-        print "done loading %d md5s for %s"%(md5Count, source)
+        
+        print "done loading %d md5s, %d funcs, %d taxa for %s"%(md5Count, funCount, taxCount, source)
+    # done with source list loop
     
     if args.lca and os.path.isfile(args.lca):
         print "loading LCAs"
