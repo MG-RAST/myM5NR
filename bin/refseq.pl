@@ -15,16 +15,32 @@ use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
 my $dirname = shift @ARGV;
+my $taxafile = shift @ARGV;
 
-unless ($dirname) {
-    print STDERR "Usage: \trefseq.pl <DIRNAME>\n";
+unless ($dirname && $taxafile) {
+    print STDERR "Usage: \trefseq.pl <DIRNAME> <taxafile>\n";
     exit 1;
 }
 
-open( my $md52id,   '>', 'md52id.txt' )   or die;
-open( my $md52seq,  '>', 'md52seq.txt' )  or die;
-open( my $md52func, '>', 'md52func.txt' ) or die;
-open( my $md52tax,  '>', 'md52taxid.txt' )  or die;
+# get NCBI taxa map
+my %taxamap = ();
+open( my $taxahdl, '<', $taxafile ) or die;
+while (my $line = <$taxahdl>) {
+    chomp $line;
+    my @parts = split(/\t/, $line);
+    my $tid   = shift @parts;
+    my $taxa  = pop @parts;
+    while (($taxa eq '-') || ($taxa =~ /^unknown/)) {
+        $taxa = pop @parts;
+    }
+    $taxamap{$tid} = $taxa;
+}
+close($taxahdl);
+
+open( my $md52id,   '>', 'md52id.txt' )    or die;
+open( my $md52seq,  '>', 'md52seq.txt' )   or die;
+open( my $md52func, '>', 'md52func.txt' )  or die;
+open( my $md52tax,  '>', 'md52taxid.txt' ) or die;
 
 # FOR EACH FILE IN THE DIRECTORY
 opendir( DIR, $dirname ) or die "Could not open $dirname\n";
@@ -109,7 +125,7 @@ while ( my $filename = readdir(DIR) ) {
 exit 0;
 
 sub print_record {
-    if ( $md5s && $sequence && $id && $func ) {
+    if ( $md5s && $sequence && $id && $func && exists($taxamap{$taxid}) ) {
         print $md52seq "$md5s\t$sequence\n";
         print $md52func "$md5s\t$func\n";
         print $md52tax "$md5s\t$tax\n";

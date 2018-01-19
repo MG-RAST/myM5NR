@@ -13,11 +13,27 @@ use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 
 my $filename = shift @ARGV;
+my $taxafile = shift @ARGV;
 
-unless ($filename) {
-    print STDERR "Usage: \tseed-annotations.pl <filename>\n";
+unless ($filename && $taxafile) {
+    print STDERR "Usage: \tseed-annotations.pl <filename> <taxafile>\n";
     exit 1;
 }
+
+# get NCBI taxa map
+my %taxamap = ();
+open( my $taxahdl, '<', $taxafile ) or die;
+while (my $line = <$taxahdl>) {
+    chomp $line;
+    my @parts = split(/\t/, $line);
+    my $tid   = shift @parts;
+    my $taxa  = pop @parts;
+    while (($taxa eq '-') || ($taxa =~ /^unknown/)) {
+        $taxa = pop @parts;
+    }
+    $taxamap{$tid} = $taxa;
+}
+close($taxahdl);
 
 open( my $md52id,   '>', 'md52id.txt' )    or die;
 open( my $md52seq,  '>', 'md52seq.txt' )   or die;
@@ -45,7 +61,7 @@ while ( my $line = <$fh1> ) {
     $func =~ s/\s+$//;
 
     # print the output
-    if ( $md5 && $id && $func && $seq ) {
+    if ( $md5 && $id && $func && $seq && $taxid && exists($taxamap{$taxid}) ) {
         print $md52id "$md5\t$id\n";
         print $md52seq "$md5\t$seq\n";
         print $md52func "$md5\t$func\n";

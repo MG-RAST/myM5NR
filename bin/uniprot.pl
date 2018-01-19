@@ -22,11 +22,27 @@ use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
 my $filename = shift @ARGV;
+my $taxafile = shift @ARGV;
 
-unless ($filename) {
-    print STDERR "Usage: \tuniprot.pl <filename> \n";
+unless ($filename && $taxafile) {
+    print STDERR "Usage: \tuniprot.pl <filename> <taxafile>\n";
     exit 1;
 }
+
+# get NCBI taxa map
+my %taxamap = ();
+open( my $taxahdl, '<', $taxafile ) or die;
+while (my $line = <$taxahdl>) {
+    chomp $line;
+    my @parts = split(/\t/, $line);
+    my $tid   = shift @parts;
+    my $taxa  = pop @parts;
+    while (($taxa eq '-') || ($taxa =~ /^unknown/)) {
+        $taxa = pop @parts;
+    }
+    $taxamap{$tid} = $taxa;
+}
+close($taxahdl);
 
 my $fh1 = new IO::Uncompress::Gunzip("$filename") or die "Cannot open '$filename': $!\n";
 
@@ -67,7 +83,7 @@ while ( my $record = <$fh1> ) {
             next;
         }
 
-        if ( $line =~ /^OX\W+NCBI_TaxID=(\d+);/ ) {
+        if ( $line =~ /^OX\W+NCBI_TaxID=(\d+)/ ) {
             $tax = $1;
             next;
         }
@@ -151,12 +167,12 @@ close($fh1);
 exit 0;
 
 sub print_record {
-    if ( $md5s && $sequence && $id ) {
+    if ( $md5s && $sequence && $id && $func && $tax && exists($taxamap{$taxid}) ) {
         print $md52id "$md5s\t$id\n";
         print $md52seq "$md5s\t$sequence\n";
-
-        print $md52func "$md5s\t$func\n"        if ( $func   ne "" );
-        print $md52tax "$md5s\t$tax\n"          if ( $tax    ne "" );
+        print $md52func "$md5s\t$func\n";
+        print $md52tax "$md5s\t$tax\n";
+        # optional id mappings
         print $md52id_ipr "$md5s\t$ipr\n"       if ( $ipr    ne "" );
         print $md52id_cog "$md5s\t$cog\n"       if ( $cog    ne "" );
         print $md52id_eggnog "$md5s\t$eggnog\n" if ( $eggnog ne "" );
@@ -165,6 +181,5 @@ sub print_record {
         print $md52id_go "$md5s\t$go\n"         if ( $go     ne "" );
         print $md52id_cazy "$md5s\t$cazy\n"     if ( $cazy   ne "" );
         print $md52id_ec "$md5s\t$ec\n"         if ( $ec     ne "" );
-        print $md52tax "$md5s\t$tax\n"          if ( $tax    ne "" );
     }
 }

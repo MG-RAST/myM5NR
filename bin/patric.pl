@@ -13,9 +13,10 @@ use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 
 my $dirname = shift @ARGV;
+my $taxafile = shift @ARGV;
 
-unless ($dirname) {
-    print STDERR "Usage: \tpatric.pl <DIRNAME>\n";
+unless ($dirname && $taxafile) {
+    print STDERR "Usage: \tpatric.pl <DIRNAME> <taxafile>\n";
     exit 1;
 }
 
@@ -23,6 +24,21 @@ open( my $md52id,   '>', 'md52id.txt' )    or die;
 open( my $md52seq,  '>', 'md52seq.txt' )   or die;
 open( my $md52func, '>', 'md52func.txt' )  or die;
 open( my $md52tax,  '>', 'md52taxid.txt' ) or die;
+
+# get NCBI taxa map
+my %taxamap = ();
+open( my $taxahdl, '<', $taxafile ) or die;
+while (my $line = <$taxahdl>) {
+    chomp $line;
+    my @parts = split(/\t/, $line);
+    my $tid   = shift @parts;
+    my $taxa  = pop @parts;
+    while (($taxa eq '-') || ($taxa =~ /^unknown/)) {
+        $taxa = pop @parts;
+    }
+    $taxamap{$tid} = $taxa;
+}
+close($taxahdl);
 
 # FOR EACH FILE IN THE DIRECTORY
 opendir( DIR, $dirname ) or die "Could not open $dirname\n";
@@ -98,7 +114,7 @@ sub process_record {
     $md5s = md5_hex($seq);
 
     # print the output
-    if ( $id && $func && $taxid ) {
+    if ( $id && $func && $taxid && exists($taxamap{$taxid}) ) {
         print $md52id "$md5s\t$id\n";
         print $md52seq "$md5s\t$seq\n";
         print $md52func "$md5s\t$func\n";

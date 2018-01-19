@@ -22,20 +22,36 @@ use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
 my $filename = shift @ARGV;
+my $taxafile = shift @ARGV;
 
-unless ($filename) {
-    print STDERR "Usage: \tmotudb.pl <filename1> \n";
+unless ($filename && $taxafile) {
+    print STDERR "Usage: \tmotudb.pl <filename1> <taxafile>\n";
     print STDERR " \te.g. motudb.pl mOTU.v1.padded	\n";
     exit 1;
 }
 
+# get NCBI taxa map
+my %taxamap = ();
+open( my $taxahdl, '<', $taxafile ) or die;
+while (my $line = <$taxahdl>) {
+    chomp $line;
+    my @parts = split(/\t/, $line);
+    my $tid   = shift @parts;
+    my $taxa  = pop @parts;
+    while (($taxa eq '-') || ($taxa =~ /^unknown/)) {
+        $taxa = pop @parts;
+    }
+    $taxamap{$tid} = $taxa;
+}
+close($taxahdl);
+
 my $fh1 = new IO::Uncompress::Gunzip("$filename")
   or die "Cannot open '$filename': $!\n";
 
-open( my $md52id,       '>', 'md52id.txt' )    or die;
-open( my $md5seq,       '>', 'md52seq.txt' )   or die;
-open( my $md5func,      '>', 'md52func.txt' )  or die;
-open( my $md5tax,       '>', 'md52taxid.txt' ) or die;
+open( my $md52id,  '>', 'md52id.txt' )    or die;
+open( my $md5seq,  '>', 'md52seq.txt' )   or die;
+open( my $md5func, '>', 'md52func.txt' )  or die;
+open( my $md5tax,  '>', 'md52taxid.txt' ) or die;
 
 my ( $id, $md5s, $func, $taxid, $seq );
 
@@ -80,7 +96,7 @@ sub process_record {
     $md5s = md5_hex($seq);
 
     # print the output
-    if ( $id && $func && $taxid ) {
+    if ( $id && $func && $taxid && exists($taxamap{$taxid}) ) {
         print $md52id "$md5s\t$id\n";
         print $md5seq "$md5s\t$seq\n";
         print $md5func "$md5s\t$func\n";

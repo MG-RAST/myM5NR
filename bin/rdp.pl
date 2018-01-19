@@ -17,11 +17,27 @@ use IO::Uncompress::Gunzip;
 my $filename1 = shift @ARGV;
 my $filename2 = shift @ARGV;
 my $filename3 = shift @ARGV;
+my $taxafile  = shift @ARGV;
 
-unless ( $filename1 && $filename2 && $filename3 ) {
-    print STDERR "Usage: \trdp.pl <filename1> <filename2> <filename3>\n";
+unless ( $filename1 && $filename2 && $filename3 && $taxafile ) {
+    print STDERR "Usage: \trdp.pl <filename1> <filename2> <filename3> <taxafile>\n";
     exit 1;
 }
+
+# get NCBI taxa map
+my %taxamap = ();
+open( my $taxahdl, '<', $taxafile ) or die;
+while (my $line = <$taxahdl>) {
+    chomp $line;
+    my @parts = split(/\t/, $line);
+    my $tid   = shift @parts;
+    my $taxa  = pop @parts;
+    while (($taxa eq '-') || ($taxa =~ /^unknown/)) {
+        $taxa = pop @parts;
+    }
+    $taxamap{$tid} = $taxa;
+}
+close($taxahdl);
 
 open( my $md52id,  '>', 'md52id.txt' )     or die;
 open( my $md52seq, '>', 'md52rnaseq.txt' ) or die;
@@ -87,7 +103,7 @@ sub read_file {
 }
 
 sub print_record {
-    if ( $md5s && $sequence && $id && $taxid ) {
+    if ( $md5s && $sequence && $id && $taxid && exists($taxamap{$taxid}) ) {
         print $md52seq "$md5s\t$sequence\n";
         print $md52tax "$md5s\t$taxid\n";
         print $md52id "$md5s\t$id\n";
