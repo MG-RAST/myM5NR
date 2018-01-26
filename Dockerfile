@@ -1,8 +1,5 @@
 
-
-
 # docker build -t mgrast/m5nr-build .
-
 
 FROM ubuntu:16.04
 
@@ -15,17 +12,23 @@ RUN apt-get update && apt-get install -y \
   unzip \
   make \
   python-biopython  \
-  python-leveldb \
   vim \
   curl \
-  python3 \ 
-  python3-pip 
+  python-pip \
+  python3 \
+  python3-pip
 
+RUN git clone https://github.com/google/leveldb.git && \
+  cd leveldb/ && \
+  make && \
+  cp out-static/lib* out-shared/lib* /usr/local/lib/ && \
+  cd include/ && \
+  cp -r leveldb /usr/local/include/ && \
+  ldconfig
 
-RUN pip3 install --upgrade pip && pip3 install \
-  PrettyTable \
-  pyyaml
+RUN pip2 install plyvel
 
+RUN pip3 install PrettyTable pyyaml
 
 # install the SEED environment for Subsystem data download
 RUN mkdir -p /sas/ && \
