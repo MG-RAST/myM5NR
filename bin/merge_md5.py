@@ -9,9 +9,9 @@ import argparse
 Input files, md5 per line in each file match.
 Input is sorted by md5, may have mutliple line with same md5.
 
-md52id.txt (required)
-md52func.txt or id2func.txt
-md52taxid.txt
+md52id.sort.txt (required)
+md52func.sort.txt or id2func.txt
+md52taxid.sort.txt
 
 Output line:
 
@@ -27,10 +27,10 @@ md52annotation.txt
 
 """
 
-IDFILE   = 'md52id.txt'
-FUNCFILE = 'md52func.txt'
+IDFILE   = 'md52id.sort.txt'
+FUNCFILE = 'md52func.sort.txt'
 FIDFILE  = 'id2func.txt'
-TAXFILE  = 'md52taxid.txt'
+TAXFILE  = 'md52taxid.sort.txt'
 OUTFILE  = 'md52annotation.txt'
 
 def emptyData():
@@ -110,12 +110,12 @@ def main(args):
         if fhdl:
             (fmd5, func) = fhdl.next().strip().split("\t")
             if fmd5 == md5:
-                data[fmd5]['function'].append(func)
+                data['function'].append(func)
         
         if thdl:
             (tmd5, tid) = thdl.next().strip().split("\t")
             if tmd5 == md5:
-                data[tmd5]['taxid'].append(tid)
+                data['taxid'].append(tid)
     
     if len(data) > 0:
         mCount += 1
