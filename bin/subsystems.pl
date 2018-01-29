@@ -99,6 +99,9 @@ while ( my $line = <MD5HIER> ) {
 close(MD5ID);
 close(MD5HIER);
 
+# cleanup
+unlink 'md52hierarchy.txt';
+
 print STDOUT "Done.\n";
 
 exit 0;

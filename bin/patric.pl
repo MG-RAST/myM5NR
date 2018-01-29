@@ -114,7 +114,7 @@ sub process_record {
     $md5s = md5_hex($seq);
 
     # print the output
-    if ( $id && $func && $taxid && exists($taxamap{$taxid}) ) {
+    if ( $md5s && $id && $func && $taxid && exists($taxamap{$taxid}) ) {
         print $md52id "$md5s\t$id\n";
         print $md52seq "$md5s\t$seq\n";
         print $md52func "$md5s\t$func\n";
