@@ -55,21 +55,30 @@ def loadFunc(fidfile):
 
 def main(args):
     parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--dir", dest="dir", default=".", help="Directory containing md5 sorted files, default is CWD.")
     args = parser.parse_args()
     
-    if not os.path.isfile(IDFILE):
-        sys.stderr.write("missing required file: %s\n"%(IDFILE))
+    if not os.path.isdir(args.dir):
+        parser.error("invalid dir for input files")
+    
+    idFile   = os.path.join(args.dir, IDFILE)
+    funcFile = os.path.join(args.dir, FUNCFILE)
+    fidFile  = os.path.join(args.dir, FIDFILE)
+    taxFile  = os.path.join(args.dir, TAXFILE)
+    
+    if not os.path.isfile(idFile):
+        sys.stderr.write("missing required file: %s\n"%(idFile))
         return 1
         
     idFuncMap = {}
-    if (not os.path.isfile(FUNCFILE)) and os.path.isfile(FIDFILE):
-        print "loading "+FIDFILE
-        idFuncMap = loadFunc(FIDFILE)
+    if (not os.path.isfile(funcFile)) and os.path.isfile(fidFile):
+        print "loading "+fidFile
+        idFuncMap = loadFunc(fidFile)
     
-    ihdl = open(IDFILE)
-    fhdl = open(FUNCFILE) if os.path.isfile(FUNCFILE) else None
-    thdl = open(TAXFILE) if os.path.isfile(TAXFILE) else None
-    ohdl = open(OUTFILE, 'w')
+    ihdl = open(idFile)
+    fhdl = open(funcFile) if os.path.isfile(funcFile) else None
+    thdl = open(taxFile) if os.path.isfile(taxFile) else None
+    ohdl = open(os.path.join(args.dir, OUTFILE), 'w')
     curr = None
     data = emptyData()
     
