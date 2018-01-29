@@ -82,6 +82,14 @@ def main(args):
     curr = None
     data = emptyData()
     
+    mCount = 0
+    pFiles = [idFile]
+    if fhdl:
+        pFiles.append(funcFile)
+    if thdl:
+        pFiles.append(taxFile)
+    print "Parsing: %s\n"%(", ".join(pFiles))
+    
     for line in ihdl:
         (md5, srcId) = line.strip().split("\t")
         hasIdFunc = True if srcId in idFuncMap else False
@@ -90,6 +98,7 @@ def main(args):
             curr = md5
         if curr != md5:
             # process batch
+            mCount += 1
             ohdl.write("%s\t%s\n"%(curr, json.dumps(data, separators=(',',':'), sort_keys=True)))
             curr = md5
             data = emptyData()
@@ -109,8 +118,10 @@ def main(args):
                 data[tmd5]['taxid'].append(tid)
     
     if len(data) > 0:
+        mCount += 1
         ohdl.write("%s\t%s\n"%(curr, json.dumps(data, separators=(',',':'), sort_keys=True)))
     
+    print "Done parsing %d md5s\n"%(mCount)
     ohdl.close()
     ihdl.close()
     if fhdl:
