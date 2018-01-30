@@ -85,9 +85,13 @@ def execute_command(command, env):
     return last_line
 
 
-def create_environment(source_obj):
+def create_environment(source_obj, ignore_error=False):
    
     new_environment = os.environ.copy()
+    new_environment['TODAY'] = datetime.date.today().isoformat()
+    new_environment['M5NR_BIN'] = bin_dir
+    new_environment['CURL_OPTS'] = CURL_OPTS
+    
     if 'env' in source_obj:
         env_obj = source_obj['env']
         for key in env_obj:
@@ -95,18 +99,16 @@ def create_environment(source_obj):
             try:
                 value_evaluated  = execute_command(value, None)
             except Exception as e:
-                raise MyException("execute_command failed: %s" % (e))
+                if ignore_error:
+                    sys.stderr.write("warning: execute_command for key %s failed: %s\n"%(key, str(e)))
+                    continue
+                else:
+                    raise MyException("execute_command for key %s failed: %s" %(key, str(e)))
             
             if args.debug:
-                print("%s=%s" % (key, value_evaluated))    
+                print("%s=%s" % (key, value_evaluated))
             new_environment[key]=value_evaluated
     
-    
-    new_environment['TODAY'] = datetime.date.today().isoformat()
-    new_environment['M5NR_BIN'] = bin_dir
-    new_environment['CURL_OPTS'] = CURL_OPTS
-    
-        
     return new_environment
 
 def download_source(directory, source_name):
@@ -364,12 +366,9 @@ def get_remote_versions(sources):
         if not 'version' in source_obj: 
             continue
         
-        try:
-            new_environment = create_environment(source_obj)
-        except Exception as e:
-            raise MyException("create_environment failed: %s" % (str(e)))
+        new_environment = create_environment(source_obj, True)
+        command = source_obj['version']
         
-        command  = source_obj['version']
         try:
             version = execute_command(command, new_environment)
         except Exception as e:
