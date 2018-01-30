@@ -290,16 +290,10 @@ def parse_source(directory, source_name, source_directory):
     
     if 'parser' in source_obj:
         
-        try:
-            new_environment = create_environment(source_obj)
-        except Exception as e:
-            raise MyException("create_environment failed: %s" % (e))
-        
-        
+        new_environment = create_environment(source_obj, True)
+
         new_environment['SOURCE_DIR'] = source_directory
         new_environment['VERSION'] = version
-        
-        
         
         command_array = []
         something  = source_obj['parser']
