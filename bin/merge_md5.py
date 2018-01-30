@@ -126,7 +126,7 @@ def main(args):
         if hasTAXA:
             (tmd5, tid) = thdl.next().strip().split("\t")
             if tmd5 == md5:
-                data['taxid'].append(tid)
+                data['taxid'].append(int(tid))
     
     if len(data) > 0:
         mCount += 1
