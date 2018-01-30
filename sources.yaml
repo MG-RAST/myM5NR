@@ -28,8 +28,9 @@ BacMet:
       - unzip -o ${SOURCE_DIR}/BacMet1.1.zip -d ${SOURCE_DIR}
       - ${M5NR_BIN}/bacmet.pl ${SOURCE_DIR}/BacMet_EXP.704.fasta ${SOURCE_DIR}/BacMet_PRE.*.fasta
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52func.sort.txt md52func.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52func.sort.txt md52func.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 CARD:
     category: protein
@@ -42,8 +43,9 @@ CARD:
       - ${M5NR_BIN}/card.pl ${SOURCE_DIR}/protein_fasta_protein_homolog_model.fasta
       - ${M5NR_BIN}/obo2hierarchy.pl ${SOURCE_DIR}/aro.obo
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52func.sort.txt md52func.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52func.sort.txt md52func.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 CAZy:
     category: protein
@@ -58,6 +60,7 @@ CAZy:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_cazy.txt ../TrEmble/md52id_cazy.txt
       - ${M5NR_BIN}/create-cazy-hierarchy.pl --input md52id.sort.txt > id2hierarchy.txt
       - cut -f1,3 id2hierarchy.txt > id2func.txt
+      - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
 
 COG:
@@ -75,6 +78,7 @@ COG:
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > ${SOURCE_DIR}/id_mapper.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
       - cut -f1,4 id2hierarchy.txt > id2func.txt
+      - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
 
 EC:
@@ -93,6 +97,7 @@ EC:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ec.txt ../TrEmble/md52id_ec.txt
       - ${M5NR_BIN}/create-ec-hierarchy.pl --class ${SOURCE_DIR}/enzclass.txt --input ${SOURCE_DIR}/enzyme.dat > id2hierarchy.txt
       - cut -f1,5 id2hierarchy.txt > id2func.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 EggNOG:
     category: protein
@@ -110,6 +115,7 @@ EggNOG:
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > ${SOURCE_DIR}/id_mapper.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
       - cut -f1,4 id2hierarchy.txt > id2func.txt
+      - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
 
 GenBank:
@@ -121,8 +127,9 @@ GenBank:
     parser:
       - ${M5NR_BIN}/genbank.pl ${SOURCE_DIR}/nr.gz
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52func.sort.txt md52func.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52func.sort.txt md52func.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 goslim:
     category: protein
@@ -139,6 +146,7 @@ goslim:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_go.txt ../TrEmble/md52id_go.txt
       - ${M5NR_BIN}/goslim.pl ${SOURCE_DIR}/goslim_metagenomics.obo
       - cut -f1,4 id2hierarchy.txt > id2func.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 Greengenes:
     category: rna
@@ -152,8 +160,9 @@ Greengenes:
     parser:
       - ${M5NR_BIN}/greengenes.pl ${SOURCE_DIR}/current_GREENGENES_gg16S_unaligned.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 InterPro:
     category: protein
@@ -167,6 +176,7 @@ InterPro:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ipr.txt ../TrEmble/md52id_ipr.txt
       - cp ${SOURCE_DIR}/names.dat id2func.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 KEGG:
     category: protein
@@ -179,8 +189,7 @@ KEGG:
       - TrEmble
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_kegg.txt ../TrEmble/md52id_kegg.txt
-    comment: kegg EC and KO mappings obtained from UniProt, KEGG maps from KEGG
-    comment2: KO hierarchy from ???
+      - ${M5NR_BIN}/merge_md5.py
 
 # id2func.txt
 M5functions:
@@ -228,7 +237,7 @@ M5lca:
       - sort -T . -m -u -o md52taxid.all.txt ../*/md52taxid.sort.txt
       - ${M5NR_BIN}/md52lca.py --taxa ../NCBI-Taxonomy/taxonomy.json --input md52taxid.all.txt --output md52lca.txt
 
-# levelDB store
+# berkeleyDB store
 M5merge:
     category: all
     type: all
@@ -240,7 +249,7 @@ M5merge:
       - M5nr
       - M5rna
     parser:
-      - ${M5NR_BIN}/m5nr_merge.py --taxa ../NCBI-Taxonomy/taxonomy.json --func ../M5functions/id2func.txt --lca ../M5lca/md52lca.txt --rna_source Greengenes,RDP,SILVA-LSU,SILVA-SSU --protein_source BacMet,CARD,CAZy,COG,EC,EggNOG,GenBank,InterPro,KEGG,PATRIC,PFAM,PhAnToMe,RefSeq,SEED-Annotations,SEED-Subsystems,Swiss-Prot,TrEmble,goslim,motuDB
+      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --func ../M5functions/id2func.txt --lca ../M5lca/md52lca.txt --rna_source Greengenes,RDP,SILVA-LSU,SILVA-SSU --protein_source BacMet,CARD,CAZy,COG,EC,EggNOG,GenBank,InterPro,KEGG,PATRIC,PFAM,PhAnToMe,RefSeq,SEED-Annotations,SEED-Subsystems,Swiss-Prot,TrEmble,goslim,motuDB
 
 # M5nr.fasta
 M5nr:
@@ -295,6 +304,7 @@ motuDB:
       - ${M5NR_BIN}/motudb.pl ${SOURCE_DIR}/mOTU.v${VERSION}.padded
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -u -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 # taxonomy.tsv taxonomy.json
 NCBI-Taxonomy:
@@ -319,9 +329,10 @@ PATRIC:
     parser:
       - ${M5NR_BIN}/patric.pl ${SOURCE_DIR}/ ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52func.sort.txt md52func.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52func.sort.txt md52func.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 PFAM:
     category: protein
@@ -336,13 +347,14 @@ PFAM:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_pfam.txt ../TrEmble/md52id_pfam.txt
       - zcat ${SOURCE_DIR}/Pfam-A.clans.tsv.gz | cut -f1,5 > id2func.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 PhAnToMe:
     category: protein
     type: function annotation
     homepage: http://www.phantome.org
     env:
-        TIMESTAMP: curl -s http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
+        TIMESTAMP: curl ${CURL_OPTS} http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
     version: date -d @${TIMESTAMP} +"%Y%m%d"
     depends:
       - NCBI-Taxonomy
@@ -352,9 +364,10 @@ PhAnToMe:
     parser:
       - ${M5NR_BIN}/phantome.pl ${SOURCE_DIR}/phage_proteins_${TIMESTAMP}.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52func.sort.txt md52func.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52func.sort.txt md52func.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 RDP:
     category: rna
@@ -373,8 +386,9 @@ RDP:
     parser:
       - ${M5NR_BIN}/rdp.pl ${SOURCE_DIR}/current_Fungi_unaligned.gb.gz ${SOURCE_DIR}/current_Bacteria_unaligned.gb.gz ${SOURCE_DIR}/current_Archaea_unaligned.gb.gz  ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 RefSeq:
     category: protein
@@ -389,9 +403,10 @@ RefSeq:
     parser:
       - ${M5NR_BIN}/refseq.pl ${SOURCE_DIR} ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52func.sort.txt md52func.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52func.sort.txt md52func.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 SEED-Annotations:
     category: protein
@@ -405,9 +420,10 @@ SEED-Annotations:
     parser:
       - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52func.sort.txt md52func.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52func.sort.txt md52func.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 SEED-Subsystems:
     category: protein
@@ -421,7 +437,8 @@ SEED-Subsystems:
       - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
       - cut -f1,5 id2hierarchy.txt > id2func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 SILVA-LSU:
     category: rna
@@ -435,8 +452,9 @@ SILVA-LSU:
     parser:
       - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 SILVA-SSU:
     category: rna
@@ -450,8 +468,9 @@ SILVA-SSU:
     parser:
       - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 Swiss-Prot:
     category: protein
@@ -464,9 +483,10 @@ Swiss-Prot:
     parser:
       - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_sprot.dat.gz ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52func.sort.txt md52func.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52func.sort.txt md52func.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py
 
 TrEmble:
     category: protein
@@ -479,6 +499,7 @@ TrEmble:
     parser:
       - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_trembl.dat.gz ../NCBI-Taxonomy/taxonomy.tsv
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52func.sort.txt md52func.txt
-      - sort -T . -u -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
+      - sort -T . -o md52func.sort.txt md52func.txt
+      - sort -T . -o md52taxid.sort.txt md52taxid.txt
+      - sort -T . -o md52id.sort.txt md52id.txt
+      - ${M5NR_BIN}/merge_md5.py

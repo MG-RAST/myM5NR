@@ -32,13 +32,17 @@ FUNCFILE = 'md52func.sort.txt'
 FIDFILE  = 'id2func.txt'
 TAXFILE  = 'md52taxid.sort.txt'
 OUTFILE  = 'md52annotation.txt'
+hasFUNC  = False
+hasFID   = False
+hasTAXA  = False
 
 def emptyData():
-    return {
-        'accession': [],
-        'function': [],
-        'taxid': []
-    }
+    d = {'accession': []}
+    if hasFUNC or hasFID:
+        d['function'] = []
+    if hasTAXA:
+        d['taxid'] = []
+    return d
 
 def loadFunc(fidfile):
     func = {}
@@ -54,6 +58,7 @@ def loadFunc(fidfile):
 
 
 def main(args):
+    global hasFUNC, hasFID, hasTAXA
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--dir", dest="dir", default=".", help="Directory containing md5 sorted files, default is CWD.")
     args = parser.parse_args()
@@ -69,33 +74,38 @@ def main(args):
     if not os.path.isfile(idFile):
         sys.stderr.write("missing required file: %s\n"%(idFile))
         return 1
+    if os.path.isfile(funcFile):
+        hasFUNC = True
+    if os.path.isfile(fidFile):
+        hasFID = True
+    if os.path.isfile(taxFile):
+        hasTAXA = True
         
     idFuncMap = {}
-    if (not os.path.isfile(funcFile)) and os.path.isfile(fidFile):
+    if (not hasFUNC) and hasFID:
         print "loading "+fidFile
         idFuncMap = loadFunc(fidFile)
     
     ihdl = open(idFile)
-    fhdl = open(funcFile) if os.path.isfile(funcFile) else None
-    thdl = open(taxFile) if os.path.isfile(taxFile) else None
+    fhdl = open(funcFile) if hasFUNC else None
+    thdl = open(taxFile) if hasTAXA else None
     ohdl = open(os.path.join(args.dir, OUTFILE), 'w')
     curr = None
     data = emptyData()
     
     mCount = 0
     pFiles = [idFile]
-    if fhdl:
+    if hasFUNC:
         pFiles.append(funcFile)
-    if thdl:
+    if hasTAXA:
         pFiles.append(taxFile)
     print "Parsing: %s\n"%(", ".join(pFiles))
     
     for line in ihdl:
         (md5, srcId) = line.strip().split("\t")
-        hasIdFunc = True if srcId in idFuncMap else False
-        
         if curr is None:
             curr = md5
+        
         if curr != md5:
             # process batch
             mCount += 1
@@ -104,15 +114,16 @@ def main(args):
             data = emptyData()
         
         data['accession'].append(srcId)
-        if hasIdFunc:
-            data['function'].append(idFuncMap[srcId])
         
-        if fhdl:
+        if hasFUNC:
             (fmd5, func) = fhdl.next().strip().split("\t")
             if fmd5 == md5:
                 data['function'].append(func)
         
-        if thdl:
+        if hasFID and (srcId in idFuncMap):
+            data['function'].append(idFuncMap[srcId])
+        
+        if hasTAXA:
             (tmd5, tid) = thdl.next().strip().split("\t")
             if tmd5 == md5:
                 data['taxid'].append(tid)
@@ -124,9 +135,9 @@ def main(args):
     print "Done parsing %d md5s\n"%(mCount)
     ohdl.close()
     ihdl.close()
-    if fhdl:
+    if hasFUNC:
         fhdl.close()
-    if thdl:
+    if hasTAXA:
         thdl.close()
     
     return 0
