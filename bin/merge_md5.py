@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import argparse
+from collections import defaultdict
 
 """
 Input files, md5 per line in each file match.
@@ -60,7 +61,8 @@ def loadFunc(fidfile):
 def main(args):
     global hasFUNC, hasFID, hasTAXA
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--dir", dest="dir", default=".", help="Directory containing md5 sorted files, default is CWD.")
+    parser.add_argument("--dir", dest="dir", default=".", help="Directory containing md5 sorted files, default is CWD.")
+    parser.add_argument("--idonly", dest="idonly", default=".", help="If true keep annotations with only IDs, default is skip them.")
     args = parser.parse_args()
     
     if not os.path.isdir(args.dir):
@@ -91,7 +93,7 @@ def main(args):
     thdl = open(taxFile) if hasTAXA else None
     ohdl = open(os.path.join(args.dir, OUTFILE), 'w')
     curr = None
-    data = emptyData()
+    data = defaultdict(list)
     
     mCount = 0
     pFiles = [idFile]
@@ -108,10 +110,11 @@ def main(args):
         
         if curr != md5:
             # process batch
-            mCount += 1
-            ohdl.write("%s\t%s\n"%(curr, json.dumps(data, separators=(',',':'), sort_keys=True)))
+            if args.idonly or (len(data) > 1):
+                mCount += 1
+                ohdl.write("%s\t%s\n"%(curr, json.dumps(data, separators=(',',':'), sort_keys=True)))
             curr = md5
-            data = emptyData()
+            data = defaultdict(list)
         
         data['accession'].append(srcId)
         
