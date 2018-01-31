@@ -62,7 +62,7 @@ def main(args):
     global hasFUNC, hasFID, hasTAXA
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", dest="dir", default=".", help="Directory containing md5 sorted files, default is CWD.")
-    parser.add_argument("--idonly", dest="idonly", default=".", help="If true keep annotations with only IDs, default is skip them.")
+    parser.add_argument("--idonly", dest="idonly", action="store_true", default=False, help="If true keep annotations with only IDs, default is skip them.")
     args = parser.parse_args()
     
     if not os.path.isdir(args.dir):
@@ -131,7 +131,7 @@ def main(args):
             if tmd5 == md5:
                 data['taxid'].append(int(tid))
     
-    if len(data) > 0:
+    if (args.idonly and (len(data) > 0)) or (len(data) > 1):
         mCount += 1
         ohdl.write("%s\t%s\n"%(curr, json.dumps(data, separators=(',',':'), sort_keys=True)))
     
