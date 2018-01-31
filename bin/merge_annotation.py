@@ -7,6 +7,7 @@ import copy
 import plyvel
 import bsddb
 import argparse
+from datetime import datetime
 
 """
 Files required:
@@ -141,6 +142,7 @@ def main(args):
     IsProtein = True if args.dbtype == 'protein' else False
     IsLevelDB = True if args.dbtype == 'levelDB' else False
     
+    print "start opening files: "+str(datetime.now())
     for src in args.source.split(","):
         annFile = os.path.join(args.parsedir, src, ANNFILE)
         if os.path.isfile(annFile):
@@ -168,7 +170,7 @@ def main(args):
     lcaSet  = nextLCA(lcaHdl)
     allSets = map(lambda x: nextSet(x[1]), Sources)
     
-    print "parsing source files"
+    print "start parsing source files / load DB: "+str(datetime.now())
     while moreSets(allSets):
         # get minimal md5
         minMd5 = getMinMd5(allSets)
@@ -191,6 +193,7 @@ def main(args):
     for src in Sources:
         src[1].close()
     
+    print "done parsing / loading: "+str(datetime.now())
     print "%d md5 annotations loaded to %s"%(mCount, args.db)
     return 0
 
