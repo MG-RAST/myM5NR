@@ -59,7 +59,6 @@ def loadFunc(ffile, id_key=False):
     return func
 
 def main(args):
-    global taxa, root
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--taxa", dest="taxa", default=None, help="json format taxonomy file for name-id mapping")
     parser.add_argument("-f", "--func", dest="func", default=None, help="tsv format function file for name-id mapping")

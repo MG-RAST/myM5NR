@@ -30,6 +30,7 @@ BacMet:
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52func.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 CARD:
@@ -45,6 +46,7 @@ CARD:
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52func.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 CAZy:
@@ -129,6 +131,7 @@ GenBank:
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52func.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 goslim:
@@ -162,6 +165,7 @@ Greengenes:
       - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 InterPro:
@@ -304,6 +308,7 @@ motuDB:
       - ${M5NR_BIN}/motudb.pl ${SOURCE_DIR}/mOTU.v${VERSION}.padded
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -u -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 # taxonomy.tsv taxonomy.json
@@ -332,6 +337,7 @@ PATRIC:
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 PFAM:
@@ -367,6 +373,7 @@ PhAnToMe:
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 RDP:
@@ -388,6 +395,7 @@ RDP:
       - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 RefSeq:
@@ -406,6 +414,7 @@ RefSeq:
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 SEED-Annotations:
@@ -423,6 +432,7 @@ SEED-Annotations:
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 SEED-Subsystems:
@@ -438,6 +448,7 @@ SEED-Subsystems:
       - cut -f1,5 id2hierarchy.txt > id2func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 SILVA-LSU:
@@ -454,6 +465,7 @@ SILVA-LSU:
       - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 SILVA-SSU:
@@ -470,6 +482,7 @@ SILVA-SSU:
       - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 Swiss-Prot:
@@ -486,6 +499,7 @@ Swiss-Prot:
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
 
 TrEmble:
@@ -502,4 +516,5 @@ TrEmble:
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
       - sort -T . -o md52id.sort.txt md52id.txt
+      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
       - ${M5NR_BIN}/merge_md5.py
