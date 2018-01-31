@@ -99,7 +99,7 @@ def main(args):
         pFiles.append(funcFile)
     if hasTAXA:
         pFiles.append(taxFile)
-    print "Parsing: %s\n"%(", ".join(pFiles))
+    print "Parsing: %s"%(", ".join(pFiles))
     
     for line in ihdl:
         (md5, srcId) = line.strip().split("\t")
@@ -132,7 +132,7 @@ def main(args):
         mCount += 1
         ohdl.write("%s\t%s\n"%(curr, json.dumps(data, separators=(',',':'), sort_keys=True)))
     
-    print "Done parsing %d md5s\n"%(mCount)
+    print "Done parsing %d md5s"%(mCount)
     ohdl.close()
     ihdl.close()
     if hasFUNC:
