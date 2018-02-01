@@ -7,6 +7,7 @@ import copy
 import plyvel
 import bsddb
 import argparse
+from datetime import datetime
 
 """
 Output record:
@@ -58,6 +59,7 @@ def main(args):
     
     ohdl = open(args.output, 'w')
     
+    print "start reading %s: %s"%(args.db, str(datetime.now()))
     count = 0;
     if IsLevelDB:
         for key, value in db:
@@ -72,6 +74,7 @@ def main(args):
             except:
                 break
     
+    print "done reading: "+str(datetime.now())
     print "found %d keys"%(count)
     db.close()
     ohdl.close()
