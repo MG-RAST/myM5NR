@@ -78,6 +78,14 @@ def mergeAnn(md5, info, lca):
             data['ann'].append(d)
     return data
 
+def mergeMd5Sources(oldAnn, annData):
+    newData = copy.deepcopy(oldAnn)
+    currSources = map(lambda x: x['source'], newData['ann'])
+    for ann in annData['ann']:
+        if ann['source'] not in currSources:
+            newData['ann'].append(ann)
+    return newData
+
 def nextLCA(fhdl):
     if not fhdl:
         return [ None, None, None ]
@@ -173,8 +181,20 @@ def main(args):
         # get minimal md5
         minMd5 = getMinMd5(allSets)
         mCount += 1
-        # insert the data
+        # merge across sources
         annData = mergeAnn(minMd5, allSets, lcaSet)
+        if args.append:
+            # merge source data with DB data
+            try:
+                if IsLevelDB:
+                    oldAnn = db.get(minMd5)
+                else:
+                    oldAnn = db[minMd5]
+            except KeyError:
+                oldAnn = None
+            if oldAnn:
+                annData = mergeMd5Sources(oldAnn, annData)
+        # insert the data
         if IsLevelDB:
             db.put(minMd5, json.dumps(annData))
         else:
