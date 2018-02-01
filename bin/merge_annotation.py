@@ -120,7 +120,7 @@ def main(args):
     parser.add_argument("-s", "--source", dest="source", default=None, help="list of sources to merge")
     parser.add_argument("--srctype", dest="srctype", default=None, help="source type, one of: rna or protein")
     parser.add_argument("-d", "--db", dest="db", default=None, help="DB path")
-    parser.add_argument("--dbtype", dest="dbtype", default="berkeleyDB", help="DB type, one of: berkeleyDB or levelDB")
+    parser.add_argument("--dbtype", dest="dbtype", default=None, help="DB type, one of: berkeleyDB or levelDB")
     parser.add_argument("--parsedir", dest="parsedir", default="../", help="Directory containing parsed source dirs")
     args = parser.parse_args()
     
@@ -132,7 +132,7 @@ def main(args):
         parser.error("invalid DB type")
     if (args.dbtype == 'levelDB') and (not os.path.isdir(args.db)):
         parser.error("invalid dir for levelDB")
-    if (args.dbtype == 'berkeleyDB') and (not os.path.isfile(args.db)):
+    if (args.dbtype == 'berkeleyDB') and (not args.db):
         parser.error("invalid file for berkeleyDB")
     if not os.path.isdir(args.parsedir):
         parser.error("invalid dir for parsed source dirs")
