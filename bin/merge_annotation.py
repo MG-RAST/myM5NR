@@ -24,16 +24,16 @@ Output record:
 
 md5 : {
   is_aa: bool,
-  lca: [ text ],
-  lcaid: int
+  lca: [ text ],  # optional
+  lcaid: int      # optional
   ann: [
     {
       source: text,
       accession: [ text ],
-      function: [ text ],
-      organism: [ text ],
-      funid: [ int ],
-      taxid: [ int ]
+      function: [ text ],  # optional
+      organism: [ text ],  # optional
+      funid: [ int ],      # optional
+      taxid: [ int ]       # optional
     }
   ]
 }
@@ -121,6 +121,7 @@ def main(args):
     parser.add_argument("-d", "--db", dest="db", default=None, help="DB path")
     parser.add_argument("--dbtype", dest="dbtype", default=None, help="DB type, one of: berkeleyDB or levelDB")
     parser.add_argument("--parsedir", dest="parsedir", default="../", help="Directory containing parsed source dirs")
+    parser.add_argument("--append", dest="append", action="store_true", default=False, help="add new sources to existing md5s in DB, default is to overwrite")
     args = parser.parse_args()
     
     if not args.source:

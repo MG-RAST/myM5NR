@@ -18,8 +18,8 @@ Output line:
 
 md5 : {
     accession: [ text ],
-    function: [ text ],
-    taxid: [ int ]
+    function: [ text ],  # optional
+    taxid: [ int ]       # optional
 }
 
 Output file:

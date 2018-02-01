@@ -253,7 +253,7 @@ M5merge:
       - M5nr
       - M5rna
     parser:
-      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --srctype rna --source Greengenes,RDP,SILVA-LSU,SILVA-SSU --dbtype berkeleyDB --db m5nr.bdb
+      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --srctype rna --source Greengenes,RDP,SILVA-LSU,SILVA-SSU --dbtype levelDB --db m5nr.ldb
       - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --func ../M5functions/id2func.txt --srctype protein --source BacMet,CARD,CAZy,COG,EC,EggNOG,GenBank,InterPro,KEGG,PATRIC,PFAM,PhAnToMe,RefSeq,SEED-Annotations,SEED-Subsystems,Swiss-Prot,TrEmble,goslim,motuDB --dbtype berkeleyDB --db m5nr.bdb
 
 # M5nr.fasta
