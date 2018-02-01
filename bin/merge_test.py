@@ -68,7 +68,7 @@ def main(args):
     else:
         while True:
             try:
-                (key, value) = db.next
+                (key, value) = db.next()
                 ohdl.write(key+"\n")
                 count += 1
             except:
