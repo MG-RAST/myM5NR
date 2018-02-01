@@ -71,14 +71,16 @@ def mergeAnn(md5, info, lca):
         if info[i][0] == md5:
             d = copy.deepcopy(info[i][1])
             d['source'] = Sources[i][0]
-            if 'function' in d:
+            if ('function' in d) and FuncMap:
                 d['funid'] = map(lambda f: FuncMap[f], d['function'])
-            if 'taxid' in d:
+            if ('taxid' in d) and TaxaMap:
                 d['organism'] = map(lambda t: TaxaMap[str(t)]['label'], d['taxid'])
             data['ann'].append(d)
     return data
 
 def nextLCA(fhdl):
+    if not fhdl:
+        return [ None, None, None ]
     try:
         line = fhdl.next()
         parts = line.strip().split("\t")
@@ -88,6 +90,8 @@ def nextLCA(fhdl):
         return [ None, None, None ]
 
 def nextSet(fhdl):
+    if not fhdl:
+        return [ None, None ]
     try:
         line = fhdl.next()
         (md5, ann) = line.strip().split("\t")
@@ -120,12 +124,6 @@ def main(args):
     parser.add_argument("--parsedir", dest="parsedir", default="../", help="Directory containing parsed source dirs")
     args = parser.parse_args()
     
-    if not (args.taxa and os.path.isfile(args.taxa)):
-        parser.error("missing taxa")
-    if not (args.func and os.path.isfile(args.func)):
-        parser.error("missing func")
-    if not (args.lca and os.path.isfile(args.lca)):
-        parser.error("missing lca")
     if not args.source:
         parser.error("missing source")
     if (args.srctype != 'rna') and (args.srctype != 'protein'):
@@ -151,9 +149,9 @@ def main(args):
     SrcSize = len(Sources)
     
     print "loading taxonomy map"
-    TaxaMap = json.load(open(args.taxa, 'r'))
+    TaxaMap = json.load(open(args.taxa, 'r')) if args.taxa else {}
     print "loading function map"
-    FuncMap = loadFunc(args.func)
+    FuncMap = loadFunc(args.func) if args.func else {}
     
     print "loading "+args.dbtype
     try:
@@ -166,7 +164,7 @@ def main(args):
         return 1
     
     mCount  = 0
-    lcaHdl  = open(args.lca, 'r')
+    lcaHdl  = open(args.lca, 'r') if args.lca else None
     lcaSet  = nextLCA(lcaHdl)
     allSets = map(lambda x: nextSet(x[1]), Sources)
     
