@@ -84,7 +84,6 @@ def nextLCA(fhdl):
     try:
         line = fhdl.next()
         parts = line.strip().split("\t")
-        annData = json.loads(ann)
         return [ parts[0], parts[1], filter(lambda x: x != '-', parts[2].split(";")) ]
     except StopIteration:
         return [ None, None, None ]
@@ -155,7 +154,7 @@ def main(args):
     
     print "loading "+args.dbtype
     try:
-        if isLevelDB:
+        if IsLevelDB:
             db = plyvel.DB(args.db, create_if_missing=True)
         else:
             db = bsddb.hashopen(args.db, 'c')
