@@ -27,6 +27,7 @@ BacMet:
     parser:
       - unzip -o ${SOURCE_DIR}/BacMet1.1.zip -d ${SOURCE_DIR}
       - ${M5NR_BIN}/bacmet.pl ${SOURCE_DIR}/BacMet_EXP.704.fasta ${SOURCE_DIR}/BacMet_PRE.*.fasta
+      - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52id.sort.txt md52id.txt
@@ -43,6 +44,7 @@ CARD:
       - tar -xjf ${SOURCE_DIR}/data -C ${SOURCE_DIR}
       - ${M5NR_BIN}/card.pl ${SOURCE_DIR}/protein_fasta_protein_homolog_model.fasta
       - ${M5NR_BIN}/obo2hierarchy.pl ${SOURCE_DIR}/aro.obo
+      - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52id.sort.txt md52id.txt
@@ -62,6 +64,7 @@ CAZy:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_cazy.txt ../TrEmble/md52id_cazy.txt
       - ${M5NR_BIN}/create-cazy-hierarchy.pl --input md52id.sort.txt > id2hierarchy.txt
       - cut -f1,3 id2hierarchy.txt > id2func.txt
+      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
 
@@ -80,6 +83,7 @@ COG:
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > ${SOURCE_DIR}/id_mapper.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
       - cut -f1,4 id2hierarchy.txt > id2func.txt
+      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
 
@@ -99,6 +103,7 @@ EC:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ec.txt ../TrEmble/md52id_ec.txt
       - ${M5NR_BIN}/create-ec-hierarchy.pl --class ${SOURCE_DIR}/enzclass.txt --input ${SOURCE_DIR}/enzyme.dat > id2hierarchy.txt
       - cut -f1,5 id2hierarchy.txt > id2func.txt
+      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
 
 EggNOG:
@@ -117,6 +122,7 @@ EggNOG:
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > ${SOURCE_DIR}/id_mapper.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
       - cut -f1,4 id2hierarchy.txt > id2func.txt
+      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
 
@@ -128,6 +134,7 @@ GenBank:
     version: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
     parser:
       - ${M5NR_BIN}/genbank.pl ${SOURCE_DIR}/nr.gz
+      - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52id.sort.txt md52id.txt
@@ -149,6 +156,7 @@ goslim:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_go.txt ../TrEmble/md52id_go.txt
       - ${M5NR_BIN}/goslim.pl ${SOURCE_DIR}/goslim_metagenomics.obo
       - cut -f1,4 id2hierarchy.txt > id2func.txt
+      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
 
 Greengenes:
@@ -180,6 +188,7 @@ InterPro:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ipr.txt ../TrEmble/md52id_ipr.txt
       - cp ${SOURCE_DIR}/names.dat id2func.txt
+      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
 
 KEGG:
@@ -221,7 +230,7 @@ M5functions:
       - TrEmble
     parser:
       - cat ../*/md52func.sort.txt ../*/id2func.txt | cut -f2 | sort -T . -u -o unique_func.txt
-      - COUNT=0; while read FUNC; do ((COUNT++)); echo -e "${COUNT}\t${FUNC}"; done < unique_func.txt > id2func.txt
+      - COUNT=0; while read FUNC; do ((COUNT++)); echo "${COUNT}"$'\t'"${FUNC}"; done < unique_func.txt > id2func.txt
 
 # md52lca.txt
 M5lca:
@@ -254,7 +263,7 @@ M5merge:
       - M5rna
     parser:
       - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --srctype rna --source Greengenes,RDP,SILVA-LSU,SILVA-SSU --dbtype levelDB --db m5nr.ldb
-      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --func ../M5functions/id2func.txt --srctype protein --source BacMet,CARD,CAZy,COG,EC,EggNOG,GenBank,InterPro,KEGG,PATRIC,PFAM,PhAnToMe,RefSeq,SEED-Annotations,SEED-Subsystems,Swiss-Prot,TrEmble,goslim,motuDB --dbtype berkeleyDB --db m5nr.bdb
+      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --func ../M5functions/id2func.txt --srctype protein --source BacMet,CARD,CAZy,COG,EC,EggNOG,GenBank,InterPro,KEGG,PATRIC,PFAM,PhAnToMe,RefSeq,SEED-Annotations,SEED-Subsystems,Swiss-Prot,TrEmble,goslim,motuDB --dbtype berkeleyDB --db m5nr.ddb
 
 # M5nr.fasta
 M5nr:
@@ -334,6 +343,7 @@ PATRIC:
     download-command: ${M5NR_BIN}/download_PATRIC.sh
     parser:
       - ${M5NR_BIN}/patric.pl ${SOURCE_DIR}/ ../NCBI-Taxonomy/taxonomy.tsv
+      - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
@@ -354,6 +364,7 @@ PFAM:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_pfam.txt ../TrEmble/md52id_pfam.txt
       - zcat ${SOURCE_DIR}/Pfam-A.clans.tsv.gz | cut -f1,5 > id2func.txt
+      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
 
 PhAnToMe:
@@ -370,6 +381,7 @@ PhAnToMe:
     comment: curl ${CURL_OPTS} "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
     parser:
       - ${M5NR_BIN}/phantome.pl ${SOURCE_DIR}/phage_proteins_${TIMESTAMP}.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
+      - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
@@ -411,6 +423,7 @@ RefSeq:
     resume-download: true
     parser:
       - ${M5NR_BIN}/refseq.pl ${SOURCE_DIR} ../NCBI-Taxonomy/taxonomy.tsv
+      - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
@@ -429,6 +442,7 @@ SEED-Annotations:
     resume-download: true
     parser:
       - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org ../NCBI-Taxonomy/taxonomy.tsv
+      - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
@@ -447,6 +461,7 @@ SEED-Subsystems:
     parser:
       - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
       - cut -f1,5 id2hierarchy.txt > id2func.txt
+      - sed -i s'/\\//g' id2func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52id.sort.txt md52id.txt
       - rm -fv md52seq.txt md52id.txt
@@ -496,6 +511,7 @@ Swiss-Prot:
       - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
     parser:
       - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_sprot.dat.gz ../NCBI-Taxonomy/taxonomy.tsv
+      - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
@@ -513,6 +529,7 @@ TrEmble:
       - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
     parser:
       - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_trembl.dat.gz ../NCBI-Taxonomy/taxonomy.tsv
+      - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
       - sort -T . -o md52taxid.sort.txt md52taxid.txt
