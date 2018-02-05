@@ -64,6 +64,10 @@ while (<$fh1>) {
         
         my @parts = split(/ \[/, $fields[3]);
         $func = $parts[0];
+        $func =~ s/^\s+|\s+$//g;
+        $func =~ s/^'|'$//g;
+        $func =~ s/^"|"$//g;
+        $func =~ s/^\s+|\s+$//g;
     }
     else {
         s/\s+//g;    # remove whitespace

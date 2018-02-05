@@ -44,6 +44,10 @@ while (my $record = <INFILE>) {
         }
         if ($line =~ /^DE\s+(.+)\.$/) {
             $desc = $1;
+            $desc =~ s/^\s+|\s+$//g;
+            $desc =~ s/^'|'$//g;
+            $desc =~ s/^"|"$//g;
+            $desc =~ s/^\s+|\s+$//g;
             next;
         }
     }

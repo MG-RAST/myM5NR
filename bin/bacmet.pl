@@ -53,6 +53,8 @@ while (<$fh1>) {
         }
 
 #>BAC0002|abeS|tr|Q2FD83|Q2FD83_ACIBA QacEdelta1 SMR family efflux pump OS=Acinetobacter baumannii GN=qacEdelta1 PE=3 SV=1
+#>BAC0290|opmD/nmpC|sp|P37592|OMPD_SALTY Outer membrane porin protein OmpD OS=Salmonella typhimurium (strain LT2 / SGSC1412 / ATCC 700720) GN=ompD PE=1 SV=2
+
         my $line = $_;
         $line =~ s/^>//g;
 
@@ -61,6 +63,10 @@ while (<$fh1>) {
         my $pos = index( $line, ' ' );    # find first space in string
         $func = substr( $line, $pos );
         ($func) = ( $func =~ /(.+)\W+OS=.+/ );
+        $func =~ s/^\s+|\s+$//g;
+        $func =~ s/^'|'$//g;
+        $func =~ s/^"|"$//g;
+        $func =~ s/^\s+|\s+$//g;
     }
     else {
         s/\s+//g;                         # remove whitespace
@@ -88,11 +94,15 @@ while (<$fh2>) {
         }
 
 #>gi|118471459|ref|YP_889645.1| cadA gene product [Mycobacterium smegmatis str. MC2 155] [ctpD:Chr:Cobalt (Co), Nickel (Ni)]
+
         my $line = $_;
         my @parts = split( /\|/, $line );
 
         $id = $parts[1];
         $func = ( split( /\[/, $parts[-1] ) )[0];
+        $func =~ s/^\s+|\s+$//g;
+        $func =~ s/^'|'$//g;
+        $func =~ s/^"|"$//g;
         $func =~ s/^\s+|\s+$//g;
     }
     else {

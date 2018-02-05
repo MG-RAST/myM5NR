@@ -49,6 +49,10 @@ while ( my $record = <$fh1> ) {
         }
         if ( $line =~ /^name.\W+(.*)/ ) {
             $name = $1;
+            $name =~ s/^\s+|\s+$//g;
+            $name =~ s/^'|'$//g;
+            $name =~ s/^"|"$//g;
+            $name =~ s/^\s+|\s+$//g;
             next;
         }
         if ( $line =~ /^namespace.\W+(\w+)/ ) {

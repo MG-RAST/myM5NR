@@ -47,6 +47,14 @@ open(INFILE, "<$input") || die "Can't open file $input\n";
 while (my $line = <INFILE>) {
     chomp $line;
     my ($id, $key, $func) = split(/\t/, $line);
+    $func =~ s/^\s+|\s+$//g;
+    $func =~ s/^'|'$//g;
+    $func =~ s/^"|"$//g;
+    $func =~ s/^\s+|\s+$//g;
+    $func =~ s/\{.+?\}$//;
+    $func =~ s/\[.+?\]$//;
+    $func =~ s/\(.+?\)$//;
+    $func =~ s/\s+$//;
     if (exists $nog->{$key}) {
         # ID, level 1, level 2, level 3
         print STDOUT $id."\t".$nog->{$key}[0]."\t".$nog->{$key}[1]."\t".$func."\n";
