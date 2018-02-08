@@ -64,6 +64,7 @@ CAZy:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_cazy.txt ../TrEmble/md52id_cazy.txt
       - ${M5NR_BIN}/create-cazy-hierarchy.pl --input md52id.sort.txt > id2hierarchy.txt
       - cut -f1,3 id2hierarchy.txt > id2func.txt
+      - sed -i s'/[\d128-\d255]//g' id2func.txt
       - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
@@ -188,6 +189,7 @@ InterPro:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ipr.txt ../TrEmble/md52id_ipr.txt
       - cp ${SOURCE_DIR}/names.dat id2func.txt
+      - sed -i s'/[\d128-\d255]//g' id2func.txt
       - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
 
@@ -364,6 +366,7 @@ PFAM:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_pfam.txt ../TrEmble/md52id_pfam.txt
       - zcat ${SOURCE_DIR}/Pfam-A.clans.tsv.gz | cut -f1,5 > id2func.txt
+      - sed -i s'/[\d128-\d255]//g' id2func.txt
       - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
 
@@ -460,8 +463,8 @@ SEED-Subsystems:
     resume-download: true
     parser:
       - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
+      - sed -i s'/\\//g' id2hierarchy.txt
       - cut -f1,5 id2hierarchy.txt > id2func.txt
-      - sed -i s'/\\//g' id2func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52id.sort.txt md52id.txt
       - rm -fv md52seq.txt md52id.txt

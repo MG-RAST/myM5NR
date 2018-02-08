@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Getopt::Long;
 
+my %good = map {$_=>1} (32..127);
+
 my $usage = "$0 --input <EC genbank file> --class <EC class file>\n";
 my $input = '';
 my $class = '';
@@ -44,6 +46,7 @@ while (my $record = <INFILE>) {
         }
         if ($line =~ /^DE\s+(.+)\.$/) {
             $desc = $1;
+            $desc =~ s/(.)/$good{ord($1)} ? $1 : ''/eg;
             $desc =~ s/^\s+|\s+$//g;
             $desc =~ s/^'|'$//g;
             $desc =~ s/^"|"$//g;

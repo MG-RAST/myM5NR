@@ -12,6 +12,8 @@ use warnings;
 use Data::Dumper qw(Dumper);
 use Digest::MD5 qw (md5_hex);
 
+my %good = map {$_=>1} (32..127);
+
 my $filename = shift @ARGV;
 my $taxafile = shift @ARGV;
 
@@ -50,6 +52,7 @@ while ( my $line = <$fh1> ) {
     my $taxid = (split(/\./, (split(/\|/, $id))[1]))[0];
     
     # function cleanup
+    $func =~ s/(.)/$good{ord($1)} ? $1 : ''/eg;
     $func =~ s/\s+/ /g;
     $func =~ s/^\s+|\s+$//g;
     $func =~ s/^'|'$//g;

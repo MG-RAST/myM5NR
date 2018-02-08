@@ -16,6 +16,8 @@ use warnings;
 use Data::Dumper qw(Dumper);
 use Digest::MD5 qw(md5_hex);
 
+my %good = map {$_=>1} (32..127);
+
 my $dirname = shift @ARGV;
 
 unless ($dirname) {
@@ -48,6 +50,8 @@ while ( defined( my $filename = readdir($dirh) ) ) {
         $ss1  =~ s/^\s+|\s+$//g;
         $ss2  =~ s/^\s+|\s+$//g;
         $ss3  =~ s/^\s+|\s+$//g;
+        $role =~ s/(.)/$good{ord($1)} ? $1 : ''/eg;
+        $role =~ s/\s+/ /g;
         $role =~ s/^\s+|\s+$//g;
         $role =~ s/^'|'$//g;
         $role =~ s/^"|"$//g;

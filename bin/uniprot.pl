@@ -21,6 +21,8 @@ use Digest::MD5 qw (md5_hex);
 use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
+my %good = map {$_=>1} (32..127);
+
 my $filename = shift @ARGV;
 my $taxafile = shift @ARGV;
 
@@ -90,9 +92,11 @@ while ( my $record = <$fh1> ) {
 
         if ( $line =~ /^DE\W+\w+Name:\W+Full=(.+);/ ) {
             $func = $1;
+            $func =~ s/(.)/$good{ord($1)} ? $1 : ''/eg;
             # remove embedded IDs or organisms at end
             $func =~ s/\{.+?\}$//;
             $func =~ s/\[.+?\]$//;
+            $func =~ s/\(.+?\)$//;
             # do we have non-informative descriptions
             if ($func =~ /\|/) {
                 $func = '';

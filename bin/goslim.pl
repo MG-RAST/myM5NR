@@ -16,6 +16,8 @@ use IO::Uncompress::Gunzip;
 
 use Getopt::Long;
 
+my %good = map {$_=>1} (32..127);
+
 my $Swiss_prot_file;
 my $TrEmble_file;
 my $verbose;
@@ -49,6 +51,7 @@ while ( my $record = <$fh1> ) {
         }
         if ( $line =~ /^name.\W+(.*)/ ) {
             $name = $1;
+            $name =~ s/(.)/$good{ord($1)} ? $1 : ''/eg;
             $name =~ s/^\s+|\s+$//g;
             $name =~ s/^'|'$//g;
             $name =~ s/^"|"$//g;

@@ -21,6 +21,8 @@ use Digest::MD5 qw (md5_hex);
 use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
+my %good = map {$_=>1} (32..127);
+
 my $filename = shift @ARGV;
 my $taxafile = shift @ARGV;
 
@@ -75,6 +77,18 @@ while (<$fh1>) {
         $id       = $parts[0];
         $func     = $parts[1];
         $taxid    = (split(/\./, $parts[3]))[0];
+        
+        # function cleanup
+        $func =~ s/(.)/$good{ord($1)} ? $1 : ''/eg;
+        $func =~ s/\s+/ /g;
+        $func =~ s/^\s+|\s+$//g;
+        $func =~ s/^'|'$//g;
+        $func =~ s/^"|"$//g;
+        $func =~ s/^\s+|\s+$//g;
+        $func =~ s/\{.+?\}$//;
+        $func =~ s/\[.+?\]$//;
+        $func =~ s/\(.+?\)$//;
+        $func =~ s/\s+$//;
     }
     else {
         s/\s+//g;    # remove whitespace

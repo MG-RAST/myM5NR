@@ -14,6 +14,8 @@ use Digest::MD5 qw (md5_hex);
 use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
+my %good = map {$_=>1} (32..127);
+
 my $dirname = shift @ARGV;
 my $taxafile = shift @ARGV;
 
@@ -62,6 +64,7 @@ while ( my $filename = readdir(DIR) ) {
         if ( $record =~ /\nDEFINITION\W+(.*?)\[.*\]\./s ) {
             $func = $1;
             # collapse whitespace, remove newlines
+            $func =~ s/(.)/$good{ord($1)} ? $1 : ''/eg;
             $func =~ s/\s+/ /gs;
             # clean terms
             $func =~ s/MULTISPECIES://g;

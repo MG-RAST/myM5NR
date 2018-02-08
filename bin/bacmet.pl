@@ -19,6 +19,7 @@ use IO::Compress::Gzip qw(gzip $GzipError);
 use IO::Uncompress::Gunzip;
 
 # the main trick is to read the document record by record
+my %good = map {$_=>1} (32..127);
 
 my $filename     = shift @ARGV;
 my $filename_pre = shift @ARGV;
@@ -63,6 +64,7 @@ while (<$fh1>) {
         my $pos = index( $line, ' ' );    # find first space in string
         $func = substr( $line, $pos );
         ($func) = ( $func =~ /(.+)\W+OS=.+/ );
+        $func =~ s/(.)/$good{ord($1)} ? $1 : ''/eg;
         $func =~ s/^\s+|\s+$//g;
         $func =~ s/^'|'$//g;
         $func =~ s/^"|"$//g;

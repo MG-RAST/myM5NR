@@ -72,9 +72,21 @@ def mergeAnn(md5, info, lca):
             d = copy.deepcopy(info[i][1])
             d['source'] = Sources[i][0]
             if ('function' in d) and FuncMap:
-                d['funid'] = map(lambda f: FuncMap[f], d['function'])
+                if 'funid' not in d:
+                    d['funid'] = []
+                for f in d['function']:
+                    if f not in FuncMap:
+                        print "[warning] function %s missing for %s %s"%(f, Sources[i][0], md5)
+                    else:
+                        d['funid'].append(FuncMap[f])
             if ('taxid' in d) and TaxaMap:
-                d['organism'] = map(lambda t: TaxaMap[str(t)]['label'], d['taxid'])
+                if 'organism' not in d:
+                    d['organism'] = []
+                for t in d['taxid']:
+                    if str(t) not in TaxaMap:
+                        print "[warning] taxonomy %d missing for %s %s"%(t, Sources[i][0], md5)
+                    else:
+                        d['organism'].append(TaxaMap[str(t)]['label'])
             data['ann'].append(d)
     return data
 

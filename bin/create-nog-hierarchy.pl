@@ -31,6 +31,7 @@ my $nog = {
     R => ["POORLY CHARACTERIZED", "General function prediction only"],
     S => ["POORLY CHARACTERIZED", "Function unknown"]
 };
+my %good = map {$_=>1} (32..127);
 
 my $usage = "$0 --input <tabbed file: ID, key, function>\n";
 my $input = '';
@@ -47,6 +48,7 @@ open(INFILE, "<$input") || die "Can't open file $input\n";
 while (my $line = <INFILE>) {
     chomp $line;
     my ($id, $key, $func) = split(/\t/, $line);
+    $func =~ s/(.)/$good{ord($1)} ? $1 : ''/eg;
     $func =~ s/^\s+|\s+$//g;
     $func =~ s/^'|'$//g;
     $func =~ s/^"|"$//g;
