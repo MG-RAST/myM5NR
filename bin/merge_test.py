@@ -64,6 +64,7 @@ def main(args):
     if args.keys and os.path.isfile(args.keys):
         ihdl = open(args.keys, 'r')
         for key in ihdl:
+            key.strip()
             if IsLevelDB:
                 value = db.get(key)
                 if value:
