@@ -193,7 +193,7 @@ def main(args):
     
     # functional hierarchy files (required)
     hhdl = open(args.output+'.ontology.all', 'w')
-    hcvs = csv.writer(thdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+    hcvs = csv.writer(hhdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
     houthdls = [
         open(args.output+'.ontology.level1', 'w'),
         open(args.output+'.ontology.level2', 'w'),
