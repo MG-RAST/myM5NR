@@ -97,7 +97,7 @@ def main(args):
         parser.error("missing taxonomy file")
     if not os.path.isdir(args.parsedir):
         parser.error("invalid dir for parsed source dirs")
-    if not args.hierarchy):
+    if not args.hierarchy:
         parser.error("missing functional hierarchy source names")
     fhSrcs = set(args.hierarchy.split(","))
     for s in fhSrcs:
