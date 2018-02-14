@@ -85,7 +85,7 @@ def getleaf(data, isid=True):
 def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--taxonomy", dest="taxonomy", default=None, help="taxonomy tabbed file")
-    parser.add_argument("-h", "--hierarchy", dest="hierarchy", default=[], help="One or more functional hierarchy source names", action='append')
+    parser.add_argument("-h", "--hierarchy", dest="hierarchy", default=None, help="list of functional hierarchy source names")
     parser.add_argument("-d", "--db", dest="db", default=None, help="DB dir path")
     parser.add_argument("-o", "--output", dest="output", default=None, help="output prefix for files")
     parser.add_argument("--parsedir", dest="parsedir", default="../", help="Directory containing parsed source dirs")
@@ -97,12 +97,13 @@ def main(args):
         parser.error("missing taxonomy file")
     if not os.path.isdir(args.parsedir):
         parser.error("invalid dir for parsed source dirs")
-    if len(args.hierarchy) == 0:
+    if not args.hierarchy):
         parser.error("missing functional hierarchy source names")
-    for h in args.hierarchy:
-        hf = os.path.join(args.parsedir, h, HIERARCHY_FILE)
-        if not os.path.isfile(hf):
-            sys.stderr.write("%s has no valid functional hierarchy file %s\n"%(h, hf))
+    fhSrcs = set(args.hierarchy.split(","))
+    for s in fhSrcs:
+        f = os.path.join(args.parsedir, s, HIERARCHY_FILE)
+        if not os.path.isfile(f):
+            sys.stderr.write("%s has no valid functional hierarchy file %s\n"%(s, f))
             return 1
     
     # annotation files from levelDB (optional)
@@ -140,7 +141,7 @@ def main(args):
                     ann['source'],
                     isaa,
                     getleaf(data, True),
-                    getlist(ann, 'accession', False) if data['is_aa'] and ann['source'] in args.hierarchy else '[]',
+                    getlist(ann, 'accession', False) if data['is_aa'] and ann['source'] in fhSrcs else '[]',
                     getlist(ann, 'funid', True),
                     getlist(ann, 'taxid', True)
                 ]
@@ -201,7 +202,7 @@ def main(args):
     ]
     hcvswriters = map(lambda h: csv.writer(h, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL), houthdls)
     # parse files
-    for source in args.hierarchy:
+    for source in fhSrcs:
         print "start reading %s: %s"%(source, str(datetime.now()))
         count = 0;
         ihdl = open(os.path.join(args.parsedir, h, HIERARCHY_FILE), 'r')
