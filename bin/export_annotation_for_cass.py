@@ -84,10 +84,10 @@ def getleaf(data, isid=True):
 
 def main(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--taxonomy", dest="taxonomy", default=None, help="taxonomy tabbed file")
-    parser.add_argument("-h", "--hierarchy", dest="hierarchy", default=None, help="list of functional hierarchy source names")
-    parser.add_argument("-d", "--db", dest="db", default=None, help="DB dir path")
-    parser.add_argument("-o", "--output", dest="output", default=None, help="output prefix for files")
+    parser.add_argument("--taxonomy", dest="taxonomy", default=None, help="taxonomy tabbed file")
+    parser.add_argument("--hierarchy", dest="hierarchy", default=None, help="list of functional hierarchy source names")
+    parser.add_argument("--db", dest="db", default=None, help="DB dir path")
+    parser.add_argument("--output", dest="output", default=None, help="output prefix for files")
     parser.add_argument("--parsedir", dest="parsedir", default="../", help="Directory containing parsed source dirs")
     args = parser.parse_args()
     
