@@ -180,7 +180,7 @@ def main(args):
         if name and tid:
             count += 1
             for i, cw in enumerate(tcvswriters):
-                if (taxa[i] != '-') and (name != taxa[i]):
+                if (taxa[i] != '-') and (not taxa[i].startswith('unknown')) and (name != taxa[i]):
                     cw.writerow([taxa[i], name])
             tcvs.writerow([name]+taxa[:7]+[tid])
 
@@ -205,7 +205,7 @@ def main(args):
     for source in fhSrcs:
         print "start reading %s: %s"%(source, str(datetime.now()))
         count = 0;
-        ihdl = open(os.path.join(args.parsedir, h, HIERARCHY_FILE), 'r')
+        ihdl = open(os.path.join(args.parsedir, source, HIERARCHY_FILE), 'r')
         for line in ihdl:
             hier  = line.strip().split("\t")
             accid = hier.pop(0)
