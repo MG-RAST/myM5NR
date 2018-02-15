@@ -20,8 +20,9 @@
 
 BacMet:
     category: protein
-    homepage: http://bacmet.biomedicine.gu.se/
     type: function annotation
+    homepage: http://bacmet.biomedicine.gu.se
+    description: Antibacterial Biocide & Metal Resistance Genes Database
     version: curl ${CURL_OPTS} "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "Database Statistics (version [0-9\.]*)" | grep -o [0-9\.]*
     download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
     parser:
@@ -36,8 +37,9 @@ BacMet:
 
 CARD:
     category: protein
-    homepage: https://card.mcmaster.ca
     type: function annotation
+    homepage: https://card.mcmaster.ca
+    description: The Comprehensive Antibiotic Resistance Database
     version: curl ${CURL_OPTS} "https://card.mcmaster.ca/download" | grep ">CARD<" | grep -o ">[0-9][0-9\.]*<" | head -n1 |  grep -o "[0-9\.]*"
     download: https://card.mcmaster.ca/latest/data
     parser:
@@ -56,6 +58,7 @@ CAZy:
     type: hierarchical function annotation
     depth: 2
     homepage: http://www.cazy.org
+    description: Carbohydrate-Active enZYmes Database
     no-download: true
     depends:
       - TrEmble
@@ -73,6 +76,8 @@ COG:
     category: protein
     type: hierarchical function annotation
     depth: 3
+    homepage: https://www.ncbi.nlm.nih.gov/COG
+    description: Clusters of Orthologous Groups
     version: echo '-'
     depends:
       - Swiss-Prot
@@ -93,6 +98,7 @@ EC:
     type: hierarchical function annotation
     depth: 4
     homepage: https://enzyme.expasy.org
+    description: Enzyme Nomenclature Database
     version: curl ${CURL_OPTS} "ftp://ftp.expasy.org/databases/enzyme/release/enzclass.txt" | grep '^Release' | grep -o '[0-9a-zA-Z\-]\+$'
     download:
       - ftp://ftp.expasy.org/databases/enzyme/enzyme.dat
@@ -112,6 +118,7 @@ EggNOG:
     type: hierarchical function annotation
     depth: 3
     homepage: http://eggnogdb.embl.de
+    description: Clusters of Orthologous Groups
     version: curl ${CURL_OPTS} "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
     depends:
       - Swiss-Prot
@@ -130,6 +137,8 @@ EggNOG:
 GenBank:
     category: protein
     type: function annotation
+    homepage: https://www.ncbi.nlm.nih.gov/genbank
+    description: NIH Genetic Sequence Database
     download:
       - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
     version: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
@@ -147,6 +156,7 @@ goslim:
     type: hierarchical function annotation
     depth: 3
     homepage: http://www.geneontology.org
+    description: Gene Ontology Database
     version: curl ${CURL_OPTS} "http://archive.geneontology.org/full/DATESTAMP"
     depends:
       - Swiss-Prot
@@ -163,7 +173,8 @@ goslim:
 Greengenes:
     category: rna
     type: SSU
-    homepage: http://greengenes.lbl.gov/
+    homepage: http://greengenes.lbl.gov
+    description: 16S rRNA Gene Database
     version: date --date="$(curl ${CURL_OPTS} http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]")" '+%Y-%m-%d'
     depends:
       - NCBI-Taxonomy
@@ -180,6 +191,8 @@ Greengenes:
 InterPro:
     category: protein
     type: function annotation
+    homepage: http://www.ebi.ac.uk/interpro
+    description: InterPro protein sequence & classification
     version: curl ${CURL_OPTS} ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
     depends:
       - Swiss-Prot
@@ -196,7 +209,8 @@ InterPro:
 KEGG:
     category: protein
     type: function annotation
-    homepage: http://www.genome.jp/kegg/
+    homepage: http://www.genome.jp/kegg
+    description: Kyoto Encyclopedia of Genes and Genomes
     depth: 4
     no-download: true
     depends:
@@ -213,7 +227,7 @@ M5cassandra:
     depends:
       - M5merge
     parser:
-      - ${M5NR_BIN}/export_annotation_for_cass.py --taxonomy ../NCBI-Taxonomy/taxonomy.tsv --hierarchy CAZy,COG,EC,EggNOG,goslim,SEED-Subsystems --db ../M5merge/m5nr.ldb --output newM5nr
+      - ${M5NR_BIN}/export_annotation_for_cass.py --taxa ../NCBI-Taxonomy/taxonomy.tsv --source ${M5NR_BIN}/../sources.yaml --db ../M5merge/m5nr.ldb --output newM5nr
 
 # id2func.txt
 M5functions:
@@ -274,8 +288,7 @@ M5merge:
       - M5rna
     parser:
       - mkdir -p m5nr.ldb
-      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --func ../M5functions/id2func.txt --srctype protein --source BacMet,CARD,CAZy,COG,EC,EggNOG,GenBank,InterPro,KEGG,PATRIC,PFAM,PhAnToMe,RefSeq,SEED-Annotations,SEED-Subsystems,Swiss-Prot,TrEmble,goslim,motuDB --dbtype levelDB --db m5nr.ldb
-      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --srctype rna --source Greengenes,RDP,SILVA-LSU,SILVA-SSU --dbtype levelDB --db m5nr.ldb
+      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --func ../M5functions/id2func.txt --source ${M5NR_BIN}/../sources.yaml --db m5nr.ldb
 
 # M5nr.fasta
 M5nr:
@@ -321,7 +334,8 @@ M5rna:
 motuDB:
     category: protein
     type: filter set
-    homepage: http://www.bork.embl.de/software/mOTU/
+    homepage: http://www.bork.embl.de/software/mOTU
+    description: Phylogenetic Marker Gene Database
     version: curl ${CURL_OPTS} http://vm-lux.embl.de/~kultima/MOCAT/download.html | grep -o "mOTU\.v[0-9\.] " | grep -o "v[0-9\.]" | grep -o "[0-9\.]"
     download:
       - http://vm-lux.embl.de/~kultima/share/mOTU/mOTU.v${VERSION}.padded.tar.gz
@@ -338,6 +352,7 @@ NCBI-Taxonomy:
     category: taxonomy
     type: hierarchical organism annotation
     homepage: https://www.ncbi.nlm.nih.gov/taxonomy
+    description: The Taxonomy Database
     version: echo ${TODAY}
     download:
       - ftp://ftp.ebi.ac.uk/pub/databases/taxonomy/taxonomy.dat
@@ -348,7 +363,8 @@ NCBI-Taxonomy:
 PATRIC:
     category: protein
     type: function annotation
-    homepage: https://www.patricbrc.org/
+    homepage: https://www.patricbrc.org
+    description: Bioinformatics Database
     version: wget -qO- ftp://ftp.patricbrc.org/patric2/ | grep current_release | grep -o "20[0-9][0-9] [a-zA-Z]*"
     depends:
       - NCBI-Taxonomy
@@ -366,7 +382,8 @@ PATRIC:
 PFAM:
     category: protein
     type: function annotation
-    homepage: http://pfam.xfam.org/
+    homepage: http://pfam.xfam.org
+    description: Protein Family Database
     version: curl ${CURL_OPTS} 'ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/relnotes.txt' | head -n 5 | grep -o 'RELEASE [0-9\.]\+' | cut -f2 -d' '
     download:
       - ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.clans.tsv.gz
@@ -384,6 +401,7 @@ PhAnToMe:
     category: protein
     type: function annotation
     homepage: http://www.phantome.org
+    description: Phage Annotation Tools and Methods
     env:
         TIMESTAMP: curl --silent --connect-timeout 10 -L http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
     version: date -d @${TIMESTAMP} +"%Y%m%d"
@@ -409,6 +427,7 @@ RDP:
       - LSU
       - ITS
     homepage: http://rdp.cme.msu.edu
+    description: Ribosomal Database Project
     version: curl ${CURL_OPTS} 'http://rdp.cme.msu.edu/download/releaseREADME.txt'
     depends:
       - NCBI-Taxonomy
@@ -427,6 +446,8 @@ RDP:
 RefSeq:
     category: protein
     type: function annotation
+    homepage: https://www.ncbi.nlm.nih.gov/refseq
+    description: NCBI Reference Sequences Database
     version: curl ${CURL_OPTS} ftp://ftp.ncbi.nih.gov/refseq/release/RELEASE_NUMBER
     depends:
       - NCBI-Taxonomy
@@ -448,6 +469,7 @@ SEED-Annotations:
     category: protein
     type: function annotation
     homepage: http://www.theseed.org
+    description: The SEED Project
     version: echo ${TODAY}
     depends:
       - NCBI-Taxonomy
@@ -468,6 +490,7 @@ SEED-Subsystems:
     type: hierarchical function annotation
     depth: 4
     homepage: http://www.theseed.org
+    description: SEED Subsystems Annotation
     version: echo ${TODAY}
     download-command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq --verbose
     resume-download: true
@@ -484,6 +507,7 @@ SILVA-LSU:
     category: rna
     type: LSU
     homepage: http://www.arb-silva.de
+    description: SILVA Large Subunit rRNA Database
     version: curl ${CURL_OPTS} -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
     depends:
       - NCBI-Taxonomy
@@ -501,6 +525,7 @@ SILVA-SSU:
     category: rna
     type: SSU
     homepage: http://www.arb-silva.de
+    description: SILVA Small Subunit rRNA Database
     version: curl ${CURL_OPTS} -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
     depends:
       - NCBI-Taxonomy
@@ -517,6 +542,8 @@ SILVA-SSU:
 Swiss-Prot:
     category: protein
     type: function annotation
+    homepage: http://www.uniprot.org
+    description: Swiss-Prot UniProt Knowledgebase
     version: curl ${CURL_OPTS} ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "Swiss-Prot" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
     depends:
       - NCBI-Taxonomy
@@ -535,6 +562,8 @@ Swiss-Prot:
 TrEmble:
     category: protein
     type: function annotation
+    homepage: http://www.uniprot.org
+    description: TrEMBL UniProt Knowledgebase
     version: curl ${CURL_OPTS} ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
     depends:
       - NCBI-Taxonomy
