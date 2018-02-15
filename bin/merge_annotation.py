@@ -157,7 +157,7 @@ def main(args):
     if not os.path.isdir(args.parsedir):
         parser.error("invalid dir for parsed source dirs")
     
-    IsProtein = True if args.dbtype == 'protein' else False
+    IsProtein = True if args.srctype == 'protein' else False
     IsLevelDB = True if args.dbtype == 'levelDB' else False
     
     print "start opening files: "+str(datetime.now())
