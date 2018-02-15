@@ -165,7 +165,6 @@ def main(args):
     print "loading function map"
     FuncMap = loadFunc(args.func) if args.func else {}
     
-    print "loading "+args.dbtype
     try:
         db = plyvel.DB(args.db, create_if_missing=True)
     except:
