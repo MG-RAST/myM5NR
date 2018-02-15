@@ -64,9 +64,9 @@ def leaf_name(taxa):
 def getlist(data, key, isint=True):
     if key in data:
         if isint:
-            return '['+','.join(data[key])+']'
+            return '['+','.join(map(str, data[key]))+']'
         else:
-            return '['+','.join(map(lambda x: "'"+x+"'", data[key]))+']'
+            return '['+','.join(map(lambda x: "'"+str(x)+"'", data[key]))+']'
     else:
         return '[]'
 
