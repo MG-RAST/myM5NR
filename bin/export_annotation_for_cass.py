@@ -4,10 +4,9 @@ import os
 import sys
 import csv
 import json
-import copy
+import yaml
 import plyvel
 import argparse
-import itertools
 from datetime import datetime
 
 """
@@ -84,8 +83,8 @@ def getleaf(data, isid=True):
 
 def main(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--taxonomy", dest="taxonomy", default=None, help="taxonomy tabbed file")
-    parser.add_argument("--hierarchy", dest="hierarchy", default=None, help="list of functional hierarchy source names")
+    parser.add_argument("--taxa", dest="taxa", default=None, help="taxonomy tabbed file")
+    parser.add_argument("--sources", dest="sources", default=None, help="sources.yaml file")
     parser.add_argument("--db", dest="db", default=None, help="DB dir path")
     parser.add_argument("--output", dest="output", default=None, help="output prefix for files")
     parser.add_argument("--parsedir", dest="parsedir", default="../", help="Directory containing parsed source dirs")
@@ -93,66 +92,21 @@ def main(args):
     
     if not args.output:
         parser.error("missing output prefix")
-    if not os.path.isfile(args.taxonomy):
+    if not os.path.isfile(args.taxa):
         parser.error("missing taxonomy file")
+    if not os.path.isfile(args.sources):
+        parser.error("missing sources.yaml file")
     if not os.path.isdir(args.parsedir):
         parser.error("invalid dir for parsed source dirs")
-    if not args.hierarchy:
-        parser.error("missing functional hierarchy source names")
-    fhSrcs = set(args.hierarchy.split(","))
-    for s in fhSrcs:
-        f = os.path.join(args.parsedir, s, HIERARCHY_FILE)
-        if not os.path.isfile(f):
-            sys.stderr.write("%s has no valid functional hierarchy file %s\n"%(s, f))
-            return 1
     
-    # annotation files from levelDB (optional)
-    if args.db and os.path.isdir(args.db):
-        try:
-            db = plyvel.DB(args.db)
-        except:
-            sys.stderr.write("unable to open DB at %s\n"%(args.db))
-            return 1
-    
-        mhdl = open(args.output+'.annotation.md5', 'w')
-        mcvs = csv.writer(mhdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-        ihdl = open(args.output+'.annotation.midx', 'w')
-        icvs = csv.writer(ihdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-    
-        print "start reading %s: %s"%(args.db, str(datetime.now()))
-        count = 0;
-        for key, value in db:
-            data = json.loads(value)
-            isaa = 'true' if data['is_aa'] else 'false'
-            count += 1
-            for ann in data['ann']:                
-                md5ann = [
-                    key,
-                    ann['source'],
-                    isaa,
-                    getleaf(data, False),
-                    getlist(data, 'lca', False),
-                    getlist(ann, 'accession', False),
-                    getlist(ann, 'function', False),
-                    getlist(ann, 'organism', False)
-                ]
-                midxann = [
-                    key,
-                    ann['source'],
-                    isaa,
-                    getleaf(data, True),
-                    getlist(ann, 'accession', False) if data['is_aa'] and ann['source'] in fhSrcs else '[]',
-                    getlist(ann, 'funid', True),
-                    getlist(ann, 'taxid', True)
-                ]
-                mcvs.writerow(md5ann)
-                icvs.writerow(midxann)
-        
-        print "done reading: "+str(datetime.now())
-        print "processed %d md5s"%(count)
-        db.close()
-        ihdl.close()
-        mhdl.close()
+    # parse sources
+    sourceInfo = yaml.load(open(args.sources, 'r'))
+    fhSrcs = set()
+    for src in sourceInfo.iterkeys():
+        if sourceInfo[src]['type'] == 'hierarchical function annotation':
+            fhSrcs.add(src)
+    if len(fhSrcs) == 0:
+        sys.stderr.write("missing functional hierarchies in %s\n"%(args.sources))
     
     # taxonomy files (required)
     thdl = open(args.output+'.taxonomy.all', 'w')
@@ -168,9 +122,9 @@ def main(args):
     ]
     tcvswriters = map(lambda h: csv.writer(h, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL), touthdls)
     # parse input
-    print "start reading %s: %s"%(args.taxonomy, str(datetime.now()))
-    count = 0;
-    ihdl = open(args.taxonomy, 'r')
+    print "start reading %s: %s"%(args.taxa, str(datetime.now()))
+    count = 0
+    ihdl = open(args.taxa, 'r')
     for line in ihdl:
         taxa = line.strip().split("\t")
         if len(taxa) != 9:
@@ -204,7 +158,7 @@ def main(args):
     # parse files
     for source in fhSrcs:
         print "start reading %s: %s"%(source, str(datetime.now()))
-        count = 0;
+        count = 0
         ihdl = open(os.path.join(args.parsedir, source, HIERARCHY_FILE), 'r')
         for line in ihdl:
             hier  = line.strip().split("\t")
@@ -223,6 +177,54 @@ def main(args):
     for h in houthdls:
         h.close()
     hhdl.close()
+    
+    # annotation files from levelDB (optional)
+    if args.db and os.path.isdir(args.db):
+        try:
+            db = plyvel.DB(args.db)
+        except:
+            sys.stderr.write("unable to open DB at %s\n"%(args.db))
+            return 1
+        
+        mhdl = open(args.output+'.annotation.md5', 'w')
+        mcvs = csv.writer(mhdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+        ihdl = open(args.output+'.annotation.midx', 'w')
+        icvs = csv.writer(ihdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+    
+        print "start reading %s: %s"%(args.db, str(datetime.now()))
+        count = 0
+        for key, value in db:
+            data = json.loads(value)
+            isaa = 'true' if data['is_aa'] else 'false'
+            count += 1
+            for ann in data['ann']:                
+                md5ann = [
+                    key,
+                    ann['source'],
+                    isaa,
+                    getleaf(data, False),
+                    getlist(data, 'lca', False),
+                    getlist(ann, 'accession', False),
+                    getlist(ann, 'function', False),
+                    getlist(ann, 'organism', False)
+                ]
+                midxann = [
+                    key,
+                    ann['source'],
+                    isaa,
+                    getleaf(data, True),
+                    getlist(ann, 'accession', False) if data['is_aa'] and ann['source'] in fhSrcs else '[]',
+                    getlist(ann, 'funid', True),
+                    getlist(ann, 'taxid', True)
+                ]
+                mcvs.writerow(md5ann)
+                icvs.writerow(midxann)
+        
+        print "done reading: "+str(datetime.now())
+        print "processed %d md5s"%(count)
+        db.close()
+        ihdl.close()
+        mhdl.close()
     
     return 0
 

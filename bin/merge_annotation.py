@@ -5,7 +5,6 @@ import sys
 import json
 import copy
 import plyvel
-import bsddb
 import argparse
 from datetime import datetime
 
@@ -42,10 +41,8 @@ md5 : {
 ANNFILE = 'md52annotation.txt'
 TaxaMap = {}
 FuncMap = {}
-Sources = [] # name, filehdl
+Sources = [] # name, filehdl, is_prot bool
 SrcSize = 0
-IsProtein = True
-IsLevelDB = True
 
 def loadFunc(ffile):
     func = {}
@@ -60,10 +57,7 @@ def loadFunc(ffile):
     return func
 
 def mergeAnn(md5, info, lca):
-    data = {
-        'is_aa' : IsProtein,
-        'ann' : []
-    }
+    data = { 'ann' : [] }
     if lca[0] == md5:
         data['lcaid'] = lca[1]
         data['lca'] = lca[2]
@@ -71,6 +65,7 @@ def mergeAnn(md5, info, lca):
         if info[i][0] == md5:
             d = copy.deepcopy(info[i][1])
             d['source'] = Sources[i][0]
+            data['is_aa'] = Sources[i][2]
             if ('function' in d) and FuncMap:
                 if 'funid' not in d:
                     d['funid'] = []
@@ -131,41 +126,37 @@ def moreSets(info):
     return hasSet
 
 def main(args):
-    global TaxaMap, FuncMap, Sources, SrcSize, IsProtein, IsLevelDB
+    global TaxaMap, FuncMap, Sources, SrcSize
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--taxa", dest="taxa", default=None, help="json format taxonomy file for name-id mapping")
-    parser.add_argument("-f", "--func", dest="func", default=None, help="tsv format function file for name-id mapping")
-    parser.add_argument("-l", "--lca", dest="lca", default=None, help="tsv format lca file for md5-lca mapping")
-    parser.add_argument("-s", "--source", dest="source", default=None, help="list of sources to merge")
-    parser.add_argument("--srctype", dest="srctype", default=None, help="source type, one of: rna or protein")
-    parser.add_argument("-d", "--db", dest="db", default='m5nr.ldb', help="DB path")
-    parser.add_argument("--dbtype", dest="dbtype", default='levelDB', help="DB type, one of: levelDB or berkeleyDB")
+    parser.add_argument("--taxa", dest="taxa", default=None, help="json format taxonomy file for name-id mapping")
+    parser.add_argument("--func", dest="func", default=None, help="tsv format function file for name-id mapping")
+    parser.add_argument("--lca", dest="lca", default=None, help="tsv format lca file for md5-lca mapping")
+    parser.add_argument("--sources", dest="sources", default=None, help="sources.yaml file")
+    parser.add_argument("--db", dest="db", default='m5nr.ldb', help="DB path")
     parser.add_argument("--parsedir", dest="parsedir", default="../", help="Directory containing parsed source dirs")
     parser.add_argument("--append", dest="append", action="store_true", default=False, help="add new sources to existing md5s in DB, default is to overwrite")
     args = parser.parse_args()
     
-    if not args.source:
-        parser.error("missing source")
-    if (args.srctype != 'rna') and (args.srctype != 'protein'):
-        parser.error("invalid source type")
-    if (args.dbtype != 'berkeleyDB') and (args.dbtype != 'levelDB'):
-        parser.error("invalid DB type")
-    if (args.dbtype == 'levelDB') and (not os.path.isdir(args.db)):
+    if not os.path.isfile(args.sources):
+        parser.error("missing sources.yaml file")
+    if not os.path.isdir(args.db):
         parser.error("invalid dir for levelDB")
-    if (args.dbtype == 'berkeleyDB') and (not args.db):
-        parser.error("invalid file for berkeleyDB")
     if not os.path.isdir(args.parsedir):
         parser.error("invalid dir for parsed source dirs")
     
-    IsProtein = True if args.srctype == 'protein' else False
-    IsLevelDB = True if args.dbtype == 'levelDB' else False
-    
     print "start opening files: "+str(datetime.now())
-    for src in args.source.split(","):
+    sourceInfo = yaml.load(open(args.sources, 'r'))
+    for src in sourceInfo.iterkeys():
+        if sourceInfo[src]['category'] == 'protein':
+            isProt = True
+        elif sourceInfo[src]['category'] == 'rna':
+            isProt = False
+        else:
+            continue
         annFile = os.path.join(args.parsedir, src, ANNFILE)
         if os.path.isfile(annFile):
             print "opening "+annFile
-            Sources.append([src, open(annFile, 'r')])
+            Sources.append([src, open(annFile, 'r'), isProt])
     SrcSize = len(Sources)
     
     print "loading taxonomy map"
@@ -175,10 +166,7 @@ def main(args):
     
     print "loading "+args.dbtype
     try:
-        if IsLevelDB:
-            db = plyvel.DB(args.db, create_if_missing=True)
-        else:
-            db = bsddb.hashopen(args.db, 'c')
+        db = plyvel.DB(args.db, create_if_missing=True)
     except:
         sys.stderr.write("unable to open DB at %s\n"%(args.db))
         return 1
@@ -197,20 +185,11 @@ def main(args):
         annData = mergeAnn(minMd5, allSets, lcaSet)
         if args.append:
             # merge source data with DB data
-            try:
-                if IsLevelDB:
-                    oldAnn = db.get(minMd5)
-                else:
-                    oldAnn = db[minMd5]
-            except KeyError:
-                oldAnn = None
+            oldAnn = db.get(minMd5)
             if oldAnn:
                 annData = mergeMd5Sources(oldAnn, annData)
         # insert the data
-        if IsLevelDB:
-            db.put(minMd5, json.dumps(annData))
-        else:
-            db[minMd5] = json.dumps(annData)
+        db.put(minMd5, json.dumps(annData))
         # iterate files that had minimal
         if lcaSet[0] == minMd5:
             lcaSet = nextLCA(lcaHdl)
