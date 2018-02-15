@@ -195,7 +195,7 @@ InterPro:
 
 KEGG:
     category: protein
-    type: hierarchical function annotation
+    type: function annotation
     homepage: http://www.genome.jp/kegg/
     depth: 4
     no-download: true
@@ -205,6 +205,15 @@ KEGG:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_kegg.txt ../TrEmble/md52id_kegg.txt
       - ${M5NR_BIN}/merge_md5.py --idonly
+
+M5cassandra:
+    category: all
+    type: all
+    no-download: true
+    depends:
+      - M5merge
+    parser:
+      - ${M5NR_BIN}/export_annotation_for_cass.py --taxonomy ../NCBI-Taxonomy/taxonomy.tsv --hierarchy CAZy,COG,EC,EggNOG,goslim,SEED-Subsystems --db ../M5merge/m5nr.ldb --output newM5nr
 
 # id2func.txt
 M5functions:
