@@ -164,7 +164,7 @@ def main(args):
                 data = {
                     'object': 'ontology',
                     'id': "o_%d"%(count),
-                    'source', source,
+                    'source': source,
                     'accession': accid
                 }
                 for i in range(level):
@@ -193,7 +193,7 @@ def main(args):
                     count += 1
                     data = {
                         'object': 'annotation',
-                        'id': "o_%d"%(count),
+                        'id': "a_%d"%(count),
                         'source': ann['source'],
                         'type': srcData[ann['source']],
                         'md5': key,

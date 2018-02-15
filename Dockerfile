@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
   wget\
   unzip \
   make \
-  python-biopython  \
+  python-biopython \
+  python-yaml \
   vim \
   curl \
   python-pip \
