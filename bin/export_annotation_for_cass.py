@@ -122,7 +122,7 @@ def main(args):
         print "start reading %s: %s"%(args.db, str(datetime.now()))
         count = 0;
         for key, value in db:
-            data = json.load(value)
+            data = json.loads(value)
             isaa = 'true' if data['is_aa'] else 'false'
             count += 1
             for ann in data['ann']:                
