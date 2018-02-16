@@ -69,15 +69,19 @@ def getlist(data, key, isint=True):
     else:
         return '[]'
 
-def getleaf(data, isid=True):
+def getleaf(md5, data, isid=True):
     if isid:
         if 'lcaid' in data:
             return data['lcaid']
         else:
             return 0
     else:
-        if ('lca' in data) and (len(data['lca']) > 0):
-            return data['lca'][-1]
+        if 'lca' in data:
+            if len(data['lca']) > 0:
+                return data['lca'][-1]
+            else:
+                print "[warning] lca for md5 %s is empty"%(md5)
+                return ''
         else:
             return ''
 
@@ -202,7 +206,7 @@ def main(args):
                     key,
                     ann['source'],
                     isaa,
-                    getleaf(data, False),
+                    getleaf(key, data, False),
                     getlist(data, 'lca', False),
                     getlist(ann, 'accession', False),
                     getlist(ann, 'function', False),
@@ -212,7 +216,7 @@ def main(args):
                     key,
                     ann['source'],
                     isaa,
-                    getleaf(data, True),
+                    getleaf(key, data, True),
                     getlist(ann, 'accession', False) if data['is_aa'] and ann['source'] in fhSrcs else '[]',
                     getlist(ann, 'funid', True),
                     getlist(ann, 'taxid', True)
