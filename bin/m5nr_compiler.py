@@ -17,13 +17,12 @@ from prettytable import PrettyTable
 import datetime
 
 CURL_OPTS = '--silent --connect-timeout 10 -L'
-m5nr_version = '0'
 
 bin_dir = os.path.dirname(os.path.realpath(__file__))
-
-repo_dir = os.path.normpath(os.path.join(bin_dir, "..", "sources.yaml"))
-config_stream = open(repo_dir, "r")
-config_sources = yaml.load(config_stream)
+repo_dir = os.path.normpath(os.path.join(bin_dir, ".."))
+sources_file = os.path.join(repo_dir, "sources.yaml")
+config_sources = yaml.load(open(sources_file, "r"))
+config_build = yaml.load(open(os.path.join(repo_dir, "build.yaml"), "r"))
 
 args = None
 
@@ -38,8 +37,6 @@ class DependencyMissingException(Exception):
 
 def execute_command(command, env):
     global args
-    
-
     
     if env:
         for key in env:
@@ -75,7 +72,6 @@ def execute_command(command, env):
         if rc==0:
             #print("Cond 2")
             break
-       
     
     if args.debug:
         print(last_line)
@@ -87,12 +83,17 @@ def execute_command(command, env):
 
 
 def create_environment(source_obj, ignore_error=False):
+    global args
+    global sources_file
+    global parses_directory
    
     new_environment = os.environ.copy()
     new_environment['TODAY'] = datetime.date.today().isoformat()
     new_environment['M5NR_BIN'] = bin_dir
     new_environment['CURL_OPTS'] = CURL_OPTS
-    new_environment['M5NR_VERSION'] = m5nr_version
+    new_environment['SOURCE_FILE'] = sources_file
+    new_environment['PARSED_DIR'] = parses_directory
+    new_environment['M5NR_VERSION'] = args.version
     
     if 'env' in source_obj:
         env_obj = source_obj['env']
@@ -131,32 +132,24 @@ def download_source(directory, source_name):
     if 'no-download' in source_obj:
         if  source_obj['no-download']:
             no_download = True
-            
-            
-            
+     
     if args.debug:
         print(source_obj)
     
     version_remote = ''
     
-    
-    
     if source_name in remote_versions_hashed:
         version_remote = str(remote_versions_hashed[source_name])
-        
+    
     else:
         if no_download:
             version_remote = "-"
         else:
             raise MyException("version is missing")
-        
-    
     
     if version_remote == "":
         raise MyException("version is empty")
     
-    
-        
     print("remote version: %s" % version_remote)
     
     #if 'version_local' in source_obj:    
@@ -164,7 +157,6 @@ def download_source(directory, source_name):
     #    version_local = execute_command(command, new_environment)
     
     download_instruction = False
-    
     
     if 'download' in source_obj:    
         something  = source_obj['download']
@@ -217,10 +209,8 @@ def download_source(directory, source_name):
             command_array = something
         else:
             command_array = [something]
-            
         
         download_instruction = True
-        
         
         try:
             new_environment = create_environment(source_obj)
@@ -230,35 +220,26 @@ def download_source(directory, source_name):
         # add VERSION to environment, often needed for download
         new_environment['VERSION'] = version_remote
         
-        
         for download_command in command_array:
             try:
                 value_evaluated  = execute_command(download_command, new_environment)
             except Exception as e:
                 raise MyException("(download_command) execute_command failed: %s" % (e))
-        
-    
     
     if (not download_instruction) and (not no_download):
         raise MyException("download instruction mising")
-        
     
     with open('version.txt', 'wt') as f:
         f.write(version_remote)
     
-    
-    
     with open('timestamp.txt', 'wt') as f:
         f.write(datetime.datetime.now().isoformat())
-        
-        
+    
     return
 
 
 def parse_source(directory, source_name, source_directory):
     global remote_versions_hashed
-    
-    
     
     if not source_name in config_sources:
         print("Error %s not found in config" % source_name)
@@ -274,7 +255,6 @@ def parse_source(directory, source_name, source_directory):
     if 'depends' in source_obj:
         depends =  source_obj["depends"]
     
-    
     for dep in depends:
         dep_dir = os.path.normpath(os.path.join(directory, "..", dep))
         dep_version_file = os.path.join(dep_dir, "version.txt")
@@ -285,7 +265,6 @@ def parse_source(directory, source_name, source_directory):
     version = 'NA'
     with open(version_file, 'r') as myfile:
         version=myfile.read()
-        
     
     if not os.path.exists(source_directory):
        raise MyException("source dir missing") 
@@ -293,7 +272,6 @@ def parse_source(directory, source_name, source_directory):
     if 'parser' in source_obj:
         
         new_environment = create_environment(source_obj, True)
-
         new_environment['SOURCE_DIR'] = source_directory
         new_environment['VERSION'] = version
         
@@ -304,15 +282,12 @@ def parse_source(directory, source_name, source_directory):
         else:
             command_array = [something]
         
-        
-        
         for command in command_array:
             try:
                 something = execute_command(command, new_environment)
             except Exception as e:
                 print(something)
                 raise MyException("execute_command failed: %s" % (e))
-    
         
         # success, copy verison file
         source_version_file = os.path.join(source_directory, "version.txt")
@@ -325,7 +300,7 @@ def parse_source(directory, source_name, source_directory):
         raise MyException("Field \"parser\" not found in config.")    
             
     return
-    
+
 
 def get_remote_versions(sources):
     global remote_versions_hashed
@@ -383,9 +358,7 @@ def get_remote_versions(sources):
     return
 
 
-
-
-def parse_sources(parsings_dir , sources, sources_directory):
+def parse_sources(parsings_dir, sources, sources_directory):
     global args
     current_dir = os.getcwd()
     
@@ -399,7 +372,6 @@ def parse_sources(parsings_dir , sources, sources_directory):
             
         if do_stop:
             sys.exit(1)
-            
     
     success_status = 0
     
@@ -415,21 +387,15 @@ def parse_sources(parsings_dir , sources, sources_directory):
             
         if os.path.isdir(parse_dir):
             print("Parse directory exists, skip it. (%s, source=%s)" % (parse_dir, source))
-            
-            
             success = True
         else:
-            
             if args.force:
                 if os.path.isdir(parse_dir_part):
                     shutil.rmtree(parse_dir_part) 
             
             os.makedirs(parse_dir_part)
-            
             os.chdir(parse_dir_part)
-            
             print("call parse_source")
-            
             source_directory = os.path.join(sources_directory, source)
             
             try:
@@ -453,8 +419,7 @@ def parse_sources(parsings_dir , sources, sources_directory):
     
     os.chdir(current_dir)
     return success_status
-            
-            
+
 
 def download_sources(sources_dir , sources):
     global args
@@ -559,21 +524,127 @@ def get_dir_size(start_path):
     return total_size
 
 
-
-def status(sources_directory, parses_directory):
+def build_m5nr(build_directory):
+    global args
+    global config_build
     
+    current_dir = os.getcwd()
+    
+    if not args.force:
+        do_stop = 0
+        for build in config_build:
+            build_dir_part = os.path.join(build_directory, build['name']+"_part")
+            if os.path.isdir(build_dir_part):
+                do_stop = 1
+                print("delete directory first: %s"%(build_dir_part))
+        
+        if do_stop:
+            sys.exit(1)
+    
+    success_status = 0
+    
+    for build in config_build:
+        print("\n")
+        print("Build %s: " % (build['name']))
+        print("---------------------")
+        
+        build_dir = os.path.join(build_directory, build['name'])
+        build_dir_part = build_dir+"_part"
+        success_after_building = False
+        error_message = ""
+        
+        if os.path.isdir(build_dir):
+            print("Build directory exists, skip it. (%s, build=%s)" %(build_dir, build['name']))
+            success = True
+        else:
+            if args.force:
+                if os.path.isdir(build_dir_part):
+                    shutil.rmtree(build_dir_part) 
+            
+            os.makedirs(build_dir_part)
+            os.chdir(build_dir_part)
+            
+            try:
+                build_action(build_dir_part, build)
+                success_after_building = True
+            except DependencyMissingException as e:
+                success_status = 42
+                error_message = str(e)
+            except Exception as e:
+                success_status = 1
+                error_message = str(e)
+            
+            if success_after_building:
+                print("build successful")
+                os.rename(build_dir_part, build_dir)
+            else:
+                print("building %s failed: %s" % (build['name'], error_message) , file=sys.stderr)
+                error_file = os.path.join(build_dir_part , 'error.txt')
+                with open(error_file, 'wt') as f:
+                    f.write(error_message)
+    
+    os.chdir(current_dir)
+    return success_status
+
+
+def build_action(directory, build_obj):
+    global remote_versions_hashed
+    
+    depends = []
+    if 'depends' in build_obj:
+        depends = build_obj["depends"]
+    
+    for dep in depends:
+        dep_dir = os.path.normpath(os.path.join(directory, "..", dep))
+        dep_version_file = os.path.join(dep_dir, "version.txt")
+        if not os.path.exists(dep_version_file):
+            raise DependencyMissingException("dependency %s missing" % (dep))
+    
+    if 'parser' in build_obj:
+        
+        new_environment = create_environment(build_obj, True)
+        
+        command_array = []
+        something  = build_obj['parser']
+        if isinstance(something, list):
+            command_array = something
+        else:
+            command_array = [something]
+        
+        for command in command_array:
+            try:
+                something = execute_command(command, new_environment)
+            except Exception as e:
+                print(something)
+                raise MyException("execute_command failed: %s" % (e))
+        
+        # success
+        with open(os.path.join(directory, 'version.txt'), 'wt') as f:
+            f.write(new_environment['M5NR_VERSION'])
+        
+        with open(os.path.join(directory, 'timestamp.txt'), 'wt') as f:
+            f.write(datetime.datetime.now().isoformat())
+        
+    else:
+        raise MyException("Field \"parser\" not found in config.")    
+            
+    return
+
+
+def status(sources_directory, parses_directory, build_directory):
     
     # define global dict remote_versions_hashed
     get_remote_versions(all_source)
-    summary_table= PrettyTable()
-    #summary_table = []
-    #summary = {}
+    
+    # table for download / parse
+    summary_table = PrettyTable()
+    
+    # table for build
+    build_table = PrettyTable()
     
     for source in sources:
-        
         download_success = False
         download_error_message = ""
-        
         parsing_success = False
         parsing_error_message = ""
         
@@ -581,18 +652,14 @@ def status(sources_directory, parses_directory):
         remote_version = ""
         if source in remote_versions_hashed:
             remote_version = str(remote_versions_hashed[source])
-            
         
-        source_dir_part = os.path.join(sources_directory , source+"_part")
         source_dir = os.path.join(sources_directory , source)
+        source_dir_part = source_dir+"_part")
        
         parse_dir = os.path.join(parses_directory , source)
-        parse_dir_part = os.path.join(parses_directory , source+"_part")
+        parse_dir_part = parse_dir+"_part")
         
         source_dir_size_mb_int = 0
-        
-        
-        
         
         # get current version (version file indicates success)
         current_version = ''
@@ -643,7 +710,6 @@ def status(sources_directory, parses_directory):
         if os.path.exists(download_timestamp_file):
             with open(download_timestamp_file) as x:
                 download_timestamp = x.read().strip().split(".")[0]
-                
         
         if os.path.exists(parsing_timestamp_file):
             with open(parsing_timestamp_file) as x:
@@ -652,13 +718,52 @@ def status(sources_directory, parses_directory):
         summary_table.add_row([source, remote_version, current_version, download_success, download_timestamp, source_dir_size_mb_int, d_message, parsing_success, parsing_timestamp, p_message ])
     
     
+    for build in config_build:
+        build_success = False
+        build_error_message = ""
+        
+        build_dir = os.path.join(build_directory , build['name'])
+        build_dir_part = build_dir+"_part")
+        
+        current_version = ''
+        error_message = ''
+        build_timestamp = ''
+        
+        version_file = os.path.join(build_dir, "version.txt")
+        error_file = os.path.join(build_dir_part, "error.txt")
+        timestamp_file = os.path.join(build_dir, "timestamp.txt")
+        
+        if (not os.path.isdir(build_dir)) and os.path.exists(error_file):
+            with open(error_file) as x:
+                error_message = x.read()
+        
+        if os.path.exists(version_file):
+            with open(version_file) as x:
+                current_version = x.read()
+        
+        if current_version != "" :
+            build_success = True # TODO is success possible without version number ?
+        
+        emessage = error_message[0:30]
+        
+        if len(emessage) == 30:
+            emessage += "..."
+        
+        if os.path.exists(timestamp_file):
+            with open(timestamp_file) as x:
+                build_timestamp = x.read().strip().split(".")[0]
+        
+        build_table.add_row([build['name'], current_version, build_success, build_timestamp, emessage])
+        
+    
+    # add headers
     summary_table.field_names = ['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Timestamp', 'Size (MB)', 'Download Error','Parsing Success', 'Parsing Timestamp', 'Parsing Error']
     summary_table.align = "l"
+    build_table.field_names = ['Build Step', 'M5NR version', 'Success', 'Timestamp', 'Error']
     
-    
+    # print tables
     print(summary_table.get_string(sortby="Database"))
-    #print(tabulate(summary_table, headers=['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Error','Parsing Success', 'Parsing Error']))
-
+    print(summary_table.get_string())
 
 
 ################### main ######################
@@ -666,14 +771,16 @@ def status(sources_directory, parses_directory):
 parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers(title='subcommands', help='sub-command help', dest='commands')
 
-
 parser.add_argument('--debug', '-d', action='store_true')
 
-
-download_parser = subparsers.add_parser("download")
 status_parser = subparsers.add_parser("status")
+download_parser = subparsers.add_parser("download")
 parse_parser = subparsers.add_parser("parse")
+build_parser = subparsers.add_parser("build")
 
+# status
+status_parser.add_argument('--sources', '-s', action='store')
+status_parser.add_argument('--debug', '-d', action='store_true')
 
 # download
 download_parser.add_argument('--sources', '-s', action='store')
@@ -682,17 +789,14 @@ download_parser.add_argument('--debug', '-d', action='store_true')
 download_parser.add_argument('--simulate', action='store_true')
 
 # parse
-parse_parser.add_argument('--version', default='0', action='store')
 parse_parser.add_argument('--sources', '-s', action='store')
 parse_parser.add_argument('--force', '-f', action='store_true')
 parse_parser.add_argument('--debug', '-d', action='store_true')
 
-# status
-status_parser.add_argument('--sources', '-s', action='store')
-status_parser.add_argument('--debug', '-d', action='store_true')
-
-
-
+# build
+build_parser.add_argument('--version', action='store')
+build_parser.add_argument('--force', '-f', action='store_true')
+build_parser.add_argument('--debug', '-d', action='store_true')
 
 try:
     args = parser.parse_args()
@@ -701,30 +805,12 @@ except Exception as e:
     parser.print_help()
     sys.exit(0)
 
-
-
-
 if not args.commands:
     print("No command provided")
     parser.print_help()
     sys.exit(0)
 
-
-#if args.debug:
-#    for source in config_sources:
-#        print("\nsource: %s" % source)
-#        print(config_sources[source])
-#    
-#    print()
-#    print("------------------------")
-#    print()
-    
-
-
-
-
 all_source = config_sources.keys()
-
 sources = None
 
 if args.sources:
@@ -732,49 +818,45 @@ if args.sources:
     if len(sources) == 1:
         sources = args.sources.split(",")
 else:
-    sources = all_source # TODO make this an option
-
+    sources = all_source
 
 sources_directory = os.path.join(os.getcwd(), "Sources")
 parses_directory = os.path.join(os.getcwd(), "Parsed")
-
+build_directory = os.path.join(os.getcwd(), "Build")
 
 if not os.path.isdir(sources_directory):
     print("Directory %s is missing." % (sources_directory), file=sys.stderr)
-    print("Directories \"Sources\" and \"Parsed\" have to be in the working directory.", file=sys.stderr)
     sys.exit(1)
 
 if not os.path.isdir(parses_directory):
     print("directory %s is missing" % (parses_directory), file=sys.stderr)
     sys.exit(1)
 
+if not os.path.isdir(build_directory):
+    print("directory %s is missing" % (build_directory), file=sys.stderr)
+    sys.exit(1)
 
+if args.commands == "status":
+    status(sources_directory, parses_directory, build_directory)
+    sys.exit(0)
 
 if args.commands == "download":
-    
-    #old_list=["SEED-Annotations", "SEED-Subsystems", "PATRIC", "InterPro","UniProt","RefSeq","GenBank","PhAnToMe","CAZy","KEGG","EggNOG","IMG","SILVA-SSU", "SILVA-LSU","Greengenes","RDP","FungiDB"] 
-    
     success_status = download_sources(sources_directory, sources)
-
-    status(sources_directory, parses_directory)
-    
+    status(sources_directory, parses_directory, build_directory)
     sys.exit(success_status)
     
 if args.commands == "parse":
-    
-    m5nr_version = str(args.version)
-    
     success_status = parse_sources(parses_directory, sources, sources_directory)
-
-    status(sources_directory, parses_directory)
-    
+    status(sources_directory, parses_directory, build_directory)
     sys.exit(success_status)
     
-if args.commands == "status":
-    
-    status(sources_directory, parses_directory)
-    
-    sys.exit(0)
+if args.commands == "build":
+    if not args.version:
+        print("m5nr version is missing", file=sys.stderr)
+        sys.exit(1)
+    success_status = build_m5nr(build_directory)
+    status(sources_directory, parses_directory, build_directory)
+    sys.exit(success_status)
 
 print("this should not happen")
 sys.exit(1)

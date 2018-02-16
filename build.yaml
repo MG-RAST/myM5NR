@@ -1,0 +1,57 @@
+#
+# M5NR configuration file
+#
+# supported variables:
+#
+# M5NR_VERSION   Version of this build of M5NR
+# M5NR_BIN       Full path to the "bin" directory in the myM5NR repository
+# PARSED_DIR     Full path to the directory containing parsed source data
+# SOURCE_FILE    Full path to sources.yaml file in the myM5NR repository
+#
+#####
+
+# id2func.txt
+- name: Functions
+  parser:
+    - cat ${PARSED_DIR}/*/md52func.sort.txt ${PARSED_DIR}/*/id2func.txt | cut -f2 | sort -T . -u -o unique_func.txt
+    - COUNT=0; while read FUNC; do ((COUNT++)); echo "${COUNT}"$'\t'"${FUNC}"; done < unique_func.txt > id2func.txt
+
+# md52lca.txt
+- name: LCA
+  parser:
+    - sort -T . -m -u -o md52taxid.all.txt ${PARSED_DIR}/*/md52taxid.sort.txt
+    - ${M5NR_BIN}/md52lca.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --input md52taxid.all.txt --output md52lca.txt
+
+# M5nr.fasta
+- name: M5nr
+  parser:
+    - sort -T . -m -u ${PARSED_DIR}/*/md52seq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5nr.fasta
+
+# M5rna.fasta
+- name: M5rna
+  parser:
+    - sort -T . -m -u ${PARSED_DIR}/*/md52rnaseq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
+
+# levelDB store
+- name: Merge
+  depends:
+    - Functions
+    - LCA
+    - M5nr
+    - M5rna
+  parser:
+    - mkdir -p m5nr.ldb
+    - ${M5NR_BIN}/merge_annotation.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --lca ../LCA/md52lca.txt --func ../Functions/id2func.txt --sources ${SOURCE_FILE} --db m5nr.ldb
+
+- name: Cassandra
+  depends:
+    - Merge
+  parser:
+    - ${M5NR_BIN}/export_annotation_for_cass.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../Merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
+
+- name: Solr
+  depends:
+    - Merge
+  parser:
+    - ${M5NR_BIN}/export_annotation_for_solr.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../Merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
+
