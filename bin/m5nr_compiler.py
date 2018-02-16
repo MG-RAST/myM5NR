@@ -803,7 +803,7 @@ parse_parser.add_argument('--debug', '-d', action='store_true')
 
 # build
 build_parser.add_argument('--version', action='store')
-parse_parser.add_argument('--action', '-a', action='store')
+build_parser.add_argument('--action', '-a', action='store')
 build_parser.add_argument('--force', '-f', action='store_true')
 build_parser.add_argument('--debug', '-d', action='store_true')
 
