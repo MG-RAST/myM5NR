@@ -3,6 +3,7 @@
 #
 # supported variables:
 #
+# M5NR_VERSION   Version of this build of M5NR
 # M5NR_BIN       Full path to the "bin" directory in the myM5NR repository (use in any field)
 # SOURCE_DIR     The directory where the source data is located (use "parser" field)
 # VERSION        Version string as obtained from remote website (use in "download" field)
@@ -223,16 +224,18 @@ KEGG:
 M5cassandra:
     category: all
     type: all
+    version: ${M5NR_VERSION}
     no-download: true
     depends:
       - M5merge
     parser:
-      - ${M5NR_BIN}/export_annotation_for_cass.py --taxa ../NCBI-Taxonomy/taxonomy.tsv --source ${M5NR_BIN}/../sources.yaml --db ../M5merge/m5nr.ldb --output newM5nr
+      - ${M5NR_BIN}/export_annotation_for_cass.py --taxa ../NCBI-Taxonomy/taxonomy.tsv --sources ${M5NR_BIN}/../sources.yaml --db ../M5merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
 
 # id2func.txt
 M5functions:
     category: function
     type: protein
+    version: ${M5NR_VERSION}
     no-download: true
     depends:
       - BacMet
@@ -261,6 +264,7 @@ M5functions:
 M5lca:
     category: lca
     type: hierarchical organism annotation
+    version: ${M5NR_VERSION}
     no-download: true
     depends:
       - NCBI-Taxonomy
@@ -279,6 +283,7 @@ M5lca:
 M5merge:
     category: all
     type: all
+    version: ${M5NR_VERSION}
     no-download: true
     depends:
       - M5functions
@@ -288,12 +293,13 @@ M5merge:
       - M5rna
     parser:
       - mkdir -p m5nr.ldb
-      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --func ../M5functions/id2func.txt --source ${M5NR_BIN}/../sources.yaml --db m5nr.ldb
+      - ${M5NR_BIN}/merge_annotation.py --taxa ../NCBI-Taxonomy/taxonomy.json --lca ../M5lca/md52lca.txt --func ../M5functions/id2func.txt --sources ${M5NR_BIN}/../sources.yaml --db m5nr.ldb
 
 # M5nr.fasta
 M5nr:
     category: fasta
     type: protein
+    version: ${M5NR_VERSION}
     no-download: true
     depends:
       - BacMet
@@ -321,6 +327,7 @@ M5nr:
 M5rna:
     category: fasta
     type: rna
+    version: ${M5NR_VERSION}
     no-download: true
     depends:
       - SILVA-SSU
@@ -329,6 +336,16 @@ M5rna:
       - Greengenes
     parser:
       - sort -T . -m -u ../*/md52rnaseq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
+
+M5solr:
+    category: all
+    type: all
+    version: ${M5NR_VERSION}
+    no-download: true
+    depends:
+      - M5merge
+    parser:
+      - ${M5NR_BIN}/export_annotation_for_solr.py --taxa ../NCBI-Taxonomy/taxonomy.tsv --sources ${M5NR_BIN}/../sources.yaml --db ../M5merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
 
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)
 motuDB:
