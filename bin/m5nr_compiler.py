@@ -760,6 +760,7 @@ def status(sources_directory, parses_directory, build_directory):
     summary_table.field_names = ['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Timestamp', 'Size (MB)', 'Download Error','Parsing Success', 'Parsing Timestamp', 'Parsing Error']
     summary_table.align = "l"
     build_table.field_names = ['Build Step', 'M5NR version', 'Success', 'Timestamp', 'Error']
+    build_table.align = "l"
     
     # print tables
     print(summary_table.get_string(sortby="Database"))
