@@ -93,7 +93,9 @@ def create_environment(source_obj, ignore_error=False):
     new_environment['CURL_OPTS'] = CURL_OPTS
     new_environment['SOURCE_FILE'] = sources_file
     new_environment['PARSED_DIR'] = parses_directory
-    new_environment['M5NR_VERSION'] = args.version
+    
+    if hasattr(args, 'version') and args.version:
+        new_environment['M5NR_VERSION'] = args.version
     
     if 'env' in source_obj:
         env_obj = source_obj['env']
@@ -606,6 +608,8 @@ def build_action(directory, build_obj):
     if 'parser' in build_obj:
         
         new_environment = create_environment(build_obj, True)
+        if 'M5NR_VERSION' not in new_environment:
+            raise MyException("missing required m5nr version: %s" % str(e))
         
         command_array = []
         something  = build_obj['parser']
@@ -619,7 +623,7 @@ def build_action(directory, build_obj):
                 something = execute_command(command, new_environment)
             except Exception as e:
                 print(something)
-                raise MyException("execute_command failed: %s" % (e))
+                raise MyException("execute_command failed: %s" % str(e))
         
         # success
         with open(os.path.join(directory, 'version.txt'), 'wt') as f:
@@ -828,7 +832,7 @@ else:
 # get build list
 all_build = map(lambda x: x['name'], config_build)
 build_actions = None
-if args.action:
+if hasattr(args, 'action') and args.action:
     build_actions = args.action.split(" ")
     if len(build_actions) == 1:
         build_actions = args.action.split(",")
