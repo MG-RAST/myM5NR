@@ -121,7 +121,7 @@ def main(args):
         if curr != md5:
             mnum += 1
             lcaStr, lcaId, lvl = getLca(tids)
-            if lcaStr:
+            if lcaStr and lcaId:
                 lnum += 1
                 ohdl.write("%s\t%s\t%s\t%d\n"%(curr, lcaId, lcaStr, lvl))
             curr = md5
@@ -131,7 +131,7 @@ def main(args):
     if len(tids) > 0:
         mnum += 1
         lcaStr, lcaId, lvl = getLca(tids)
-        if lcaStr:
+        if lcaStr and lcaId:
             lnum += 1
             ohdl.write("%s\t%s\t%s\t%d\n"%(curr, lcaId, lcaStr, lvl))
     
