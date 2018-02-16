@@ -71,17 +71,13 @@ def getlist(data, key, isint=True):
 
 def getleaf(md5, data, isid=True):
     if isid:
-        if 'lcaid' in data:
+        if ('lcaid' in data) and data['lcaid']:
             return data['lcaid']
         else:
             return 0
     else:
-        if 'lca' in data:
-            if len(data['lca']) > 0:
-                return data['lca'][-1]
-            else:
-                print "[warning] lca for md5 %s is empty"%(md5)
-                return ''
+        if ('lca' in data) and (len(data['lca']) > 0):
+            return data['lca'][-1]
         else:
             return ''
 

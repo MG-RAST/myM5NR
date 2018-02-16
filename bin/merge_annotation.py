@@ -59,7 +59,7 @@ def loadFunc(ffile):
 
 def mergeAnn(md5, info, lca):
     data = { 'ann' : [] }
-    if lca[0] == md5:
+    if (lca[0] == md5) and (len(lca[2]) > 0):
         data['lcaid'] = lca[1]
         data['lca'] = lca[2]
     for i in range(SrcSize):
