@@ -763,7 +763,7 @@ def status(sources_directory, parses_directory, build_directory):
     
     # print tables
     print(summary_table.get_string(sortby="Database"))
-    print(summary_table.get_string())
+    print(build_table.get_string())
 
 
 ################### main ######################
