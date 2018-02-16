@@ -774,6 +774,29 @@ def status(sources_directory, parses_directory, build_directory):
     print(build_table.get_string())
 
 
+# only use this with complete source list, so no broken / missing dependencies
+def sources_sorted_by_dependency():
+    sorted_sources = set()
+    sources = set(config_sources.keys())
+    
+    # seed with non-dependants
+    for src in sources:
+        if 'depends' not in config_sources[src]:
+            sorted_sources.add(src)
+    
+    # add dependencies
+    while len(sorted_sources) != len(sources):
+        for src in sources:
+            if 'depends' in config_sources[src]:
+                has_dependants = 0
+                for dep in config_sources[src]['depends']:
+                    if dep in sorted_sources:
+                        has_dependants += 1
+                if len(config_sources[src]['depends']) == has_dependants:
+                    sorted_sources.add(src)
+    return sorted_sources
+
+
 ################### main ######################
 
 parser = argparse.ArgumentParser()
@@ -821,7 +844,7 @@ if not args.commands:
     sys.exit(0)
 
 # get source list
-all_source = config_sources.keys()
+all_source = sources_sorted_by_dependency()
 sources = None
 if hasattr(args, 'sources') and args.sources:
     sources = args.sources.split(" ")
