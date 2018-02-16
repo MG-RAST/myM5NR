@@ -788,6 +788,7 @@ build_parser = subparsers.add_parser("build")
 
 # status
 status_parser.add_argument('--sources', '-s', action='store')
+status_parser.add_argument('--action', '-a', action='store')
 status_parser.add_argument('--debug', '-d', action='store_true')
 
 # download
@@ -822,7 +823,7 @@ if not args.commands:
 # get source list
 all_source = config_sources.keys()
 sources = None
-if args.sources:
+if hasattr(args, 'sources') and args.sources:
     sources = args.sources.split(" ")
     if len(sources) == 1:
         sources = args.sources.split(",")
