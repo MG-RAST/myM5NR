@@ -17,7 +17,7 @@ from prettytable import PrettyTable
 import datetime
 
 CURL_OPTS = '--silent --connect-timeout 10 -L'
-m5nr_version = 0
+m5nr_version = '0'
 
 bin_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -682,7 +682,7 @@ download_parser.add_argument('--debug', '-d', action='store_true')
 download_parser.add_argument('--simulate', action='store_true')
 
 # parse
-parse_parser.add_argument('--version', default=0, action='store')
+parse_parser.add_argument('--version', default='0', action='store')
 parse_parser.add_argument('--sources', '-s', action='store')
 parse_parser.add_argument('--force', '-f', action='store_true')
 parse_parser.add_argument('--debug', '-d', action='store_true')
@@ -762,7 +762,7 @@ if args.commands == "download":
     
 if args.commands == "parse":
     
-    m5nr_version = args.version
+    m5nr_version = str(args.version)
     
     success_status = parse_sources(parses_directory, sources, sources_directory)
 
