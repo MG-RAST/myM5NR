@@ -654,10 +654,10 @@ def status(sources_directory, parses_directory, build_directory):
             remote_version = str(remote_versions_hashed[source])
         
         source_dir = os.path.join(sources_directory , source)
-        source_dir_part = source_dir+"_part")
+        source_dir_part = source_dir+"_part"
        
         parse_dir = os.path.join(parses_directory , source)
-        parse_dir_part = parse_dir+"_part")
+        parse_dir_part = parse_dir+"_part"
         
         source_dir_size_mb_int = 0
         
@@ -723,7 +723,7 @@ def status(sources_directory, parses_directory, build_directory):
         build_error_message = ""
         
         build_dir = os.path.join(build_directory , build['name'])
-        build_dir_part = build_dir+"_part")
+        build_dir_part = build_dir+"_part"
         
         current_version = ''
         error_message = ''
