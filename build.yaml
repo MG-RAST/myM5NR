@@ -41,17 +41,17 @@
     - M5rna
   parser:
     - mkdir -p m5nr.ldb
-    - ${M5NR_BIN}/merge_annotation.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --lca ../LCA/md52lca.txt --func ../Functions/id2func.txt --sources ${SOURCE_FILE} --db m5nr.ldb
+    - ${M5NR_BIN}/merge_annotation.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --lca ../LCA/md52lca.txt --func ../Functions/id2func.txt --sources ${SOURCE_FILE} --db m5nr.ldb
 
 - name: Cassandra
   depends:
     - Merge
   parser:
-    - ${M5NR_BIN}/export_annotation_for_cass.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../Merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
+    - ${M5NR_BIN}/export_annotation_for_cass.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../Merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
 
 - name: Solr
   depends:
     - Merge
   parser:
-    - ${M5NR_BIN}/export_annotation_for_solr.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../Merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
+    - ${M5NR_BIN}/export_annotation_for_solr.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../Merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
 
