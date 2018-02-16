@@ -76,7 +76,7 @@ def getleaf(data, isid=True):
         else:
             return 0
     else:
-        if 'lca' in data:
+        if ('lca' in data) and (len(data['lca']) > 0):
             return data['lca'][-1]
         else:
             return ''
