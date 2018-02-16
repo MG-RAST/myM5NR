@@ -524,7 +524,7 @@ def get_dir_size(start_path):
     return total_size
 
 
-def build_m5nr(build_directory):
+def build_m5nr(build_directory, build_actions):
     global args
     global config_build
     
@@ -544,6 +544,9 @@ def build_m5nr(build_directory):
     success_status = 0
     
     for build in config_build:
+        if build['name'] not in build_actions:
+            continue
+        
         print("\n")
         print("Build %s: " % (build['name']))
         print("---------------------")
@@ -796,6 +799,7 @@ parse_parser.add_argument('--debug', '-d', action='store_true')
 
 # build
 build_parser.add_argument('--version', action='store')
+parse_parser.add_argument('--action', '-a', action='store')
 build_parser.add_argument('--force', '-f', action='store_true')
 build_parser.add_argument('--debug', '-d', action='store_true')
 
@@ -811,15 +815,25 @@ if not args.commands:
     parser.print_help()
     sys.exit(0)
 
+# get source list
 all_source = config_sources.keys()
 sources = None
-
 if args.sources:
     sources = args.sources.split(" ")
     if len(sources) == 1:
         sources = args.sources.split(",")
 else:
     sources = all_source
+
+# get build list
+all_build = map(lambda x: x['name'], config_build)
+build_actions = None
+if args.action:
+    build_actions = args.action.split(" ")
+    if len(build_actions) == 1:
+        build_actions = args.action.split(",")
+else:
+    build_actions = all_build
 
 sources_directory = os.path.join(os.getcwd(), "Sources")
 parses_directory = os.path.join(os.getcwd(), "Parsed")
@@ -855,7 +869,7 @@ if args.commands == "build":
     if not args.version:
         print("m5nr version is missing", file=sys.stderr)
         sys.exit(1)
-    success_status = build_m5nr(build_directory)
+    success_status = build_m5nr(build_directory, build_actions)
     status(sources_directory, parses_directory, build_directory)
     sys.exit(success_status)
 
