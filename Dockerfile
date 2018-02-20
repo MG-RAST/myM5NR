@@ -8,13 +8,15 @@ RUN apt-get update && apt-get install -y \
   lftp \
   libdbi-perl  \
   libdbd-pg-perl \
+  zlib1g-dev \
   wget\
   unzip \
   make \
-  python-biopython \
-  python-yaml \
   vim \
   curl \
+  ncbi-blast+ \
+  python-biopython \
+  python-yaml \
   python-pip \
   python3 \
   python3-pip
@@ -38,6 +40,14 @@ RUN mkdir -p /sas/ && \
   tar xvzf sas.tgz && \
   cd modules && \
   ./BUILD_MODULES
+
+### install DIAMOND
+RUN cd /root \
+	&& git clone https://github.com/bbuchfink/diamond.git \
+	&& cd diamond \
+	&& sh ./build_simple.sh \
+	&& install -s -m555 diamond /usr/local/bin \
+	&& cd /root ; rm -rf diamond 
 
 ENV PERL5LIB $PERL5LIB:/sas/lib:/sas/modules/lib
 ENV PATH $PATH:/sas/bin

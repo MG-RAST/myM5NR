@@ -22,36 +22,39 @@
     - sort -T . -m -u -o md52taxid.all.txt ${PARSED_DIR}/*/md52taxid.sort.txt
     - ${M5NR_BIN}/md52lca.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --input md52taxid.all.txt --output md52lca.txt
 
-# M5nr.fasta
+# m5nr.fasta
 - name: M5nr
   parser:
-    - sort -T . -m -u ${PARSED_DIR}/*/md52seq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5nr.fasta
+    - sort -T . -m -u ${PARSED_DIR}/*/md52seq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5nr.raw.fasta
+    - ${M5NR_BIN}/seqUtil --input m5nr.raw.fasta --output m5nr.fasta --stdfasta --protein --iupac --ambig_per 85
+    - ${M5NR_BIN}/seq_length_stats.py --input m5nr.fasta --output m5nr.stats --protein --strict
+    - diamond makedb --in m5nr.fasta -d m5nr
 
-# M5rna.fasta
+# m5rna.fasta
 - name: M5rna
   parser:
     - sort -T . -m -u ${PARSED_DIR}/*/md52rnaseq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
+    - ${M5NR_BIN}/seq_length_stats.py --input m5rna.fasta --output m5rna.stats --strict
+    - diamond makedb --in m5rna.fasta -d m5rna
 
-# levelDB store
-- name: Merge
+# m5nr.ldb
+- name: LevelDB
   depends:
     - Functions
     - LCA
-    - M5nr
-    - M5rna
   parser:
     - mkdir -p m5nr.ldb
     - ${M5NR_BIN}/merge_annotation.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --lca ../LCA/md52lca.txt --func ../Functions/id2func.txt --sources ${SOURCE_FILE} --db m5nr.ldb
 
 - name: Cassandra
   depends:
-    - Merge
+    - LevelDB
   parser:
-    - ${M5NR_BIN}/export_annotation_for_cass.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../Merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
+    - ${M5NR_BIN}/export_annotation_for_cass.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr.ldb --output m5nr_v${M5NR_VERSION}
 
 - name: Solr
   depends:
-    - Merge
+    - LevelDB
   parser:
-    - ${M5NR_BIN}/export_annotation_for_solr.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../Merge/m5nr.ldb --output m5nr_v${M5NR_VERSION}
+    - ${M5NR_BIN}/export_annotation_for_solr.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr.ldb --output m5nr_v${M5NR_VERSION}
 
