@@ -143,7 +143,7 @@ def main(args):
                 if (t != '-') and (name != t):
                     taxaData[tid][TAX_RANKS[i]] = t
                     data[TAX_RANKS[i]] = t
-            otHdl.write(json.loads(data)+"\n")
+            otHdl.write(json.dumps(data)+"\n")
     otHdl.close()
     json.dump(taxaData, open(args.output+'.taxonomy'))
     print "done reading: "+str(datetime.now())
@@ -170,7 +170,7 @@ def main(args):
                 for i in range(level):
                     if hier[i] != '-':
                         data["level%d"%(i+1)] = hier[i]
-                ofHdl.write(json.loads(data)+"\n")
+                ofHdl.write(json.dumps(data)+"\n")
         print "done reading: "+str(datetime.now())
         print "processed %d branches"%(count)
     ofHdl.close()
@@ -210,7 +210,7 @@ def main(args):
                         data.update(taxaData[ann['taxid'][i]])
                     except:
                         pass
-                    oaHdl.write(json.loads(data)+"\n")
+                    oaHdl.write(json.dumps(data)+"\n")
         oaHdl.close()
         print "done reading: "+str(datetime.now())
         print "processed %d annotations"%(count)
