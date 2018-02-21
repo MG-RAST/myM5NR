@@ -145,7 +145,6 @@ def main(args):
                     data[TAX_RANKS[i]] = t
             otHdl.write(json.dumps(data)+"\n")
     otHdl.close()
-    json.dump(taxaData, open(args.output+'.taxonomy'))
     print "done reading: "+str(datetime.now())
     print "processed %d taxa"%(count)
     
