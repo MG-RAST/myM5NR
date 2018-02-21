@@ -151,9 +151,10 @@ def main(args):
     # ontology file
     ofHdl = open(args.output+'.ontology', 'w')
     for source in fhSrcs:
-        print "start reading %s: %s"%(args.taxa, str(datetime.now()))
+        hierfile = os.path.join(args.parsedir, source, HIERARCHY_FILE)
+        print "start reading %s: %s"%(hierfile, str(datetime.now()))
         count = 0
-        ifHdl = open(os.path.join(args.parsedir, source, HIERARCHY_FILE), 'r')
+        ifHdl = open(hierfile, 'r')
         for line in ifHdl:
             hier  = line.strip().split("\t")
             accid = hier.pop(0)
