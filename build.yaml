@@ -27,7 +27,7 @@
   parser:
     - sort -T . -m -u ${PARSED_DIR}/*/md52seq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5nr.raw.fasta
     - ${M5NR_BIN}/seqUtil --input m5nr.raw.fasta --output m5nr.fasta --stdfasta --protein --iupac --ambig_per 85 --minimum 20
-    - ${M5NR_BIN}/seq_length_stats.py --input m5nr.fasta --output m5nr.stats --protein --strict
+    - ${M5NR_BIN}/seq_length_stats.py --input m5nr.fasta --output m5nr.stats --protein --strict --iupac --x_percent 90
     - diamond makedb --in m5nr.fasta -d m5nr
 
 # m5rna.fasta
