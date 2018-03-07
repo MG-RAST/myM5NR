@@ -5,8 +5,8 @@ import sys
 import json
 import yaml
 import argparse
+from datetime import datetime
 from nested_dict import nested_dict
-from collections import defaultdict
 
 FUNC_HIER_FILE = 'id2hierarchy.txt'
 
@@ -22,7 +22,7 @@ def buildTree(fname, skipdash=False):
             cols = map(lambda x: 'null' if x == '-' else x, cols)
         if cols == 0:
             continue
-        branch = cid
+        branch = {'id': cid, 'depth': len(cols)}
         for c in reversed(cols):
             branch = {c: branch}
         tree.update(nested_dict(branch))
