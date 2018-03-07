@@ -30,7 +30,7 @@ RUN git clone https://github.com/google/leveldb.git \
     && cp -r leveldb /usr/local/include/ \
     && ldconfig
 
-RUN pip2 install plyvel
+RUN pip2 install plyvel nested_dict
 RUN pip3 install PrettyTable pyyaml
 
 # install the SEED environment for Subsystem data download
