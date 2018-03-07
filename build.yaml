@@ -27,6 +27,8 @@
   parser:
     - ${M5NR_BIN}/hierarchy2tree.py --type taxonomy --input ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --output taxonomy.json
     - ${M5NR_BIN}/hierarchy2tree.py --type functional --input ${SOURCE_FILE} --output functional.json --parsedir ${PARSED_DIR}
+    - gzip taxonomy.json
+    - gzip functional.json
 
 # m5nr.fasta
 - name: M5nr
