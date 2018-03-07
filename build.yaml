@@ -22,6 +22,12 @@
     - sort -T . -m -u -o md52taxid.all.txt ${PARSED_DIR}/*/md52taxid.sort.txt
     - ${M5NR_BIN}/md52lca.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --input md52taxid.all.txt --output md52lca.txt
 
+# taxonomy.json.gz / functional.json.gz
+- name: Hierarchies
+  parser:
+    - ${M5NR_BIN}/hierarchy2tree.py --type taxonomy --input ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --output taxonomy.json --parsedir ${PARSED_DIR}
+    - ${M5NR_BIN}/hierarchy2tree.py --type functional --input ${SOURCE_FILE} --output functional.json --parsedir ${PARSED_DIR}
+
 # m5nr.fasta
 - name: M5nr
   parser:
@@ -50,16 +56,19 @@
   parser:
     - mkdir -p m5nr.ldb
     - ${M5NR_BIN}/merge_annotation.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --lca ../LCA/md52lca.txt --func ../Functions/id2func.txt --sources ${SOURCE_FILE} --db m5nr.ldb
+    - tar -zcf m5nr_v${M5NR_VERSION}.ldb.tgz m5nr.ldb
 
 - name: Cassandra
   depends:
     - LevelDB
   parser:
     - ${M5NR_BIN}/export_annotation_for_cass.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr.ldb --output m5nr_v${M5NR_VERSION}
+    - tar -zcf m5nr_v${M5NR_VERSION}.cass.tgz m5nr_v${M5NR_VERSION}.*
 
 - name: Solr
   depends:
     - LevelDB
   parser:
     - ${M5NR_BIN}/export_annotation_for_solr.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr.ldb --output m5nr_v${M5NR_VERSION}
+    - tar -zcf m5nr_v${M5NR_VERSION}.solr.tgz m5nr_v${M5NR_VERSION}.*
 

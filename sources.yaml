@@ -66,9 +66,9 @@ CAZy:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_cazy.txt ../TrEmble/md52id_cazy.txt
       - ${M5NR_BIN}/create-cazy-hierarchy.pl --input md52id.sort.txt > id2hierarchy.txt
+      - sed -i s'/[\d128-\d255]//g' id2hierarchy.txt
+      - sed -i s'/\\//g' id2hierarchy.txt
       - cut -f1,3 id2hierarchy.txt > id2func.txt
-      - sed -i s'/[\d128-\d255]//g' id2func.txt
-      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
 
@@ -88,8 +88,8 @@ COG:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_cog.txt ../TrEmble/md52id_cog.txt
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > ${SOURCE_DIR}/id_mapper.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
+      - sed -i s'/\\//g' id2hierarchy.txt
       - cut -f1,4 id2hierarchy.txt > id2func.txt
-      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
 
@@ -109,8 +109,8 @@ EC:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ec.txt ../TrEmble/md52id_ec.txt
       - ${M5NR_BIN}/create-ec-hierarchy.pl --class ${SOURCE_DIR}/enzclass.txt --input ${SOURCE_DIR}/enzyme.dat > id2hierarchy.txt
+      - sed -i s'/\\//g' id2hierarchy.txt
       - cut -f1,5 id2hierarchy.txt > id2func.txt
-      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
 
 EggNOG:
@@ -129,8 +129,8 @@ EggNOG:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_eggnog.txt ../TrEmble/md52id_eggnog.txt
       - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > ${SOURCE_DIR}/id_mapper.txt
       - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
+      - sed -i s'/\\//g' id2hierarchy.txt
       - cut -f1,4 id2hierarchy.txt > id2func.txt
-      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
     # the hierarchy is hardcoded in script
 
@@ -166,8 +166,8 @@ goslim:
     parser:
       - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_go.txt ../TrEmble/md52id_go.txt
       - ${M5NR_BIN}/goslim.pl ${SOURCE_DIR}/goslim_metagenomics.obo
+      - sed -i s'/\\//g' id2hierarchy.txt
       - cut -f1,4 id2hierarchy.txt > id2func.txt
-      - sed -i s'/\\//g' id2func.txt
       - ${M5NR_BIN}/merge_md5.py
 
 Greengenes:
@@ -221,6 +221,7 @@ KEGG:
       - ${M5NR_BIN}/merge_md5.py --idonly
 
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)
+# NOTE: these are DNA sequences
 motuDB:
     category: protein
     type: filter set
