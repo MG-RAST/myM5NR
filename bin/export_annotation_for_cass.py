@@ -103,7 +103,7 @@ def main(args):
     sourceInfo = yaml.load(open(args.sources, 'r'))
     fhSrcs = set()
     for src in sourceInfo.iterkeys():
-        if sourceInfo[src]['type'] == 'hierarchical function annotation':
+        if (sourceInfo[src]'category' == 'protein') and (sourceInfo[src]['type'] == 'hierarchical function annotation'):
             fhSrcs.add(src)
     if len(fhSrcs) == 0:
         sys.stderr.write("missing functional hierarchies in %s\n"%(args.sources))
@@ -190,14 +190,14 @@ def main(args):
         mcvs = csv.writer(mhdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
         ihdl = open(args.output+'.annotation.midx', 'w')
         icvs = csv.writer(ihdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-    
+        
         print "start reading %s: %s"%(args.db, str(datetime.now()))
         count = 0
         for key, value in db:
             data = json.loads(value)
             isaa = 'true' if data['is_aa'] else 'false'
             count += 1
-            for ann in data['ann']:                
+            for ann in data['ann']:
                 md5ann = [
                     key,
                     ann['source'],

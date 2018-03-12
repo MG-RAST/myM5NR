@@ -189,7 +189,7 @@ def main(args):
             if oldAnn:
                 annData = mergeMd5Sources(oldAnn, annData)
         # insert the data
-        db.put(minMd5, json.dumps(annData))
+        db.put(minMd5, json.dumps(annData, separators=(',',':')))
         # iterate files that had minimal
         if lcaSet[0] == minMd5:
             lcaSet = nextLCA(lcaHdl)

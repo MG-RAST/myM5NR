@@ -2,7 +2,6 @@
 
 import os
 import sys
-import csv
 import json
 import yaml
 import plyvel
@@ -87,14 +86,11 @@ def main(args):
     srcInfo = yaml.load(open(args.sources, 'r'))
     osHdl   = open(args.output+'.source', 'w')
     for src in srcInfo.iterkeys():
-        if src.startswith('M5'):
-            continue
         count += 1
-        if srcInfo[src]['type'] == 'hierarchical function annotation':
+        stype = srcInfo[src]['category']
+        if (srcInfo[src]'category' == 'protein') and (srcInfo[src]['type'] == 'hierarchical function annotation'):
             fhSrcs.add(src)
             stype = 'ontology'
-        else:
-            stype = srcInfo[src]['category']
         srcData[src] = stype
         data = {
             'object': 'source',

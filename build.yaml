@@ -60,6 +60,13 @@
     - ${M5NR_BIN}/merge_annotation.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --lca ../LCA/md52lca.txt --func ../Functions/id2func.txt --sources ${SOURCE_FILE} --db m5nr.ldb
     - tar -zcf m5nr_v${M5NR_VERSION}.ldb.tgz m5nr.ldb
 
+# m5nr_v#.bdb
+- name: BerkelyDB
+  depends:
+    - LevelDB
+  parser:
+    - ${M5NR_BIN}/export_annotation_for_bdb.py --sources ${SOURCE_FILE} --db ../LevelDB/m5nr.ldb --output m5nr_v${M5NR_VERSION}.bdb
+
 - name: Cassandra
   depends:
     - LevelDB
