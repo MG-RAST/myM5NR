@@ -65,7 +65,7 @@ def main(args):
     for src in srcInfo.iterkeys():
         count += 1
         stype = srcInfo[src]['category']
-        if (srcInfo[src]'category' == 'protein') and (srcInfo[src]['type'] == 'hierarchical function annotation'):
+        if (srcInfo[src]['category'] == 'protein') and (srcInfo[src]['type'] == 'hierarchical function annotation'):
             stype = 'ontology'
         srcData[str(count)] = [src, stype]
         srcIDs[src] = str(count)

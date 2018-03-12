@@ -103,7 +103,7 @@ def main(args):
     sourceInfo = yaml.load(open(args.sources, 'r'))
     fhSrcs = set()
     for src in sourceInfo.iterkeys():
-        if (sourceInfo[src]'category' == 'protein') and (sourceInfo[src]['type'] == 'hierarchical function annotation'):
+        if (sourceInfo[src]['category'] == 'protein') and (sourceInfo[src]['type'] == 'hierarchical function annotation'):
             fhSrcs.add(src)
     if len(fhSrcs) == 0:
         sys.stderr.write("missing functional hierarchies in %s\n"%(args.sources))

@@ -88,7 +88,7 @@ def main(args):
     for src in srcInfo.iterkeys():
         count += 1
         stype = srcInfo[src]['category']
-        if (srcInfo[src]'category' == 'protein') and (srcInfo[src]['type'] == 'hierarchical function annotation'):
+        if (srcInfo[src]['category'] == 'protein') and (srcInfo[src]['type'] == 'hierarchical function annotation'):
             fhSrcs.add(src)
             stype = 'ontology'
         srcData[src] = stype
