@@ -73,7 +73,11 @@ def main(args):
     print "processed %d sources"%(count)
     
     # get bdb file, insert data
-    bdb = bsddb.hashopen(args.output, 'c')
+    try:
+        bdb = bsddb.hashopen(args.output, 'c')
+    except:
+        sys.stderr.write("unable to open DB at %s\n"%(args.output))
+        return 1
     bdb['source'] = json.dumps(srcData, separators=(',',':'))
     
     # lca from levelDB
@@ -85,7 +89,7 @@ def main(args):
     
     print "start reading %s: %s"%(args.db, str(datetime.now()))
     count = 0
-    for key, value in db:
+    for key, value in ldb:
         count += 1
         bigdata = json.loads(value)
         smalldata = { 'lca' : [], 'ann' : {} }
@@ -97,7 +101,9 @@ def main(args):
         bdb[md5] = json.dumps(smalldata, separators=(',',':'))
     print "done reading: "+str(datetime.now())
     print "processed %d md5s"%(count)
-    db.close()
+    
+    ldb.close()
+    bdb.close()
     
     return 0
 
