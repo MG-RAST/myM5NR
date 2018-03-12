@@ -95,7 +95,7 @@ def main(args):
         smalldata = { 'lca' : [], 'ann' : {} }
         if 'lca' in bigdata:
             smalldata['lca'] = bigdata['lca']
-        for ann in data['ann']:
+        for ann in bigdata['ann']:
             if ann['source'] in srcIDs:
                 smalldata['ann'][ srcIDs[ann['source']] ] = True
         bdb[md5] = json.dumps(smalldata, separators=(',',':'))
