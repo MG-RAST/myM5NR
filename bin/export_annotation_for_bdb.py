@@ -98,7 +98,7 @@ def main(args):
         for ann in bigdata['ann']:
             if ann['source'] in srcIDs:
                 smalldata['ann'][ srcIDs[ann['source']] ] = True
-        bdb[md5] = json.dumps(smalldata, separators=(',',':'))
+        bdb[key] = json.dumps(smalldata, separators=(',',':'))
     print "done reading: "+str(datetime.now())
     print "processed %d md5s"%(count)
     
