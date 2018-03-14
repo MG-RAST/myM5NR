@@ -23,7 +23,7 @@ BacMet:
     type: function annotation
     homepage: http://bacmet.biomedicine.gu.se
     description: Antibacterial Biocide & Metal Resistance Genes Database
-    version: curl ${CURL_OPTS} "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "Database Statistics (version [0-9\.]*)" | grep -o [0-9\.]*
+    version: curl ${CURL_OPTS} "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "(version [0-9\.]\+)" | grep -o "[0-9\.]\+"
     download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
     parser:
       - unzip -o ${SOURCE_DIR}/BacMet1.1.zip -d ${SOURCE_DIR}
@@ -40,7 +40,7 @@ CARD:
     type: function annotation
     homepage: https://card.mcmaster.ca
     description: The Comprehensive Antibiotic Resistance Database
-    version: curl ${CURL_OPTS} "https://card.mcmaster.ca/download" | grep ">CARD<" | grep -o ">[0-9][0-9\.]*<" | head -n1 |  grep -o "[0-9\.]*"
+    version: curl ${CURL_OPTS} "https://card.mcmaster.ca/download" | grep "<tr><td>Data</td>" | grep -o ">[0-9\.]\+<" | head -n1 | grep -o "[0-9\.]\+"
     download: https://card.mcmaster.ca/latest/data
     parser:
       - tar -xjf ${SOURCE_DIR}/data -C ${SOURCE_DIR}
