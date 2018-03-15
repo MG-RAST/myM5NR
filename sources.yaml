@@ -256,12 +256,12 @@ PATRIC:
     type: function annotation
     homepage: https://www.patricbrc.org
     description: Bioinformatics Database
-    version: wget -qO- ftp://ftp.patricbrc.org/patric2/ | grep current_release | grep -o "20[0-9][0-9] [a-zA-Z]*"
+    version: curl ${CURL_OPTS} 'https://www.patricbrc.org/' | grep -A 3 'PATRIC Logo' | grep 'appLabel' | grep -o '[0-9\.]\+'
     depends:
       - NCBI-Taxonomy
     download-command: ${M5NR_BIN}/download_PATRIC.sh
     parser:
-      - ${M5NR_BIN}/patric.pl ${SOURCE_DIR}/ ../NCBI-Taxonomy/taxonomy.tsv
+      - ${M5NR_BIN}/patric.py --dir ${SOURCE_DIR}/ --taxa ../NCBI-Taxonomy/taxonomy.tsv
       - sed -i s'/\\//g' md52func.txt
       - sort -T . -u -o md52seq.sort.txt md52seq.txt
       - sort -T . -o md52func.sort.txt md52func.txt
