@@ -51,6 +51,9 @@ def main(args):
             print "[warning] invalid file: "+fname
             continue
         for feature in data:
+            if ('feature_type' not in feature) or (feature['feature_type'] != 'CDS'):
+                # only save protein coding features
+                continue
             try:
                 sequence = "".join(feature['aa_sequence'].split()).upper()
                 md5sum   = md5.new(sequence).hexdigest()
