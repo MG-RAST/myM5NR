@@ -633,9 +633,6 @@ def status(sources_directory, parses_directory, build_directory):
     # table for download / parse
     summary_table = PrettyTable()
     
-    # table for build
-    build_table = PrettyTable()
-    
     for source in sources:
         download_success = False
         download_error_message = ""
@@ -710,55 +707,57 @@ def status(sources_directory, parses_directory, build_directory):
                 parsing_timestamp = x.read().strip().split(".")[0]
         
         summary_table.add_row([source, remote_version, current_version, download_success, download_timestamp, source_dir_size_mb_int, d_message, parsing_success, parsing_timestamp, p_message ])
+    # done for loop
     
-    
-    for build in config_build:
-        build_success = False
-        build_error_message = ""
-        
-        build_dir = os.path.join(build_directory , build['name'])
-        build_dir_part = build_dir+"_part"
-        
-        current_version = ''
-        error_message = ''
-        build_timestamp = ''
-        
-        version_file = os.path.join(build_dir, "version.txt")
-        error_file = os.path.join(build_dir_part, "error.txt")
-        timestamp_file = os.path.join(build_dir, "timestamp.txt")
-        
-        if (not os.path.isdir(build_dir)) and os.path.exists(error_file):
-            with open(error_file) as x:
-                error_message = x.read()
-        
-        if os.path.exists(version_file):
-            with open(version_file) as x:
-                current_version = x.read()
-        
-        if current_version != "" :
-            build_success = True # TODO is success possible without version number ?
-        
-        emessage = error_message[0:30]
-        
-        if len(emessage) == 30:
-            emessage += "..."
-        
-        if os.path.exists(timestamp_file):
-            with open(timestamp_file) as x:
-                build_timestamp = x.read().strip().split(".")[0]
-        
-        build_table.add_row([build['name'], current_version, build_success, build_timestamp, emessage])
-        
-    
-    # add headers
     summary_table.field_names = ['Database', 'Remote Version', 'Local Version', 'Download Success', 'Download Timestamp', 'Size (MB)', 'Download Error','Parsing Success', 'Parsing Timestamp', 'Parsing Error']
     summary_table.align = "l"
-    build_table.field_names = ['Build Step', 'M5NR version', 'Success', 'Timestamp', 'Error']
-    build_table.align = "l"
-    
-    # print tables
     print(summary_table.get_string(sortby="Database"))
-    print(build_table.get_string())
+    
+    if build_directory:
+        # table for build
+        build_table = PrettyTable()
+        
+        for build in config_build:
+            build_success = False
+            build_error_message = ""
+            
+            build_dir = os.path.join(build_directory , build['name'])
+            build_dir_part = build_dir+"_part"
+            
+            current_version = ''
+            error_message = ''
+            build_timestamp = ''
+            
+            version_file = os.path.join(build_dir, "version.txt")
+            error_file = os.path.join(build_dir_part, "error.txt")
+            timestamp_file = os.path.join(build_dir, "timestamp.txt")
+            
+            if (not os.path.isdir(build_dir)) and os.path.exists(error_file):
+                with open(error_file) as x:
+                    error_message = x.read()
+            
+            if os.path.exists(version_file):
+                with open(version_file) as x:
+                    current_version = x.read()
+            
+            if current_version != "" :
+            build_success = True # TODO is success possible without version number ?
+            
+            emessage = error_message[0:30]
+            
+            if len(emessage) == 30:
+                emessage += "..."
+            
+            if os.path.exists(timestamp_file):
+                with open(timestamp_file) as x:
+                    build_timestamp = x.read().strip().split(".")[0]
+            
+            build_table.add_row([build['name'], current_version, build_success, build_timestamp, emessage])
+        # done for loop
+        
+        build_table.field_names = ['Build Step', 'M5NR version', 'Success', 'Timestamp', 'Error']
+        build_table.align = "l"
+        print(build_table.get_string())
 
 
 # only use this with complete source list, so no broken / missing dependencies
@@ -885,12 +884,12 @@ if args.commands == "status":
 
 if args.commands == "download":
     success_status = download_sources(sources_directory, sources)
-    status(sources_directory, parses_directory, build_directory)
+    status(sources_directory, parses_directory, None)
     sys.exit(success_status)
     
 if args.commands == "parse":
     success_status = parse_sources(parses_directory, sources, sources_directory)
-    status(sources_directory, parses_directory, build_directory)
+    status(sources_directory, parses_directory, None)
     sys.exit(success_status)
     
 if args.commands == "build":
