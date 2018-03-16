@@ -839,7 +839,7 @@ if not args.commands:
     sys.exit(0)
 
 # get source list
-if args.commands == "status":
+if args.commands == "dependancy":
     sources_sorted_by_dependency(True)
     sys.exit(0)
 else:
