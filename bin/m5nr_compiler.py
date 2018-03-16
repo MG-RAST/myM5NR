@@ -682,7 +682,7 @@ def status(sources_directory, parses_directory, build_directory):
             if source_dir_size_mb > 1:
                 source_dir_size_mb_int = int(source_dir_size_mb)
             else:
-                source_dir_size_mb_int = "%.3f"%(source_dir_size_mb)
+                source_dir_size_mb_int = "%.5f"%(source_dir_size_mb)
         
         if not download_success:
             source_dir_size_mb_int = ''
