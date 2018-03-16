@@ -640,6 +640,10 @@ def status(sources_directory, parses_directory, build_directory):
         parsing_error_message = ""
         
         source_obj = config_sources[source]
+        if ('skip' in source_obj) and source_obj['skip']:
+            summary_table.add_row([source, "", "", "Skip", "", "", "", "Skip", "", "" ])
+            continue
+        
         remote_version = ""
         if source in remote_versions_hashed:
             remote_version = str(remote_versions_hashed[source])
