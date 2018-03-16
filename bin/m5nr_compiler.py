@@ -675,7 +675,7 @@ def status(sources_directory, parses_directory, build_directory):
             with open(version_file) as x:
                 current_version = x.read()
         
-        if current_version != "" 
+        if current_version != "":
             download_success = True # TODO is success possible without version number ?
             source_dir_size = get_dir_size(source_dir)
             source_dir_size_mb = source_dir_size/(1014*1024*1.0)
