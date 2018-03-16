@@ -678,8 +678,11 @@ def status(sources_directory, parses_directory, build_directory):
         if current_version != "" :
             download_success = True # TODO is success possible without version number ?
             source_dir_size = get_dir_size(source_dir)
-            source_dir_size_mb = source_dir_size/(1014*1024)
-            source_dir_size_mb_int = int(source_dir_size_mb)
+            source_dir_size_mb = source_dir_size/(1014*1024*1.0)
+            if source_dir_size_mb > 1:
+                source_dir_size_mb_int = int(source_dir_size_mb)
+            else:
+                source_dir_size_mb_int = source_dir_size_mb
         
         d_message = download_error_message[0:30]
         p_message = parsing_error_message[0:30]
@@ -693,8 +696,8 @@ def status(sources_directory, parses_directory, build_directory):
         if os.path.exists(parsing_version_file):
             parsing_success = True
         
-        if source_dir_size_mb_int == 0:
-            source_dir_size_mb_int = ''
+        #if source_dir_size_mb_int == 0:
+        #    source_dir_size_mb_int = ''
         
         # get current timestamps
         download_timestamp = ""
