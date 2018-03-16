@@ -762,7 +762,7 @@ def status(sources_directory, parses_directory, build_directory):
 
 
 # only use this with complete source list, so no broken / missing dependencies
-def sources_sorted_by_dependency():
+def sources_sorted_by_dependency(display=False):
     sorted_sources = []
     sources = sorted(config_sources.keys())
     
@@ -770,6 +770,8 @@ def sources_sorted_by_dependency():
     for src in sources:
         if 'depends' not in config_sources[src]:
             sorted_sources.append(src)
+            if display:
+                print(src)
     
     # add dependencies
     while len(sorted_sources) != len(sources):
@@ -782,6 +784,10 @@ def sources_sorted_by_dependency():
                     has_dependants += 1
             if len(config_sources[src]['depends']) == has_dependants:
                 sorted_sources.append(src)
+                if display:
+                    print(src)
+                    for dep in config_sources[src]['depends']:
+                        print("\t"+dep)
     return sorted_sources
 
 
@@ -792,6 +798,7 @@ subparsers = parser.add_subparsers(title='subcommands', help='sub-command help',
 
 parser.add_argument('--debug', '-d', action='store_true')
 
+status_parser = subparsers.add_parser("dependancy")
 status_parser = subparsers.add_parser("status")
 download_parser = subparsers.add_parser("download")
 parse_parser = subparsers.add_parser("parse")
@@ -832,7 +839,12 @@ if not args.commands:
     sys.exit(0)
 
 # get source list
-all_source = sources_sorted_by_dependency()
+if args.commands == "status":
+    sources_sorted_by_dependency(True)
+    sys.exit(0)
+else:
+    all_source = sources_sorted_by_dependency()
+
 sources = None
 if hasattr(args, 'sources') and args.sources:
     sources = args.sources.split(" ")
