@@ -16,7 +16,8 @@ import pprint
 from prettytable import PrettyTable
 import datetime
 
-CURL_OPTS = '--silent --connect-timeout 10 -L'
+# variable for use in config file: --location (-L) = follow redirect
+CURL_OPTS = '--silent --show-error --connect-timeout 10 --location'
 
 bin_dir = os.path.dirname(os.path.realpath(__file__))
 repo_dir = os.path.normpath(os.path.join(bin_dir, ".."))
@@ -40,42 +41,32 @@ def execute_command(command, env):
     
     if env:
         for key in env:
-            #print("key: %s" % (key))
             search_string = "${"+key+"}"
-            if args.debug:
-                print("search_string: %s" % (search_string))
             value = env[key]
             command = command.replace(search_string, value)
         
         if args.debug:
            print("exec: %s" % (command), flush=True)
-            
         process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable='/bin/bash', env=env)
     else:
         if args.debug:
            print("exec: %s" % (command), flush=True)
-        #print("no special environment")
         process = subprocess.Popen(command, shell=True,  stdout=PIPE, stderr=STDOUT, close_fds=True, executable='/bin/bash')
   
     last_line = ''
     while True:
-        #print('loop')
         output = process.stdout.readline()
         rc = process.poll()
         if (not output) and (process.poll() is not None):
-            #print("Cond 1")
             break
-        
         if output:
             last_line = output.decode("utf-8").rstrip()
-            print(last_line)
         if rc==0:
-            #print("Cond 2")
             break
     
     if args.debug:
         print(last_line)
-        
+    
     if process.returncode:
         raise MyException("Command failed (return code %d, command: %s): %s" % (process.returncode, command, last_line[0:500]))
         
@@ -102,7 +93,7 @@ def create_environment(source_obj, ignore_error=False):
         for key in env_obj:
             value = env_obj[key]
             try:
-                value_evaluated  = execute_command(value, None)
+                value_evaluated  = execute_command(value, new_environment)
             except Exception as e:
                 if ignore_error:
                     sys.stderr.write("warning: execute_command for key %s failed: %s\n"%(key, str(e)))
@@ -182,14 +173,10 @@ def download_source(directory, source_name):
                 if not url:
                     continue
                 
-                silent="--silent "
-                if args.debug:
-                    silent = ""
                 # curl: --speed-time 15 --speed-limit 1000 : stop transfer if less than 1000 bytes per second during 15 seconds
-                # -C - (try to resume download)
-                download_command = "curl %s--connect-timeout 10 --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 --remote-name-all -L -C - %s" % (silent, url)
+                # --continue-at - (try to resume download)
+                download_command = "curl %s --retry 5 --retry-delay 10 --speed-time 15 --speed-limit 1000 --remote-name-all --continue-at - %s" % (CURL_OPTS, url)
                 
-                    
                 some_text=""    
                 if args.simulate:
                     print("SIMULATION MODE: "+download_command)

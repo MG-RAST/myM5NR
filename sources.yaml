@@ -6,7 +6,7 @@
 # M5NR_BIN       Full path to the "bin" directory in the myM5NR repository (use in any field)
 # SOURCE_DIR     The directory where the source data is located (use "parser" field)
 # VERSION        Version string as obtained from remote website (use in "download" field)
-# CURL_OPTS      --silent --connect-timeout 10 -L
+# CURL_OPTS      --silent --show-error --connect-timeout 10 -L
 # user-defined   Use dict "env" to create user defined environvent variables: key is name of new variable, value is a command that generate value
 #
 # fields:
@@ -294,7 +294,7 @@ PhAnToMe:
     homepage: http://www.phantome.org
     description: Phage Annotation Tools and Methods
     env:
-        TIMESTAMP: curl --silent --connect-timeout 10 -L http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
+        TIMESTAMP: curl ${CURL_OPTS} http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
     version: date -d @${TIMESTAMP} +"%Y%m%d"
     depends:
       - NCBI-Taxonomy
@@ -343,7 +343,7 @@ RefSeq:
     depends:
       - NCBI-Taxonomy
     env:
-        COUNT: curl --silent --connect-timeout 10 -L ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
+        COUNT: curl ${CURL_OPTS} ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
     download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.gpff.gz
     resume-download: true
     parser:
@@ -399,7 +399,7 @@ SILVA-LSU:
     type: LSU
     homepage: http://www.arb-silva.de
     description: SILVA Large Subunit rRNA Database
-    version: curl ${CURL_OPTS} -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
+    version: curl ${CURL_OPTS} "ftp://ftp.arb-silva.de/current/Exports/" | grep -o "SILVA_[0-9\.]\+_LSURef_tax_silva_trunc.fasta.gz$" | grep -o "[0-9][0-9\.]\+"
     depends:
       - NCBI-Taxonomy
     download:
@@ -417,7 +417,7 @@ SILVA-SSU:
     type: SSU
     homepage: http://www.arb-silva.de
     description: SILVA Small Subunit rRNA Database
-    version: curl ${CURL_OPTS} -N "ftp://ftp.arb-silva.de//current/Exports/README.txt" | head -n 1 | grep -o "SILVA [0-9.]*" | cut -d ' ' -f 2
+    version: curl ${CURL_OPTS} "ftp://ftp.arb-silva.de/current/Exports/" | grep -o "SILVA_[0-9\.]\+_LSURef_tax_silva_trunc.fasta.gz$" | grep -o "[0-9][0-9\.]\+"
     depends:
       - NCBI-Taxonomy
     download:
