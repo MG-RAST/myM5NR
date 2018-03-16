@@ -744,8 +744,8 @@ def status(sources_directory, parses_directory, build_directory):
                 with open(version_file) as x:
                     current_version = x.read()
             
-            if current_version != "" :
-            build_success = True # TODO is success possible without version number ?
+            if current_version != "":
+                build_success = True # TODO is success possible without version number ?
             
             emessage = error_message[0:30]
             
