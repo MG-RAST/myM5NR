@@ -19,6 +19,7 @@ if [ "$ACTION" == "download" ]; then
         SUBDIR=${PREFIX:0:2}
     fi
     mkdir -p ${SUBDIR}
+    
     FILE="${SUBDIR}/${VALUE}.features.json"
     if [ ! -e ${FILE} ]; then
         rm -f ${FILE}_part
