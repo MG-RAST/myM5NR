@@ -33,16 +33,16 @@ elif [ "$ACTION" == "wrapper" ]; then
     for MIN in `seq 0 100 9900`; do
         MAX=$((MIN + 100))
         GENOMES=`curl -s ${GENOME_URL} --data "eq(taxon_lineage_ids,131567)&select(genome_id)&limit(25000)&ge(patric_cds,${MIN})&lt(patric_cds,${MAX})" 2> /dev/null | tail -n +2 | tr -d '"'`
-        COUNT=`echo ${GENOMES} | wc -l`
+        COUNT=`echo ${GENOMES} | tr ' ' '\n' | wc -l`
         echo "Downloading ${COUNT} genome files, feature count range: ${MIN} - ${MAX}"
-        echo ${GENOMES} | xargs -n 1 -I {} -P ${VALUE} ${SELF} download {}
+        echo ${GENOMES} | tr ' ' '\n' | xargs -n 1 -I {} -P ${VALUE} ${SELF} download {}
     done
 
     # all with CDS count > 10000
     GENOMES=`curl -s ${GENOME_URL} --data "eq(taxon_lineage_ids,131567)&select(genome_id)&limit(25000)&ge(patric_cds,10000)" 2> /dev/null | tail -n +2 | tr -d '"'`
-    COUNT=`echo ${GENOMES} | wc -l`
+    COUNT=`echo ${GENOMES} | tr ' ' '\n' | wc -l`
     echo "Downloading ${COUNT} genome files, feature counts > 10000"
-    echo ${GENOMES} | xargs -n 1 -I {} -P ${VALUE} ${SELF} download {}
+    echo ${GENOMES} | tr ' ' '\n' | xargs -n 1 -I {} -P ${VALUE} ${SELF} download {}
 
 else
     echo "[error] invalid action request"
