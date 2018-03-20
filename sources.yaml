@@ -276,6 +276,7 @@ PATRIC:
   depends:
     - NCBI-Taxonomy
   download-command: ${M5NR_BIN}/download_PATRIC.sh wrapper 8
+  resume-download: true
   parser:
     - ${M5NR_BIN}/patric.py --dir ${SOURCE_DIR}/ --taxa ../NCBI-Taxonomy/taxonomy.tsv
     - sed -i s'/\\//g' md52func.txt
@@ -385,7 +386,7 @@ SEED-Annotations:
   rank: 2
   depends:
     - NCBI-Taxonomy
-  download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org
+  download-command: ${M5NR_BIN}/querySAS.pl --source=SEED --output=SEED.md52id2func2org
   resume-download: true
   parser:
     - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org ../NCBI-Taxonomy/taxonomy.tsv
