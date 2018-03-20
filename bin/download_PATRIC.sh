@@ -21,9 +21,14 @@ if [ "$ACTION" == "download" ]; then
     mkdir -p ${SUBDIR}
     
     FILE="${SUBDIR}/${VALUE}.features.json"
-    if [ ! -e ${FILE} ]; then
-        rm -f ${FILE}_part
-        curl -s -o ${FILE}_part ${FEATURE_URL} -H 'Accept: application/solr+json' --data "in(genome_id,(${GID}))&limit(25000)&facet((field,feature_type),(mincount,1))" 2> /dev/null
+    FSIZE=0
+    if [ -e ${FILE} ]; then
+        FSIZE=$(stat -c%s ${FILE})
+    fi
+    
+    if [ "${FSIZE}" -lt "10" ]; then
+        rm -f ${FILE} ${FILE}_part
+        curl -s -o ${FILE}_part ${FEATURE_URL} -H 'Accept: application/solr+json' --data "eq(genome_id,${GID})&select(feature_type,aa_sequence,patric_id,product,taxon_id)&limit(25000)&facet((field,feature_type),(mincount,1))" 2> /dev/null
         mv ${FILE}_part ${FILE}
     fi
     
@@ -34,14 +39,14 @@ elif [ "$ACTION" == "wrapper" ]; then
         MAX=$((MIN + 100))
         GENOMES=`curl -s ${GENOME_URL} --data "eq(taxon_lineage_ids,131567)&select(genome_id)&limit(25000)&ge(patric_cds,${MIN})&lt(patric_cds,${MAX})" 2> /dev/null | tail -n +2 | tr -d '"'`
         COUNT=`echo ${GENOMES} | tr ' ' '\n' | wc -l`
-        echo "Downloading ${COUNT} genome files, feature count range: ${MIN} - ${MAX}"
+        stdbuf -o0 echo "Downloading ${COUNT} genome files, feature count range: ${MIN} - ${MAX}"
         echo ${GENOMES} | tr ' ' '\n' | xargs -n 1 -I {} -P ${VALUE} ${SELF} download {}
     done
 
     # all with CDS count > 10000
     GENOMES=`curl -s ${GENOME_URL} --data "eq(taxon_lineage_ids,131567)&select(genome_id)&limit(25000)&ge(patric_cds,10000)" 2> /dev/null | tail -n +2 | tr -d '"'`
     COUNT=`echo ${GENOMES} | tr ' ' '\n' | wc -l`
-    echo "Downloading ${COUNT} genome files, feature counts > 10000"
+    stdbuf -o0 echo "Downloading ${COUNT} genome files, feature counts > 10000"
     echo ${GENOMES} | tr ' ' '\n' | xargs -n 1 -I {} -P ${VALUE} ${SELF} download {}
 
 else
