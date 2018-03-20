@@ -39,36 +39,43 @@ def main(args):
     md52func  = open('md52func.txt', 'w')
     md52taxid = open('md52taxid.txt', 'w')
     
-    # for each .json file in directory
     count = 0
-    for fname in os.listdir(args.dir):
-        data = []
-        try:
-            content = json.load(open(os.path.join(args.dir, fname), 'r'))
-            data = content['response']['docs']
-        except:
-            # some problem with this genome, give warning and move on
-            print "[warning] invalid file: "+fname
+    # for each sub-dir in main dir
+    for subdir in os.listdir(args.dir):
+        path = os.path.join(args.dir, subdir)
+        if not os.path.isdir(path):
             continue
-        for feature in data:
-            if ('feature_type' not in feature) or (feature['feature_type'] != 'CDS'):
-                # only save protein coding features
-                continue
+        # for each .json file in sub-dir
+        for fname in os.listdir(path):
+            data = []
             try:
-                sequence = "".join(feature['aa_sequence'].split()).upper()
-                md5sum   = md5.new(sequence).hexdigest()
-                featid   = feature['patric_id']
-                function = feature['product'].encode('ascii', 'ignore').strip().strip("'\"").strip()
-                taxaid   = int(feature['taxon_id'])
-                taxaname = taxamap[taxaid]
-                md52id.write("%s\t%s\n"%(md5sum, featid))
-                md52seq.write("%s\t%s\n"%(md5sum, sequence))
-                md52func.write("%s\t%s\n"%(md5sum, function))
-                md52taxid.write("%s\t%s\n"%(md5sum, taxaid))
+                content = json.load(open(os.path.join(path, fname), 'r'))
+                data = content['response']['docs']
             except:
-                # some problem with this feature, skip silently
+                # some problem with this genome, give warning and move on
+                print "[warning] invalid file: "+fname
                 continue
-        count += 1
+            for feature in data:
+                if ('feature_type' not in feature) or (feature['feature_type'] != 'CDS'):
+                    # only save protein coding features
+                    continue
+                try:
+                    sequence = "".join(feature['aa_sequence'].split()).upper()
+                    md5sum   = md5.new(sequence).hexdigest()
+                    featid   = feature['patric_id']
+                    function = feature['product'].encode('ascii', 'ignore').strip().strip("'\"").strip()
+                    taxaid   = int(feature['taxon_id'])
+                    taxaname = taxamap[taxaid]
+                    md52id.write("%s\t%s\n"%(md5sum, featid))
+                    md52seq.write("%s\t%s\n"%(md5sum, sequence))
+                    md52func.write("%s\t%s\n"%(md5sum, function))
+                    md52taxid.write("%s\t%s\n"%(md5sum, taxaid))
+                except:
+                    # some problem with this feature, skip silently
+                    continue
+            count += 1
+        # end files loop
+    # end sub-dir loop
     
     print "Done parsing %d genome files"%(count)
     return 0
