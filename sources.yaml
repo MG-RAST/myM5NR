@@ -19,455 +19,479 @@
 #####
 
 BacMet:
-    category: protein
-    type: function annotation
-    homepage: http://bacmet.biomedicine.gu.se
-    description: Antibacterial Biocide & Metal Resistance Genes Database
-    version: curl ${CURL_OPTS} "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "(version [0-9\.]\+)" | grep -o "[0-9\.]\+"
-    download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
-    parser:
-      - unzip -o ${SOURCE_DIR}/BacMet1.1.zip -d ${SOURCE_DIR}
-      - ${M5NR_BIN}/bacmet.pl ${SOURCE_DIR}/BacMet_EXP.704.fasta ${SOURCE_DIR}/BacMet_PRE.*.fasta
-      - sed -i s'/\\//g' md52func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52func.sort.txt md52func.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52func.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: http://bacmet.biomedicine.gu.se
+  description: Antibacterial Biocide & Metal Resistance Genes Database
+  version: curl ${CURL_OPTS} "http://bacmet.biomedicine.gu.se/index.html" | grep -o  "(version [0-9\.]\+)" | grep -o "[0-9\.]\+"
+  rank: 1
+  download: http://bacmet.biomedicine.gu.se/download/BacMet1.1.zip
+  parser:
+    - unzip -o ${SOURCE_DIR}/BacMet1.1.zip -d ${SOURCE_DIR}
+    - ${M5NR_BIN}/bacmet.pl ${SOURCE_DIR}/BacMet_EXP.704.fasta ${SOURCE_DIR}/BacMet_PRE.*.fasta
+    - sed -i s'/\\//g' md52func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52func.sort.txt md52func.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52func.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 CARD:
-    category: protein
-    type: function annotation
-    skip: true
-    homepage: https://card.mcmaster.ca
-    description: The Comprehensive Antibiotic Resistance Database
-    version: curl ${CURL_OPTS} "https://card.mcmaster.ca/download" | grep "<tr><td>Data</td>" | grep -o ">[0-9\.]\+<" | head -n1 | grep -o "[0-9\.]\+"
-    download: https://card.mcmaster.ca/latest/data
-    parser:
-      - tar -xjf ${SOURCE_DIR}/data -C ${SOURCE_DIR}
-      - rm -f ${SOURCE_DIR}/data
-      - ${M5NR_BIN}/card.pl ${SOURCE_DIR}/protein_fasta_protein_homolog_model.fasta
-      - ${M5NR_BIN}/obo2hierarchy.pl ${SOURCE_DIR}/aro.obo
-      - sed -i s'/\\//g' md52func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52func.sort.txt md52func.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52func.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  skip: true
+  homepage: https://card.mcmaster.ca
+  description: The Comprehensive Antibiotic Resistance Database
+  version: curl ${CURL_OPTS} "https://card.mcmaster.ca/download" | grep "<tr><td>Data</td>" | grep -o ">[0-9\.]\+<" | head -n1 | grep -o "[0-9\.]\+"
+  rank: 1
+  download: https://card.mcmaster.ca/latest/data
+  parser:
+    - tar -xjf ${SOURCE_DIR}/data -C ${SOURCE_DIR}
+    - rm -f ${SOURCE_DIR}/data
+    - ${M5NR_BIN}/card.pl ${SOURCE_DIR}/protein_fasta_protein_homolog_model.fasta
+    - ${M5NR_BIN}/obo2hierarchy.pl ${SOURCE_DIR}/aro.obo
+    - sed -i s'/\\//g' md52func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52func.sort.txt md52func.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52func.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 CAZy:
-    category: protein
-    type: hierarchical function annotation
-    depth: 2
-    homepage: http://www.cazy.org
-    description: Carbohydrate-Active enZYmes Database
-    no-download: true
-    depends:
-      - TrEmble
-      - Swiss-Prot
-    parser:
-      - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_cazy.txt ../TrEmble/md52id_cazy.txt
-      - ${M5NR_BIN}/create-cazy-hierarchy.pl --input md52id.sort.txt > id2hierarchy.txt
-      - sed -i s'/[\d128-\d255]//g' id2hierarchy.txt
-      - sed -i s'/\\//g' id2hierarchy.txt
-      - cut -f1,3 id2hierarchy.txt > id2func.txt
-      - ${M5NR_BIN}/merge_md5.py
-    # the hierarchy is hardcoded in script
+  category: protein
+  type: hierarchical function annotation
+  depth: 2
+  homepage: http://www.cazy.org
+  description: Carbohydrate-Active enZYmes Database
+  no-download: true
+  rank: 3
+  depends:
+    - TrEmble
+    - Swiss-Prot
+  parser:
+    - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_cazy.txt ../TrEmble/md52id_cazy.txt
+    - ${M5NR_BIN}/create-cazy-hierarchy.pl --input md52id.sort.txt > id2hierarchy.txt
+    - sed -i s'/[\d128-\d255]//g' id2hierarchy.txt
+    - sed -i s'/\\//g' id2hierarchy.txt
+    - cut -f1,3 id2hierarchy.txt > id2func.txt
+    - ${M5NR_BIN}/merge_md5.py
+# the hierarchy is hardcoded in script
 
 COG:
-    category: protein
-    type: hierarchical function annotation
-    depth: 3
-    homepage: https://www.ncbi.nlm.nih.gov/COG
-    description: Clusters of Orthologous Groups
-    version: echo '-'
-    depends:
-      - Swiss-Prot
-      - TrEmble
-    download:
-      - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
-    parser:
-      - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_cog.txt ../TrEmble/md52id_cog.txt
-      - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > ${SOURCE_DIR}/id_mapper.txt
-      - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
-      - sed -i s'/\\//g' id2hierarchy.txt
-      - cut -f1,4 id2hierarchy.txt > id2func.txt
-      - ${M5NR_BIN}/merge_md5.py
-    # the hierarchy is hardcoded in script
+  category: protein
+  type: hierarchical function annotation
+  depth: 3
+  homepage: https://www.ncbi.nlm.nih.gov/COG
+  description: Clusters of Orthologous Groups
+  version: echo '-'
+  rank: 3
+  depends:
+    - Swiss-Prot
+    - TrEmble
+  download:
+    - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
+  parser:
+    - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_cog.txt ../TrEmble/md52id_cog.txt
+    - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep COG > ${SOURCE_DIR}/id_mapper.txt
+    - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
+    - sed -i s'/\\//g' id2hierarchy.txt
+    - cut -f1,4 id2hierarchy.txt > id2func.txt
+    - ${M5NR_BIN}/merge_md5.py
+# the hierarchy is hardcoded in script
 
 EC:
-    category: protein
-    type: hierarchical function annotation
-    depth: 4
-    homepage: https://enzyme.expasy.org
-    description: Enzyme Nomenclature Database
-    version: curl ${CURL_OPTS} "ftp://ftp.expasy.org/databases/enzyme/release/enzclass.txt" | grep '^Release' | grep -o '[0-9a-zA-Z\-]\+$'
-    download:
-      - ftp://ftp.expasy.org/databases/enzyme/enzyme.dat
-      - ftp://ftp.expasy.org/databases/enzyme/enzclass.txt
-    depends:
-      - Swiss-Prot
-      - TrEmble
-    parser:
-      - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ec.txt ../TrEmble/md52id_ec.txt
-      - ${M5NR_BIN}/create-ec-hierarchy.pl --class ${SOURCE_DIR}/enzclass.txt --input ${SOURCE_DIR}/enzyme.dat > id2hierarchy.txt
-      - sed -i s'/\\//g' id2hierarchy.txt
-      - cut -f1,5 id2hierarchy.txt > id2func.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: hierarchical function annotation
+  depth: 4
+  homepage: https://enzyme.expasy.org
+  description: Enzyme Nomenclature Database
+  version: curl ${CURL_OPTS} "ftp://ftp.expasy.org/databases/enzyme/release/enzclass.txt" | grep '^Release' | grep -o '[0-9a-zA-Z\-]\+$'
+  rank: 3
+  depends:
+    - Swiss-Prot
+    - TrEmble
+  download:
+    - ftp://ftp.expasy.org/databases/enzyme/enzyme.dat
+    - ftp://ftp.expasy.org/databases/enzyme/enzclass.txt
+  parser:
+    - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ec.txt ../TrEmble/md52id_ec.txt
+    - ${M5NR_BIN}/create-ec-hierarchy.pl --class ${SOURCE_DIR}/enzclass.txt --input ${SOURCE_DIR}/enzyme.dat > id2hierarchy.txt
+    - sed -i s'/\\//g' id2hierarchy.txt
+    - cut -f1,5 id2hierarchy.txt > id2func.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 EggNOG:
-    category: protein
-    type: hierarchical function annotation
-    depth: 3
-    homepage: http://eggnogdb.embl.de
-    description: Clusters of Orthologous Groups
-    version: curl ${CURL_OPTS} "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
-    depends:
-      - Swiss-Prot
-      - TrEmble
-    download:
-      - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
-    parser:
-      - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_eggnog.txt ../TrEmble/md52id_eggnog.txt
-      - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > ${SOURCE_DIR}/id_mapper.txt
-      - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
-      - sed -i s'/\\//g' id2hierarchy.txt
-      - cut -f1,4 id2hierarchy.txt > id2func.txt
-      - ${M5NR_BIN}/merge_md5.py
-    # the hierarchy is hardcoded in script
+  category: protein
+  type: hierarchical function annotation
+  depth: 3
+  homepage: http://eggnogdb.embl.de
+  description: Clusters of Orthologous Groups
+  version: curl ${CURL_OPTS} "http://eggnogdb.embl.de/download/" | grep -o "eggnog_[0-9\.]*" | cut -d "_" -f 2 | sort -u  --version-sort  | tail -n1
+  rank: 3
+  depends:
+    - Swiss-Prot
+    - TrEmble
+  download:
+    - http://eggnogdb.embl.de/download/eggnog_4.5/data/NOG/NOG.annotations.tsv.gz
+  parser:
+    - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_eggnog.txt ../TrEmble/md52id_eggnog.txt
+    - zcat ${SOURCE_DIR}/NOG.annotations.tsv.gz | cut -f2,5,6 | fgrep ENOG > ${SOURCE_DIR}/id_mapper.txt
+    - ${M5NR_BIN}/create-nog-hierarchy.pl --input ${SOURCE_DIR}/id_mapper.txt > id2hierarchy.txt
+    - sed -i s'/\\//g' id2hierarchy.txt
+    - cut -f1,4 id2hierarchy.txt > id2func.txt
+    - ${M5NR_BIN}/merge_md5.py
+# the hierarchy is hardcoded in script
 
 GenBank:
-    category: protein
-    type: function annotation
-    homepage: https://www.ncbi.nlm.nih.gov/genbank
-    description: NIH Genetic Sequence Database
-    download:
-      - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
-    version: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
-    parser:
-      - ${M5NR_BIN}/genbank.pl ${SOURCE_DIR}/nr.gz
-      - sed -i s'/\\//g' md52func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52func.sort.txt md52func.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52func.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: https://www.ncbi.nlm.nih.gov/genbank
+  description: NIH Genetic Sequence Database
+  rank: 1
+  download:
+    - ftp://ftp.ncbi.nih.gov/blast/db/FASTA/nr.gz
+  version: date --date=$(wget -qO- ftp.ncbi.nih.gov/blast/db/FASTA/ | grep ">nr.gz<" | grep -o "[0-9\-]\{10\}") '+%Y-%m-%d'
+  parser:
+    - ${M5NR_BIN}/genbank.pl ${SOURCE_DIR}/nr.gz
+    - sed -i s'/\\//g' md52func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52func.sort.txt md52func.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52func.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 goslim:
-    category: protein
-    type: hierarchical function annotation
-    depth: 3
-    homepage: http://www.geneontology.org
-    description: Gene Ontology Database
-    version: curl ${CURL_OPTS} "http://archive.geneontology.org/full/DATESTAMP"
-    depends:
-      - Swiss-Prot
-      - TrEmble
-    download:
-      - http://www.geneontology.org/ontology/subsets/goslim_metagenomics.obo
-    parser:
-      - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_go.txt ../TrEmble/md52id_go.txt
-      - ${M5NR_BIN}/goslim.pl ${SOURCE_DIR}/goslim_metagenomics.obo
-      - sed -i s'/\\//g' id2hierarchy.txt
-      - cut -f1,4 id2hierarchy.txt > id2func.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: hierarchical function annotation
+  depth: 3
+  homepage: http://www.geneontology.org
+  description: Gene Ontology Database
+  version: curl ${CURL_OPTS} "http://archive.geneontology.org/full/DATESTAMP"
+  rank: 3
+  depends:
+    - Swiss-Prot
+    - TrEmble
+  download:
+    - http://www.geneontology.org/ontology/subsets/goslim_metagenomics.obo
+  parser:
+    - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_go.txt ../TrEmble/md52id_go.txt
+    - ${M5NR_BIN}/goslim.pl ${SOURCE_DIR}/goslim_metagenomics.obo
+    - sed -i s'/\\//g' id2hierarchy.txt
+    - cut -f1,4 id2hierarchy.txt > id2func.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 Greengenes:
-    category: rna
-    type: SSU
-    homepage: http://greengenes.lbl.gov
-    description: 16S rRNA Gene Database
-    version: date --date="$(curl ${CURL_OPTS} http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]")" '+%Y-%m-%d'
-    depends:
-      - NCBI-Taxonomy
-    download:
-      - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
-    parser:
-      - ${M5NR_BIN}/greengenes.pl ${SOURCE_DIR}/current_GREENGENES_gg16S_unaligned.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
-      - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: rna
+  type: SSU
+  homepage: http://greengenes.lbl.gov
+  description: 16S rRNA Gene Database
+  version: date --date="$(curl ${CURL_OPTS} http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/ | grep current_GREENGENES_gg16S_unaligned.fasta.gz | grep -o "[0-9][0-9]-.*-[0-9][0-9][0-9][0-9]")" '+%Y-%m-%d'
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  download:
+    - http://greengenes.lbl.gov/Download/Sequence_Data/Fasta_data_files/current_GREENGENES_gg16S_unaligned.fasta.gz
+  parser:
+    - ${M5NR_BIN}/greengenes.pl ${SOURCE_DIR}/current_GREENGENES_gg16S_unaligned.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
+    - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 InterPro:
-    category: protein
-    type: function annotation
-    homepage: http://www.ebi.ac.uk/interpro
-    description: InterPro protein sequence & classification
-    version: curl ${CURL_OPTS} ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
-    depends:
-      - Swiss-Prot
-      - TrEmble
-    download:
-      - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/names.dat
-    parser:
-      - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ipr.txt ../TrEmble/md52id_ipr.txt
-      - cp ${SOURCE_DIR}/names.dat id2func.txt
-      - sed -i s'/[\d128-\d255]//g' id2func.txt
-      - sed -i s'/\\//g' id2func.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: http://www.ebi.ac.uk/interpro
+  description: InterPro protein sequence & classification
+  version: curl ${CURL_OPTS} ftp://ftp.ebi.ac.uk/pub/databases/interpro/current/release_notes.txt | grep "Release [0-9]" | grep -o "[0-9]*\.[0-9]*"
+  rank: 3
+  depends:
+    - Swiss-Prot
+    - TrEmble
+  download:
+    - ftp://ftp.ebi.ac.uk/pub/databases/interpro/${VERSION}/names.dat
+  parser:
+    - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_ipr.txt ../TrEmble/md52id_ipr.txt
+    - cp ${SOURCE_DIR}/names.dat id2func.txt
+    - sed -i s'/[\d128-\d255]//g' id2func.txt
+    - sed -i s'/\\//g' id2func.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 KEGG:
-    category: protein
-    type: function annotation
-    homepage: http://www.genome.jp/kegg
-    description: Kyoto Encyclopedia of Genes and Genomes
-    depth: 4
-    no-download: true
-    depends:
-      - Swiss-Prot
-      - TrEmble
-    parser:
-      - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_kegg.txt ../TrEmble/md52id_kegg.txt
-      - ${M5NR_BIN}/merge_md5.py --idonly
+  category: protein
+  type: function annotation
+  homepage: http://www.genome.jp/kegg
+  description: Kyoto Encyclopedia of Genes and Genomes
+  depth: 4
+  no-download: true
+  rank: 3
+  depends:
+    - Swiss-Prot
+    - TrEmble
+  parser:
+    - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_kegg.txt ../TrEmble/md52id_kegg.txt
+    - ${M5NR_BIN}/merge_md5.py --idonly
 
 # MOTUDB a set of 40 protein-coding phylogenetic marker genes (MGs) have been identified (Ciccarelli et al SCience 2006)
 # NOTE: these are DNA sequences
 motuDB:
-    category: protein
-    type: filter set
-    homepage: http://www.bork.embl.de/software/mOTU
-    description: Phylogenetic Marker Gene Database
-    version: curl ${CURL_OPTS} http://vm-lux.embl.de/~kultima/MOCAT/download.html | grep -o "mOTU\.v[0-9\.] " | grep -o "v[0-9\.]" | grep -o "[0-9\.]"
-    download:
-      - http://vm-lux.embl.de/~kultima/share/mOTU/mOTU.v${VERSION}.padded.tar.gz
-    parser:
-      - tar -xzf ${SOURCE_DIR}/mOTU.v${VERSION}.padded.tar.gz -C ${SOURCE_DIR}
-      - ${M5NR_BIN}/motudb.pl ${SOURCE_DIR}/mOTU.v${VERSION}.padded
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -u -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py --idonly
+  category: protein
+  type: filter set
+  homepage: http://www.bork.embl.de/software/mOTU
+  description: Phylogenetic Marker Gene Database
+  version: curl ${CURL_OPTS} http://vm-lux.embl.de/~kultima/MOCAT/download.html | grep -o "mOTU\.v[0-9\.] " | grep -o "v[0-9\.]" | grep -o "[0-9\.]"
+  rank: 1
+  download:
+    - http://vm-lux.embl.de/~kultima/share/mOTU/mOTU.v${VERSION}.padded.tar.gz
+  parser:
+    - tar -xzf ${SOURCE_DIR}/mOTU.v${VERSION}.padded.tar.gz -C ${SOURCE_DIR}
+    - ${M5NR_BIN}/motudb.pl ${SOURCE_DIR}/mOTU.v${VERSION}.padded
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -u -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py --idonly
 
 # taxonomy.tsv taxonomy.json
 NCBI-Taxonomy:
-    category: taxonomy
-    type: hierarchical organism annotation
-    homepage: https://www.ncbi.nlm.nih.gov/taxonomy
-    description: The Taxonomy Database
-    version: echo ${TODAY}
-    download:
-      - ftp://ftp.ebi.ac.uk/pub/databases/taxonomy/taxonomy.dat
-    parser:
-      - ${M5NR_BIN}/parse_taxonomy.py --input ${SOURCE_DIR}/taxonomy.dat --output ${SOURCE_DIR}/taxonomy.json
-      - ${M5NR_BIN}/clean_taxonomy.py --rank --format both --input ${SOURCE_DIR}/taxonomy.json --output taxonomy
+  category: taxonomy
+  type: hierarchical organism annotation
+  homepage: https://www.ncbi.nlm.nih.gov/taxonomy
+  description: The Taxonomy Database
+  version: echo ${TODAY}
+  rank: 1
+  download:
+    - ftp://ftp.ebi.ac.uk/pub/databases/taxonomy/taxonomy.dat
+  parser:
+    - ${M5NR_BIN}/parse_taxonomy.py --input ${SOURCE_DIR}/taxonomy.dat --output ${SOURCE_DIR}/taxonomy.json
+    - ${M5NR_BIN}/clean_taxonomy.py --rank --format both --input ${SOURCE_DIR}/taxonomy.json --output taxonomy
 
 PATRIC:
-    category: protein
-    type: function annotation
-    homepage: https://www.patricbrc.org
-    description: Bioinformatics Database
-    version: curl ${CURL_OPTS} 'https://www.patricbrc.org/' | grep -A 3 'PATRIC Logo' | grep 'appLabel' | grep -o '[0-9\.]\+'
-    depends:
-      - NCBI-Taxonomy
-    download-command: ${M5NR_BIN}/download_PATRIC.sh
-    parser:
-      - ${M5NR_BIN}/patric.py --dir ${SOURCE_DIR}/ --taxa ../NCBI-Taxonomy/taxonomy.tsv
-      - sed -i s'/\\//g' md52func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52func.sort.txt md52func.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: https://www.patricbrc.org
+  description: Bioinformatics Database
+  version: curl ${CURL_OPTS} 'https://www.patricbrc.org/' | grep -A 3 'PATRIC Logo' | grep 'appLabel' | grep -o '[0-9\.]\+'
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  download-command: ${M5NR_BIN}/download_PATRIC.sh
+  parser:
+    - ${M5NR_BIN}/patric.py --dir ${SOURCE_DIR}/ --taxa ../NCBI-Taxonomy/taxonomy.tsv
+    - sed -i s'/\\//g' md52func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52func.sort.txt md52func.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 PFAM:
-    category: protein
-    type: function annotation
-    homepage: http://pfam.xfam.org
-    description: Protein Family Database
-    version: curl ${CURL_OPTS} 'ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/relnotes.txt' | head -n 5 | grep -o 'RELEASE [0-9\.]\+' | cut -f2 -d' '
-    download:
-      - ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.clans.tsv.gz
-    depends:
-      - Swiss-Prot
-      - TrEmble
-    parser:
-      - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_pfam.txt ../TrEmble/md52id_pfam.txt
-      - zcat ${SOURCE_DIR}/Pfam-A.clans.tsv.gz | cut -f1,5 > id2func.txt
-      - sed -i s'/[\d128-\d255]//g' id2func.txt
-      - sed -i s'/\\//g' id2func.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: http://pfam.xfam.org
+  description: Protein Family Database
+  version: curl ${CURL_OPTS} 'ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/relnotes.txt' | head -n 5 | grep -o 'RELEASE [0-9\.]\+' | cut -f2 -d' '
+  rank: 3
+  download:
+    - ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.clans.tsv.gz
+  depends:
+    - Swiss-Prot
+    - TrEmble
+  parser:
+    - sort -T . -u -o md52id.sort.txt ../Swiss-Prot/md52id_pfam.txt ../TrEmble/md52id_pfam.txt
+    - zcat ${SOURCE_DIR}/Pfam-A.clans.tsv.gz | cut -f1,5 > id2func.txt
+    - sed -i s'/[\d128-\d255]//g' id2func.txt
+    - sed -i s'/\\//g' id2func.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 PhAnToMe:
-    category: protein
-    type: function annotation
-    homepage: http://www.phantome.org
-    description: Phage Annotation Tools and Methods
-    env:
-        TIMESTAMP: curl ${CURL_OPTS} http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
-    version: date -d @${TIMESTAMP} +"%Y%m%d"
-    depends:
-      - NCBI-Taxonomy
-    download:
-      - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz
-    comment: curl ${CURL_OPTS} "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
-    parser:
-      - ${M5NR_BIN}/phantome.pl ${SOURCE_DIR}/phage_proteins_${TIMESTAMP}.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
-      - sed -i s'/\\//g' md52func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52func.sort.txt md52func.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: http://www.phantome.org
+  description: Phage Annotation Tools and Methods
+  env:
+    TIMESTAMP: curl ${CURL_OPTS} http://www.phantome.org/Downloads/proteins/all_sequences/ | grep -o ">phage_proteins_[0-9]*.fasta.gz" | sort | tail -n 1 | grep -o "[0-9]*"
+  version: date -d @${TIMESTAMP} +"%Y%m%d"
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  download:
+    - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz
+  comment: curl ${CURL_OPTS} "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
+  parser:
+    - ${M5NR_BIN}/phantome.pl ${SOURCE_DIR}/phage_proteins_${TIMESTAMP}.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
+    - sed -i s'/\\//g' md52func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52func.sort.txt md52func.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 RDP:
-    category: rna
-    type:
-      - SSU
-      - LSU
-      - ITS
-    homepage: http://rdp.cme.msu.edu
-    description: Ribosomal Database Project
-    version: curl ${CURL_OPTS} 'http://rdp.cme.msu.edu/download/releaseREADME.txt'
-    depends:
-      - NCBI-Taxonomy
-    download:
-      - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
-      - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
-      - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
-    parser:
-      - ${M5NR_BIN}/rdp.pl ${SOURCE_DIR}/current_Fungi_unaligned.gb.gz ${SOURCE_DIR}/current_Bacteria_unaligned.gb.gz ${SOURCE_DIR}/current_Archaea_unaligned.gb.gz  ../NCBI-Taxonomy/taxonomy.tsv
-      - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: rna
+  type:
+    - SSU
+    - LSU
+    - ITS
+  homepage: http://rdp.cme.msu.edu
+  description: Ribosomal Database Project
+  version: curl ${CURL_OPTS} 'http://rdp.cme.msu.edu/download/releaseREADME.txt'
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  download:
+    - http://rdp.cme.msu.edu/download/current_Bacteria_unaligned.gb.gz
+    - http://rdp.cme.msu.edu/download/current_Archaea_unaligned.gb.gz
+    - http://rdp.cme.msu.edu/download/current_Fungi_unaligned.gb.gz
+  parser:
+    - ${M5NR_BIN}/rdp.pl ${SOURCE_DIR}/current_Fungi_unaligned.gb.gz ${SOURCE_DIR}/current_Bacteria_unaligned.gb.gz ${SOURCE_DIR}/current_Archaea_unaligned.gb.gz  ../NCBI-Taxonomy/taxonomy.tsv
+    - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 RefSeq:
-    category: protein
-    type: function annotation
-    homepage: https://www.ncbi.nlm.nih.gov/refseq
-    description: NCBI Reference Sequences Database
-    version: curl ${CURL_OPTS} ftp://ftp.ncbi.nih.gov/refseq/release/RELEASE_NUMBER
-    depends:
-      - NCBI-Taxonomy
-    env:
-        COUNT: curl ${CURL_OPTS} ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
-    download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.gpff.gz
-    resume-download: true
-    parser:
-      - ${M5NR_BIN}/refseq.pl ${SOURCE_DIR} ../NCBI-Taxonomy/taxonomy.tsv
-      - sed -i s'/\\//g' md52func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52func.sort.txt md52func.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: https://www.ncbi.nlm.nih.gov/refseq
+  description: NCBI Reference Sequences Database
+  version: curl ${CURL_OPTS} ftp://ftp.ncbi.nih.gov/refseq/release/RELEASE_NUMBER
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  env:
+    COUNT: curl ${CURL_OPTS} ftp://ftp.ncbi.nih.gov/refseq/release/complete/ | grep -o "complete.nonredundant_protein.*\.faa\.gz" | sort -V | tail -n 1 | grep -o [0-9]*
+  download: ftp://ftp.ncbi.nih.gov/refseq/release/complete/complete.nonredundant_protein.{1..${COUNT}}.protein.gpff.gz
+  resume-download: true
+  parser:
+    - ${M5NR_BIN}/refseq.pl ${SOURCE_DIR} ../NCBI-Taxonomy/taxonomy.tsv
+    - sed -i s'/\\//g' md52func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52func.sort.txt md52func.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 SEED-Annotations:
-    category: protein
-    type: function annotation
-    homepage: http://www.theseed.org
-    description: The SEED Project
-    version: echo ${TODAY}
-    depends:
-      - NCBI-Taxonomy
-    download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org
-    resume-download: true
-    parser:
-      - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org ../NCBI-Taxonomy/taxonomy.tsv
-      - sed -i s'/\\//g' md52func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52func.sort.txt md52func.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: http://www.theseed.org
+  description: The SEED Project
+  version: echo ${TODAY}
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  download-command: ${M5NR_BIN}/querySAS.pl --source=SEED  --output=SEED.md52id2func2org
+  resume-download: true
+  parser:
+    - ${M5NR_BIN}/seed-annotations.pl ${SOURCE_DIR}/SEED.md52id2func2org ../NCBI-Taxonomy/taxonomy.tsv
+    - sed -i s'/\\//g' md52func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52func.sort.txt md52func.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 SEED-Subsystems:
-    category: protein
-    type: hierarchical function annotation
-    depth: 4
-    homepage: http://www.theseed.org
-    description: SEED Subsystems Annotation
-    version: echo ${TODAY}
-    download-command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq --verbose
-    resume-download: true
-    parser:
-      - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
-      - sed -i s'/\\//g' id2hierarchy.txt
-      - cut -f1,5 id2hierarchy.txt > id2func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: hierarchical function annotation
+  depth: 4
+  homepage: http://www.theseed.org
+  description: SEED Subsystems Annotation
+  version: echo ${TODAY}
+  rank: 1
+  download-command: ${M5NR_BIN}/querySAS.pl --source=Subsystems --output=Subsystems.subsystem2role2seq --verbose
+  resume-download: true
+  parser:
+    - ${M5NR_BIN}/subsystems.pl ${SOURCE_DIR}
+    - sed -i s'/\\//g' id2hierarchy.txt
+    - cut -f1,5 id2hierarchy.txt > id2func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 SILVA-LSU:
-    category: rna
-    type: LSU
-    homepage: http://www.arb-silva.de
-    description: SILVA Large Subunit rRNA Database
-    version: curl ${CURL_OPTS} "ftp://ftp.arb-silva.de/current/Exports/" | grep -o "SILVA_[0-9\.]\+_LSURef_tax_silva_trunc.fasta.gz$" | grep -o "[0-9][0-9\.]\+"
-    depends:
-      - NCBI-Taxonomy
-    download:
-      - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
-    parser:
-      - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
-      - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: rna
+  type: LSU
+  homepage: http://www.arb-silva.de
+  description: SILVA Large Subunit rRNA Database
+  version: curl ${CURL_OPTS} "ftp://ftp.arb-silva.de/current/Exports/" | grep -o "SILVA_[0-9\.]\+_LSURef_tax_silva_trunc.fasta.gz$" | grep -o "[0-9][0-9\.]\+"
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  download:
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz
+  parser:
+    - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_LSURef_tax_silva_trunc.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
+    - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 SILVA-SSU:
-    category: rna
-    type: SSU
-    homepage: http://www.arb-silva.de
-    description: SILVA Small Subunit rRNA Database
-    version: curl ${CURL_OPTS} "ftp://ftp.arb-silva.de/current/Exports/" | grep -o "SILVA_[0-9\.]\+_LSURef_tax_silva_trunc.fasta.gz$" | grep -o "[0-9][0-9\.]\+"
-    depends:
-      - NCBI-Taxonomy
-    download:
-      - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
-    parser:
-      - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
-      - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: rna
+  type: SSU
+  homepage: http://www.arb-silva.de
+  description: SILVA Small Subunit rRNA Database
+  version: curl ${CURL_OPTS} "ftp://ftp.arb-silva.de/current/Exports/" | grep -o "SILVA_[0-9\.]\+_LSURef_tax_silva_trunc.fasta.gz$" | grep -o "[0-9][0-9\.]\+"
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  download:
+    - ftp://ftp.arb-silva.de/current/Exports/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz
+  parser:
+    - ${M5NR_BIN}/silva.pl ${SOURCE_DIR}/SILVA_${VERSION}_SSURef_tax_silva_trunc.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
+    - sort -T . -u -o md52rnaseq.sort.txt md52rnaseq.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52rnaseq.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 Swiss-Prot:
-    category: protein
-    type: function annotation
-    homepage: http://www.uniprot.org
-    description: Swiss-Prot UniProt Knowledgebase
-    version: curl ${CURL_OPTS} ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "Swiss-Prot" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
-    depends:
-      - NCBI-Taxonomy
-    download:
-      - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
-    parser:
-      - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_sprot.dat.gz ../NCBI-Taxonomy/taxonomy.tsv
-      - sed -i s'/\\//g' md52func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52func.sort.txt md52func.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: http://www.uniprot.org
+  description: Swiss-Prot UniProt Knowledgebase
+  version: curl ${CURL_OPTS} ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "Swiss-Prot" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  download:
+    - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz
+  parser:
+    - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_sprot.dat.gz ../NCBI-Taxonomy/taxonomy.tsv
+    - sed -i s'/\\//g' md52func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52func.sort.txt md52func.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py
 
 TrEmble:
-    category: protein
-    type: function annotation
-    homepage: http://www.uniprot.org
-    description: TrEMBL UniProt Knowledgebase
-    version: curl ${CURL_OPTS} ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
-    depends:
-      - NCBI-Taxonomy
-    download:
-      - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
-    parser:
-      - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_trembl.dat.gz ../NCBI-Taxonomy/taxonomy.tsv
-      - sed -i s'/\\//g' md52func.txt
-      - sort -T . -u -o md52seq.sort.txt md52seq.txt
-      - sort -T . -o md52func.sort.txt md52func.txt
-      - sort -T . -o md52taxid.sort.txt md52taxid.txt
-      - sort -T . -o md52id.sort.txt md52id.txt
-      - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
-      - ${M5NR_BIN}/merge_md5.py
+  category: protein
+  type: function annotation
+  homepage: http://www.uniprot.org
+  description: TrEMBL UniProt Knowledgebase
+  version: curl ${CURL_OPTS} ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/reldate.txt | grep "TrEMBL" | grep -o "Release 20[0-9_]*" | grep -o "20[0-9_]*"
+  rank: 2
+  depends:
+    - NCBI-Taxonomy
+  download:
+    - ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.dat.gz
+  parser:
+    - ${M5NR_BIN}/uniprot.pl ${SOURCE_DIR}/uniprot_trembl.dat.gz ../NCBI-Taxonomy/taxonomy.tsv
+    - sed -i s'/\\//g' md52func.txt
+    - sort -T . -u -o md52seq.sort.txt md52seq.txt
+    - sort -T . -o md52func.sort.txt md52func.txt
+    - sort -T . -o md52taxid.sort.txt md52taxid.txt
+    - sort -T . -o md52id.sort.txt md52id.txt
+    - rm -fv md52seq.txt md52func.txt md52taxid.txt md52id.txt
+    - ${M5NR_BIN}/merge_md5.py

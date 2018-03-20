@@ -12,18 +12,21 @@
 
 # id2func.txt
 - name: Functions
+  rank: 1
   parser:
     - cat ${PARSED_DIR}/*/md52func.sort.txt ${PARSED_DIR}/*/id2func.txt | cut -f2 | sort -T . -u -o unique_func.txt
     - COUNT=0; while read FUNC; do ((COUNT++)); echo "${COUNT}"$'\t'"${FUNC}"; done < unique_func.txt > id2func.txt
 
 # md52lca.txt
 - name: LCA
+  rank: 1
   parser:
     - sort -T . -m -u -o md52taxid.all.txt ${PARSED_DIR}/*/md52taxid.sort.txt
     - ${M5NR_BIN}/md52lca.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --input md52taxid.all.txt --output md52lca.txt
 
 # taxonomy.json.gz / functional.json.gz
 - name: Hierarchies
+  rank: 1
   parser:
     - ${M5NR_BIN}/hierarchy2tree.py --type taxonomy --input ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --output taxonomy.json
     - ${M5NR_BIN}/hierarchy2tree.py --type functional --input ${SOURCE_FILE} --output functional.json --parsedir ${PARSED_DIR}
@@ -32,6 +35,7 @@
 
 # m5nr.fasta
 - name: M5nr
+  rank: 1
   parser:
     - sort -T . -m -u ${PARSED_DIR}/*/md52seq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5nr.raw.fasta
     - ${M5NR_BIN}/seq_length_stats.py --input m5nr.raw.fasta --output m5nr.raw.stats --protein --strict --iupac --x_percent 85
@@ -41,6 +45,7 @@
 
 # m5rna.fasta
 - name: M5rna
+  rank: 1
   parser:
     - sort -T . -m -u ${PARSED_DIR}/*/md52rnaseq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5rna.raw.fasta
     - ${M5NR_BIN}/seq_length_stats.py --input m5rna.fasta --output m5rna.stats --strict
@@ -52,6 +57,7 @@
 
 # m5nr.ldb
 - name: LevelDB
+  rank: 2
   depends:
     - Functions
     - LCA
@@ -61,13 +67,15 @@
     - tar -zcf m5nr_v${M5NR_VERSION}.ldb.tgz m5nr.ldb
 
 # m5nr_v#.bdb
-- name: BerkelyDB
-  depends:
-    - LevelDB
-  parser:
-    - ${M5NR_BIN}/export_annotation_for_bdb.py --sources ${SOURCE_FILE} --db ../LevelDB/m5nr.ldb --output m5nr_v${M5NR_VERSION}.bdb
+#- name: BerkelyDB
+#  rank: 3
+#  depends:
+#    - LevelDB
+#  parser:
+#    - ${M5NR_BIN}/export_annotation_for_bdb.py --sources ${SOURCE_FILE} --db ../LevelDB/m5nr.ldb --output m5nr_v${M5NR_VERSION}.bdb
 
 - name: Cassandra
+  rank: 3
   depends:
     - LevelDB
   parser:
@@ -75,6 +83,7 @@
     - tar -zcf m5nr_v${M5NR_VERSION}.cass.tgz m5nr_v${M5NR_VERSION}.*
 
 - name: Solr
+  rank: 3
   depends:
     - LevelDB
   parser:

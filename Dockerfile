@@ -75,6 +75,10 @@ RUN cd /root \
     && make clean \
     && cd /root ; rm -rf sortmerna-2* 2*.tar.gz
 
+### install yq
+RUN curl -L "https://github.com/mikefarah/yq/releases/download/1.14.0/yq_linux_amd64" > /usr/bin/yq \
+    && chmod +x /usr/bin/yq
+
 # copy stuff from the repo into the /root (note the .dockerignore file)
 COPY . /myM5NR
 ENV PATH $PATH:/root/bin
