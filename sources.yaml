@@ -275,7 +275,7 @@ PATRIC:
   rank: 2
   depends:
     - NCBI-Taxonomy
-  download-command: ${M5NR_BIN}/download_PATRIC.sh
+  download-command: ${M5NR_BIN}/download_PATRIC.sh wrapper 8
   parser:
     - ${M5NR_BIN}/patric.py --dir ${SOURCE_DIR}/ --taxa ../NCBI-Taxonomy/taxonomy.tsv
     - sed -i s'/\\//g' md52func.txt
