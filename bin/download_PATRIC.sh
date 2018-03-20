@@ -28,7 +28,7 @@ if [ "$ACTION" == "download" ]; then
     
     if [ "${FSIZE}" -lt "10" ]; then
         rm -f ${FILE} ${FILE}_part
-        curl -s -o ${FILE}_part ${FEATURE_URL} -H 'Accept: application/solr+json' --data "eq(genome_id,${GID})&select(feature_type,aa_sequence,patric_id,product,taxon_id)&limit(25000)&facet((field,feature_type),(mincount,1))" 2> /dev/null
+        curl -s -o ${FILE}_part ${FEATURE_URL} -H 'Accept: application/solr+json' --data "eq(genome_id,${VALUE})&select(feature_type,aa_sequence,patric_id,product,taxon_id)&limit(25000)&facet((field,feature_type),(mincount,1))" 2> /dev/null
         mv ${FILE}_part ${FILE}
     fi
     
