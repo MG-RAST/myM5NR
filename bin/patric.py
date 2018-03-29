@@ -27,7 +27,7 @@ def main(args):
     # get NCBI taxa map
     taxamap = {}
     thdl = open(args.taxa, 'r')
-    for line in ihdl:
+    for line in thdl:
         taxa = line.strip().split("\t")
         tid  = int(taxa.pop(0))
         taxamap[tid] = leaf_name(taxa)
