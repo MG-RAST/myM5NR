@@ -45,6 +45,11 @@ def main(args):
         path = os.path.join(args.dir, subdir)
         if not os.path.isdir(path):
             continue
+        # subdir name should be digits only
+        try:
+            int(subdir)
+        except ValueError:
+            continue
         # for each .json file in sub-dir
         for fname in os.listdir(path):
             data = []
