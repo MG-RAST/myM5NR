@@ -10,6 +10,8 @@ import argparse
 from datetime import datetime
 
 """
+------- Inputs -------
+
 Files required:
 
 --taxa Parsed/NCBI-Taxonomy/taxonomy.json
@@ -20,7 +22,9 @@ File processed from Source dir:
 
 md52annotation.txt
 
-Output record:
+------- Outputs: levelDB records -------
+
+Full:
 
 md5 : {
   is_aa: bool,
@@ -37,8 +41,16 @@ md5 : {
     }
   ]
 }
+
+Minimal:
+
+md5 : {
+  lca : [ text ],  # optional
+  sources : [ text ]
+}
 """
 
+BATCHSIZE = 10000
 ANNFILE = 'md52annotation.txt'
 TaxaMap = {}
 FuncMap = {}
@@ -86,6 +98,13 @@ def mergeAnn(md5, info, lca):
             data['ann'].append(d)
     return data
 
+def minFromFull(fullData):
+    minData = {}
+    minData['sources'] = map(lambda x: x['source'], fullData['ann'])
+    if 'lca' in fullData:
+        minData['lca'] = fullData['lca']
+    return minData
+
 def mergeMd5Sources(oldAnn, annData):
     newData = copy.deepcopy(oldAnn)
     currSources = map(lambda x: x['source'], newData['ann'])
@@ -93,6 +112,13 @@ def mergeMd5Sources(oldAnn, annData):
         if ann['source'] not in currSources:
             newData['ann'].append(ann)
     return newData
+
+def mergeMd5SourcesMin(oldMin, minData):
+    newMin = copy.deepcopy(oldMin)
+    sources = set(newMin['sources'])
+    sources.union(set(minData['sources']))
+    newMin['sources'] = list(sources)
+    return newMin
 
 def nextLCA(fhdl):
     if not fhdl:
@@ -133,15 +159,18 @@ def main(args):
     parser.add_argument("--func", dest="func", default=None, help="tsv format function file for name-id mapping")
     parser.add_argument("--lca", dest="lca", default=None, help="tsv format lca file for md5-lca mapping")
     parser.add_argument("--sources", dest="sources", default=None, help="sources.yaml file")
-    parser.add_argument("--db", dest="db", default='m5nr.ldb', help="DB path")
+    parser.add_argument("--db_full", dest="dbfull", default='m5nr-full.ldb', help="DB path")
+    parser.add_argument("--db_min", dest="dbmin", default='m5nr-min.ldb', help="DB path")
     parser.add_argument("--parsedir", dest="parsedir", default="../", help="Directory containing parsed source dirs")
     parser.add_argument("--append", dest="append", action="store_true", default=False, help="add new sources to existing md5s in DB, default is to overwrite")
     args = parser.parse_args()
     
     if not os.path.isfile(args.sources):
         parser.error("missing sources.yaml file")
-    if not os.path.isdir(args.db):
-        parser.error("invalid dir for levelDB")
+    if not os.path.isdir(args.dbfull):
+        parser.error("invalid dir for full M5NR levelDB")
+    if not os.path.isdir(args.dbmin):
+        parser.error("invalid dir for minimal M5NR levelDB")
     if not os.path.isdir(args.parsedir):
         parser.error("invalid dir for parsed source dirs")
     
@@ -166,7 +195,12 @@ def main(args):
     FuncMap = loadFunc(args.func) if args.func else {}
     
     try:
-        db = plyvel.DB(args.db, create_if_missing=True)
+        dbfull = plyvel.DB(args.dbfull, create_if_missing=True)
+    except:
+        sys.stderr.write("unable to open DB at %s\n"%(args.db))
+        return 1
+    try:
+        dbmin = plyvel.DB(args.dbmin, create_if_missing=True)
     except:
         sys.stderr.write("unable to open DB at %s\n"%(args.db))
         return 1
@@ -175,6 +209,8 @@ def main(args):
     lcaHdl  = open(args.lca, 'r') if args.lca else None
     lcaSet  = nextLCA(lcaHdl)
     allSets = map(lambda x: nextSet(x[1]), Sources)
+    wbfull  = dbfull.write_batch()
+    wbmin   = dbmin.write_batch()
     
     print "start parsing source files / load DB: "+str(datetime.now())
     while moreSets(allSets):
@@ -183,13 +219,25 @@ def main(args):
         mCount += 1
         # merge across sources
         annData = mergeAnn(minMd5, allSets, lcaSet)
+        minData = minFromFull(annData)
         if args.append:
             # merge source data with DB data
-            oldAnn = db.get(minMd5)
+            oldAnn = dbfull.get(minMd5)
             if oldAnn:
                 annData = mergeMd5Sources(oldAnn, annData)
+            oldMin = dbmin.get(minMd5)
+            if oldMin:
+                minData = mergeMd5SourcesMin(oldMin, minData)
         # insert the data
-        db.put(minMd5, json.dumps(annData, separators=(',',':')))
+        wbfull.put(minMd5, json.dumps(annData, separators=(',',':')))
+        wbmin.put(minMd5, json.dumps(minData, separators=(',',':')))
+        if (mCount % BATCHSIZE) == 0:
+            wbfull.write()
+            wbmin.write()
+            wbfull = dbfull.write_batch()
+            wbmin  = dbmin.write_batch()
+        if (mCount % (BATCHSIZE * 100)) == 0:
+            sys.stdout.write(".")
         # iterate files that had minimal
         if lcaSet[0] == minMd5:
             lcaSet = nextLCA(lcaHdl)
@@ -197,7 +245,11 @@ def main(args):
             if allSets[i][0] == minMd5:
                 allSets[i] = nextSet(Sources[i][1])
     
-    db.close()
+    wbfull.write()
+    wbmin.write()
+    sys.stdout.write(".\n")
+    dbfull.close()
+    dbmin.close()
     lcaHdl.close()
     for src in Sources:
         src[1].close()
