@@ -9,7 +9,9 @@ import argparse
 from datetime import datetime
 
 """
-Input levelDB record:
+------- Inputs -------
+
+levelDB record:
 
 md5 : {
   is_aa: bool,
@@ -27,13 +29,13 @@ md5 : {
   ]
 }
 
-Input taxonomy.tsv file:
+taxonomy.tsv file:
     taxid, domain, phylum, class, order, family, genus, species, strain
 
-Input id2hierarchy.txt file:
+id2hierarchy.txt file:
     accession, level1, level2, level3 (optional), level4 (optional)
 
-Output files, JSON format:
+------- Outputs: JSON format -------
 
 <output>.source
 <output>.ontology

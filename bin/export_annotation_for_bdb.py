@@ -10,7 +10,9 @@ import argparse
 from datetime import datetime
 
 """
-Input levelDB record:
+------- Inputs -------
+
+levelDB record:
 
 md5 : {
   is_aa: bool,
@@ -28,7 +30,7 @@ md5 : {
   ]
 }
 
-Output berkelyDB record:
+------- Outputs: berkelyDB record -------
 Note: this is backwards compatible with old bdb format used in sims_annotate.pl
 
 md5 : {
