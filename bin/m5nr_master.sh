@@ -106,11 +106,11 @@ elif [ "${ACTION}" == "build" ] ; then
     
     echo "Building Started: "`date +"%Y%m%d.%H%M"`
     echo "Building ${FIRST_LIST}"
-    echo ${FIRST_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -d -f -s {}
+    echo ${FIRST_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -d -f -a {}
     echo "Building ${SECOND_LIST}"
-    echo ${SECOND_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -d -f -s {}
+    echo ${SECOND_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -d -f -a {}
     echo "Building ${THIRD_LIST}"
-    echo ${THIRD_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -d -f -s {}
+    echo ${THIRD_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -d -f -a {}
     echo "Building Completed: "`date +"%Y%m%d.%H%M"`
 else
     echo "invalid action"
