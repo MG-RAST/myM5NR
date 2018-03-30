@@ -17,6 +17,7 @@ function usage {
   echo "   -s sources.yaml file "
   echo "   -b build.yaml file "
   echo "   -c /path/to/m5nr_compiler.py "
+  echo "   -v m5nr version "
 }
 
 # get options
@@ -85,7 +86,7 @@ elif [ "${ACTION}" == "build" ] ; then
         usage
         exit 1
     fi
-    if [ ! -e "${M5NR_VERSION}" ]; then
+    if [ "${M5NR_VERSION}" == "" ]; then
         echo "build action requires m5nr version"
         usage
         exit 1
