@@ -24,14 +24,14 @@
     - sort -T . -m -u -o md52taxid.all.txt ${PARSED_DIR}/*/md52taxid.sort.txt
     - ${M5NR_BIN}/md52lca.py --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --input md52taxid.all.txt --output md52lca.txt
 
-# taxonomy.json.gz / functional.json.gz
+# taxonomy.map.json.gz / functional.map.json.gz
 - name: Hierarchies
   rank: 1
   parser:
-    - ${M5NR_BIN}/hierarchy2tree.py --type taxonomy --input ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --output taxonomy.json
-    - ${M5NR_BIN}/hierarchy2tree.py --type functional --input ${SOURCE_FILE} --output functional.json --parsedir ${PARSED_DIR}
-    - gzip taxonomy.json
-    - gzip functional.json
+    - ${M5NR_BIN}/hierarchy2tree.py --type taxonomy --input ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --output taxonomy
+    - ${M5NR_BIN}/hierarchy2tree.py --type functional --input ${SOURCE_FILE} --output functional --parsedir ${PARSED_DIR}
+    - gzip taxonomy.*
+    - gzip functional.*
 
 # m5nr.fasta
 - name: M5nr
@@ -47,7 +47,7 @@
 - name: M5rna
   rank: 1
   parser:
-    - sort -T . -m -u ${PARSED_DIR}/*/md52rnaseq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5rna.raw.fasta
+    - sort -T . -m -u ${PARSED_DIR}/*/md52rnaseq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
     - ${M5NR_BIN}/seq_length_stats.py --input m5rna.fasta --output m5rna.stats --strict
     - diamond makedb --in m5rna.fasta -d m5rna
     - vsearch --quiet --strand both --id 0.8 --cluster_fast m5rna.fasta --centroids m5rna.clust.fasta
