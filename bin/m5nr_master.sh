@@ -6,10 +6,11 @@ ACTION=''
 PROCS=4
 SOURCE_CONFIG=''
 BUILD_CONFIG=''
+M5NR_VERSION=''
 COMPILER='/myM5NR/bin/m5nr_compiler.py'
 
 function usage {
-  echo "Usage:   $0 -a <action> -p <procs> -s <source config> -b <build config> -c <m5nr_compiler.py> [-h <help>] "
+  echo "Usage:   $0 -a <action> -p <procs> -s <source config> -b <build config> -c <m5nr_compiler.py> -v <m5nr version> [-h <help>] "
   echo "   -h <help>  "
   echo "   -a (download|parse|build) "
   echo "   -p <# of threads to use> "
@@ -69,12 +70,12 @@ if [ "${ACTION}" == "download" ] || [ "${ACTION}" == "parse" ]; then
         done
         
         echo "Parsing Started: "`date +"%Y%m%d.%H%M"`
-        echo "Parsing ${FIRST_LIST}"
-        echo ${FIRST_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} parse -d -f -s {}
-        echo "Parsing ${SECOND_LIST}"
-        echo ${SECOND_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} parse -d -f -s {}
-        echo "Parsing ${THIRD_LIST}"
-        echo ${THIRD_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} parse -d -f -s {}
+        echo "Parsing ${FIRST_LIST[@]}"
+        echo ${FIRST_LIST[@]} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} parse -d -f -s {}
+        echo "Parsing ${SECOND_LIST[@]}"
+        echo ${SECOND_LIST[@]} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} parse -d -f -s {}
+        echo "Parsing ${THIRD_LIST[@]}"
+        echo ${THIRD_LIST[@]} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} parse -d -f -s {}
         echo "Parsing Completed: "`date +"%Y%m%d.%H%M"`
     fi
 elif [ "${ACTION}" == "build" ] ; then
@@ -83,6 +84,12 @@ elif [ "${ACTION}" == "build" ] ; then
         usage
         exit 1
     fi
+    if [ ! -e "${M5NR_VERSION}" ]; then
+        echo "build action requires m5nr version"
+        usage
+        exit 1
+    fi
+    
     mkdir -p Build
     
     TOTAL=`grep '^- name:' ${BUILD_CONFIG} | wc -l`
@@ -105,12 +112,12 @@ elif [ "${ACTION}" == "build" ] ; then
     done
     
     echo "Building Started: "`date +"%Y%m%d.%H%M"`
-    echo "Building ${FIRST_LIST}"
-    echo ${FIRST_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -d -f -a {}
-    echo "Building ${SECOND_LIST}"
-    echo ${SECOND_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -d -f -a {}
-    echo "Building ${THIRD_LIST}"
-    echo ${THIRD_LIST} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -d -f -a {}
+    echo "Building ${FIRST_LIST[@]}"
+    echo ${FIRST_LIST[@]} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -v ${M5NR_VERSION} -d -f -a {}
+    echo "Building ${SECOND_LIST[@]}"
+    echo ${SECOND_LIST[@]} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -v ${M5NR_VERSION} -d -f -a {}
+    echo "Building ${THIRD_LIST[@]}"
+    echo ${THIRD_LIST[@]} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -v ${M5NR_VERSION} -d -f -a {}
     echo "Building Completed: "`date +"%Y%m%d.%H%M"`
 else
     echo "invalid action"
