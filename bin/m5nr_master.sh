@@ -20,7 +20,7 @@ function usage {
 }
 
 # get options
-while getopts ha:p:s:b: option; do
+while getopts ha:p:s:b:v: option; do
     case "${option}"
 	in
 	    h) HELP=1;;
@@ -28,6 +28,7 @@ while getopts ha:p:s:b: option; do
 	    p) PROCS=${OPTARG};;
 	    s) SOURCE_CONFIG=${OPTARG};;
 	    b) BUILD_CONFIG=${OPTARG};;
+        v) M5NR_VERSION=${OPTARG};;
     esac
 done
 
