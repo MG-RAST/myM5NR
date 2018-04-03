@@ -63,8 +63,8 @@
     - Functions
     - LCA
   parser:
-    - mkdir -p m5nr-full.ldb
-    - mkdir -p m5nr-min.ldb
+    - mkdir -p m5nr_v${M5NR_VERSION}-full.ldb
+    - mkdir -p m5nr_v${M5NR_VERSION}-min.ldb
     - ${M5NR_BIN}/merge_annotation.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --lca ../LCA/md52lca.txt --func ../Functions/id2func.txt --sources ${SOURCE_FILE} --db_full m5nr_v${M5NR_VERSION}-full.ldb --db_min m5nr_v${M5NR_VERSION}-min.ldb
     - tar -zcf m5nr_v${M5NR_VERSION}-full.ldb.tgz m5nr_v${M5NR_VERSION}-full.ldb
     - tar -zcf m5nr_v${M5NR_VERSION}-min.ldb.tgz m5nr_v${M5NR_VERSION}-min.ldb
