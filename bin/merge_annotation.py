@@ -197,12 +197,12 @@ def main(args):
     try:
         dbfull = plyvel.DB(args.dbfull, create_if_missing=True)
     except:
-        sys.stderr.write("unable to open DB at %s\n"%(args.db))
+        sys.stderr.write("unable to open DB at %s\n"%(args.dbfull))
         return 1
     try:
         dbmin = plyvel.DB(args.dbmin, create_if_missing=True)
     except:
-        sys.stderr.write("unable to open DB at %s\n"%(args.db))
+        sys.stderr.write("unable to open DB at %s\n"%(args.dbmin))
         return 1
     
     mCount  = 0
@@ -255,7 +255,7 @@ def main(args):
         src[1].close()
     
     print "done parsing / loading: "+str(datetime.now())
-    print "%d md5 annotations loaded to %s"%(mCount, args.db)
+    print "%d md5 annotations loaded to %s / %s"%(mCount, args.dbfull, args.dbmin)
     return 0
 
 if __name__ == "__main__":
