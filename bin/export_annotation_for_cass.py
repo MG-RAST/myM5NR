@@ -188,7 +188,7 @@ def main(args):
                 db = plyvel.DB(args.db)
                 break
             except IOError:
-                time.sleep(60) 
+                time.sleep(60)
             except:
                 sys.stderr.write("unable to open DB at %s\n"%(args.db))
                 return 1
