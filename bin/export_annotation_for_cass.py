@@ -181,12 +181,17 @@ def main(args):
     hhdl.close()
     
     # annotation files from levelDB (optional)
+    # wait if another process using levelDB
     if args.db and os.path.isdir(args.db):
-        try:
-            db = plyvel.DB(args.db)
-        except:
-            sys.stderr.write("unable to open DB at %s\n"%(args.db))
-            return 1
+        while True:
+            try:
+                db = plyvel.DB(args.db)
+                break
+            except IOError:
+                time.sleep(60) 
+            except:
+                sys.stderr.write("unable to open DB at %s\n"%(args.db))
+                return 1
         
         mhdl = open(args.output+'.annotation.md5', 'w')
         mcvs = csv.writer(mhdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)

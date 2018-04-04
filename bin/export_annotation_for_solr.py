@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import yaml
+import time
 import plyvel
 import argparse
 from datetime import datetime
@@ -174,12 +175,17 @@ def main(args):
     ofHdl.close()
         
     # annotation files from levelDB (optional)
+    # wait if another process using levelDB
     if args.db and os.path.isdir(args.db):
-        try:
-            db = plyvel.DB(args.db)
-        except:
-            sys.stderr.write("unable to open DB at %s\n"%(args.db))
-            return 1
+        while True:
+            try:
+                db = plyvel.DB(args.db)
+                break
+            except IOError:
+                time.sleep(60) 
+            except:
+                sys.stderr.write("unable to open DB at %s\n"%(args.db))
+                return 1
         
         print "start reading %s: %s"%(args.db, str(datetime.now()))
         count = 0
