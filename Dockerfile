@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
   wget\
   unzip \
   make \
+  cmake \
   dh-autoreconf \
   vim \
   curl \
@@ -22,18 +23,21 @@ RUN apt-get update && apt-get install -y \
   python3 \
   python3-pip
 
-RUN git clone https://github.com/google/leveldb.git \
-    && cd leveldb/ \
+RUN pip2 install --upgrade pip
+RUN pip2 install plyvel nested_dict
+RUN pip3 install --upgrade pip
+RUN pip3 install PrettyTable pyyaml
+
+# install leveldb
+RUN cd /root \
+    && wget https://github.com/google/leveldb/archive/v1.20.tar.gz \
+    && tar xvzf v1.20.tar.gz \
+    && cd leveldb-1.20/ \
     && make \
     && cp out-static/lib* out-shared/lib* /usr/local/lib/ \
     && cd include/ \
     && cp -r leveldb /usr/local/include/ \
     && ldconfig
-
-RUN pip2 install --upgrade pip
-RUN pip2 install plyvel nested_dict
-RUN pip3 install --upgrade pip
-RUN pip3 install PrettyTable pyyaml
 
 # install the SEED environment for Subsystem data download
 RUN mkdir -p /sas/ \
