@@ -4,9 +4,9 @@
 HELP=0
 ACTION=''
 PROCS=4
-SOURCE_CONFIG=''
-BUILD_CONFIG=''
 M5NR_VERSION=''
+SOURCE_CONFIG='/myM5NR/sources.yaml'
+BUILD_CONFIG='/myM5NR/build.yaml'
 COMPILER='/myM5NR/bin/m5nr_compiler.py'
 
 function usage {
@@ -21,7 +21,7 @@ function usage {
 }
 
 # get options
-while getopts ha:p:s:b:v: option; do
+while getopts ha:p:s:b:c:v: option; do
     case "${option}"
 	in
 	    h) HELP=1;;
@@ -29,6 +29,7 @@ while getopts ha:p:s:b:v: option; do
 	    p) PROCS=${OPTARG};;
 	    s) SOURCE_CONFIG=${OPTARG};;
 	    b) BUILD_CONFIG=${OPTARG};;
+        c) COMPILER=${OPTARG};;
         v) M5NR_VERSION=${OPTARG};;
     esac
 done

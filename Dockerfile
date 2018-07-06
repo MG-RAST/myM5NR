@@ -8,11 +8,11 @@ RUN apt-get update && apt-get install -y \
   lftp \
   libdbi-perl  \
   libdbd-pg-perl \
+  libmodule-install-perl \
   zlib1g-dev \
   wget\
   unzip \
   make \
-  cmake \
   dh-autoreconf \
   vim \
   curl \
@@ -24,9 +24,9 @@ RUN apt-get update && apt-get install -y \
   python3-pip
 
 RUN pip2 install --upgrade pip
-RUN pip2 install plyvel nested_dict
+RUN python -m pip install plyvel nested_dict
 RUN pip3 install --upgrade pip
-RUN pip3 install PrettyTable pyyaml
+RUN python3 -m pip install PrettyTable pyyaml
 
 # install leveldb
 RUN cd /root \
@@ -40,7 +40,8 @@ RUN cd /root \
     && ldconfig
 
 # install the SEED environment for Subsystem data download
-RUN mkdir -p /sas/ \
+RUN cd /root \
+    && mkdir -p sas/ \
     && cd sas \
     && wget http://blog.theseed.org/downloads/sas.tgz \
     && tar xvzf sas.tgz \
