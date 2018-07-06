@@ -1,7 +1,7 @@
 
 # docker build -t mgrast/m5nr-build .
 
-FROM debian
+FROM debian:9.4
 
 RUN apt-get update && apt-get install -y \
   git-core \
