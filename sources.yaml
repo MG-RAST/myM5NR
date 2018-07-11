@@ -292,7 +292,7 @@ PFAM:
   type: function annotation
   homepage: http://pfam.xfam.org
   description: Protein Family Database
-  version: curl ${CURL_OPTS} 'ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/relnotes.txt' | head -n 5 | grep -o 'RELEASE [0-9\.]\+' | cut -f2 -d' '
+  version: curl -s 'ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/relnotes.txt' | head -n 5 | grep -o 'RELEASE [0-9\.]\+' | cut -f2 -d' '
   rank: 3
   download:
     - ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.clans.tsv.gz
