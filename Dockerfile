@@ -1,7 +1,7 @@
 
 # docker build -t mgrast/m5nr-build .
 
-FROM debian:9.4
+FROM ubuntu:16.04
 
 RUN apt-get update && apt-get install -y \
   git-core \
@@ -40,9 +40,8 @@ RUN cd /root \
     && ldconfig
 
 # install the SEED environment for Subsystem data download
-RUN cd /root \
-    && mkdir -p sas/ \
-    && cd sas \
+RUN mkdir -p /sas \
+    && cd /sas \
     && wget http://blog.theseed.org/downloads/sas.tgz \
     && tar xvzf sas.tgz \
     && cd modules \
@@ -86,8 +85,9 @@ RUN cd /root \
 RUN curl -L "https://github.com/mikefarah/yq/releases/download/1.14.0/yq_linux_amd64" > /usr/bin/yq \
     && chmod +x /usr/bin/yq
 
-# copy stuff from the repo into the /root (note the .dockerignore file)
+# copy myM%NR and set up env
 COPY . /myM5NR
-ENV PATH $PATH:/root/bin
+ENV PATH $PATH:/myM5NR/bin
 
-WORKDIR /myM5NR
+RUN mkdir -p /m5nr_data /m5nr_data/Sources /m5nr_data/Parsed /m5nr_data/Build
+WORKDIR /m5nr_data
