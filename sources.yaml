@@ -320,7 +320,7 @@ PhAnToMe:
     - http://www.phantome.org/Downloads/proteins/all_sequences/phage_proteins_${TIMESTAMP}.fasta.gz
   comment: curl ${CURL_OPTS} "http://shock.metagenomics.anl.gov/node?query&type=data-library&project=M5NR&data-library-name=M5NR_source_Phantome&version=${VERSION}" | grep -o "[0-f]\{8\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{4\}-[0-f]\{12\}"`
   parser:
-    - ${M5NR_BIN}/phantome.pl ${SOURCE_DIR}/phage_proteins_${TIMESTAMP}.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
+    - ${M5NR_BIN}/phantome.pl ${SOURCE_DIR}/phage_proteins_*.fasta.gz ../NCBI-Taxonomy/taxonomy.tsv
     - sed -i s'/\\//g' md52func.txt
     - sort -T . -u -o md52seq.sort.txt md52seq.txt
     - sort -T . -o md52func.sort.txt md52func.txt
