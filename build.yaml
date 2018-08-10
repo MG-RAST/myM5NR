@@ -43,6 +43,7 @@
     - ${M5NR_BIN}/seq_length_stats.py --input m5nr.fasta --output m5nr.stats --protein --strict --iupac --x_percent 85
     - ${M5NR_BIN}/seqUtil --input m5nr.fasta --output m5nr --splitfasta 4
     - for i in `seq 1 4`; do diamond makedb --in m5nr.${i}.fasta --db m5nr.${i}; done
+    - for i in `seq 1 4`; do rm -f m5nr.${i}.fasta; done
 
 # m5rna.fasta
 - name: M5rna
