@@ -1,0 +1,23 @@
+# docker build -t mgrast/m5nr-upload upload/.
+
+FROM ubuntu:16.04
+
+RUN apt-get update && apt-get install -y \
+  wget \
+  dh-autoreconf \
+  vim \
+  curl \
+  python-yaml
+
+### install yq
+RUN curl -L "https://github.com/mikefarah/yq/releases/download/1.14.0/yq_linux_amd64" > /usr/bin/yq \
+    && chmod +x /usr/bin/yq
+
+# copy myM5NR and set up env
+RUN mkdir -p /myM5NR /myM5NR/bin
+COPY bin/* /myM5NR/bin/
+COPY upload/bin/* /myM5NR/bin/
+COPY config/upload.yaml /myM5NR/
+ENV PATH $PATH:/myM5NR/bin
+
+WORKDIR /m5nr_data

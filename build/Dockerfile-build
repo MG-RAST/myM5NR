@@ -1,17 +1,10 @@
-
-# docker build -t mgrast/m5nr-build .
+# docker build -t mgrast/m5nr-build build/.
 
 FROM ubuntu:16.04
 
 RUN apt-get update && apt-get install -y \
   git-core \
-  lftp \
-  libdbi-perl  \
-  libdbd-pg-perl \
-  libmodule-install-perl \
-  zlib1g-dev \
-  wget\
-  unzip \
+  wget \
   make \
   dh-autoreconf \
   vim \
@@ -38,17 +31,6 @@ RUN cd /root \
     && cd include/ \
     && cp -r leveldb /usr/local/include/ \
     && ldconfig
-
-# install the SEED environment for Subsystem data download
-RUN mkdir -p /sas \
-    && cd /sas \
-    && wget http://blog.theseed.org/downloads/sas.tgz \
-    && tar xvzf sas.tgz \
-    && cd modules \
-    && ./BUILD_MODULES
-
-ENV PERL5LIB $PERL5LIB:/sas/lib:/sas/modules/lib
-ENV PATH $PATH:/sas/bin
 
 ### install DIAMOND
 RUN cd /root \
@@ -85,9 +67,13 @@ RUN cd /root \
 RUN curl -L "https://github.com/mikefarah/yq/releases/download/1.14.0/yq_linux_amd64" > /usr/bin/yq \
     && chmod +x /usr/bin/yq
 
-# copy myM%NR and set up env
-COPY . /myM5NR
+# copy myM5NR and set up env
+RUN mkdir -p /myM5NR /myM5NR/bin
+COPY bin/* /myM5NR/bin/
+COPY build/bin/* /myM5NR/bin/
+COPY config/sources.yaml /myM5NR/
+COPY config/build.yaml /myM5NR/
 ENV PATH $PATH:/myM5NR/bin
 
-RUN mkdir -p /m5nr_data /m5nr_data/Sources /m5nr_data/Parsed /m5nr_data/Build
+RUN mkdir -p /m5nr_data/Build
 WORKDIR /m5nr_data

@@ -1,0 +1,43 @@
+# docker build -t mgrast/m5nr-download download/.
+
+FROM ubuntu:16.04
+
+RUN apt-get update && apt-get install -y \
+  lftp \
+  libmodule-install-perl \
+  zlib1g-dev \
+  wget \
+  unzip \
+  dh-autoreconf \
+  vim \
+  curl \
+  python3 \
+  python3-pip
+
+RUN pip3 install --upgrade pip
+RUN python3 -m pip install PrettyTable pyyaml
+
+# install the SEED environment for Subsystem data download
+RUN mkdir -p /sas \
+    && cd /sas \
+    && wget http://blog.theseed.org/downloads/sas.tgz \
+    && tar xvzf sas.tgz \
+    && cd modules \
+    && ./BUILD_MODULES
+
+ENV PERL5LIB $PERL5LIB:/sas/lib:/sas/modules/lib
+ENV PATH $PATH:/sas/bin
+
+### install yq
+RUN curl -L "https://github.com/mikefarah/yq/releases/download/1.14.0/yq_linux_amd64" > /usr/bin/yq \
+    && chmod +x /usr/bin/yq
+
+# copy myM5NR and set up env
+RUN mkdir -p /myM5NR /myM5NR/bin
+COPY bin/* /myM5NR/bin/
+COPY download/bin/* /myM5NR/bin/
+COPY config/sources.yaml /myM5NR/
+ENV PATH $PATH:/myM5NR/bin
+
+RUN mkdir -p /m5nr_data/Sources
+WORKDIR /m5nr_data

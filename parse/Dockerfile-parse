@@ -1,0 +1,32 @@
+# docker build -t mgrast/m5nr-parse parse/.
+
+FROM ubuntu:16.04
+
+RUN apt-get update && apt-get install -y \
+  lftp \
+  wget \
+  unzip \
+  dh-autoreconf \
+  vim \
+  curl \
+  python-biopython \
+  python-yaml \
+  python3 \
+  python3-pip
+
+RUN pip3 install --upgrade pip
+RUN python3 -m pip install PrettyTable pyyaml
+
+### install yq
+RUN curl -L "https://github.com/mikefarah/yq/releases/download/1.14.0/yq_linux_amd64" > /usr/bin/yq \
+    && chmod +x /usr/bin/yq
+
+# copy myM5NR and set up env
+RUN mkdir -p /myM5NR /myM5NR/bin
+COPY bin/* /myM5NR/bin/
+COPY parse/bin/* /myM5NR/bin/
+COPY config/sources.yaml /myM5NR/
+ENV PATH $PATH:/myM5NR/bin
+
+RUN mkdir -p /m5nr_data/Parsed
+WORKDIR /m5nr_data
