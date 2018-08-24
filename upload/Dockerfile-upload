@@ -1,13 +1,25 @@
 # docker build -t mgrast/m5nr-upload upload/.
 
-FROM ubuntu:16.04
+FROM ubuntu
 
 RUN apt-get update && apt-get install -y \
   wget \
+  git \
   dh-autoreconf \
   vim \
   curl \
   python-yaml
+
+RUN add-apt-repository ppa:openjdk-r/ppa
+RUN apt-get update && apt-get install -y \
+  openjdk-8-jdk \
+  maven
+
+### install solr-import-export-json
+RUN cd /root \
+    && git clone https://github.com/freedev/solr-import-export-json.git \
+    && cd solr-import-export-json \
+    && mvn clean package
 
 ### install yq
 RUN curl -L "https://github.com/mikefarah/yq/releases/download/1.14.0/yq_linux_amd64" > /usr/bin/yq \
