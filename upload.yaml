@@ -1,0 +1,120 @@
+
+upload-info:
+    shock-url: http://shock.mg-rast.org
+    bearer: mgrast
+
+static:
+    type: reference
+    version: null
+    created: null
+
+build:
+    M5rna:
+        - file: m5rna.clust.fasta
+          name: m5rna.clust
+          data_type: clustered m5rna
+          file_format: fasta
+          description: 80% identity clustered RNA sequences
+          stats: m5rna.clust.stats
+    
+        - file: m5rna.fasta
+          name: m5rna
+          data_type: m5rna
+          file_format: fasta
+          description: m5nr of RNA sequences
+          stats: m5rna.stats
+    
+    M5nr:
+        - file: m5nr.fasta
+          name: m5nr
+          data_type: m5nr
+          file_format: fasta
+          description: m5nr of protein sequences
+          stats: m5nr.stats
+    
+        - file: m5nr.1.dmnd
+          name: m5nr.1.dmnd
+          data_type: m5nr
+          file_format: diamond DB
+          description: diamond formatted DB of m5nr protein sequences
+          part: 1
+
+        - file: m5nr.2.dmnd
+          name: m5nr.2.dmnd
+          data_type: m5nr
+          file_format: diamond DB
+          description: diamond formatted DB of m5nr protein sequences
+          part: 2
+
+        - file: m5nr.3.dmnd
+          name: m5nr.3.dmnd
+          data_type: m5nr
+          file_format: diamond DB
+          description: diamond formatted DB of m5nr protein sequences
+          part: 3
+
+        - file: m5nr.4.dmnd
+          name: m5nr.4.dmnd
+          data_type: m5nr
+          file_format: diamond DB
+          description: diamond formatted DB of m5nr protein sequences
+          part: 4
+
+    LevelDB:
+        - file: m5nr-min.ldb.tgz
+          name: m5nr-min.ldb
+          data_type: m5nr annotation
+          file_format: tgz levelDB
+          description: gzip-tar of md5 to minimal annotation text mapping
+          size: minimal
+          db: leveldb
+
+        - file: m5nr-full.ldb.tgz
+          name: m5nr-full.ldb
+          data_type: m5nr annotation
+          file_format: tgz levelDB
+          description: gzip-tar of md5 to full annotation text mapping
+          size: full
+          db: leveldb
+
+    Cassandra:
+        - file: m5nr.cass.tgz
+          name: m5nr.cass
+          data_type: m5nr annotation
+          file_format: tgz json
+          description: gzip-tar of m5nr annotations in cassandra load format
+          db: cassandra
+
+    Solr:
+        - file: m5nr.solr.tgz
+          name: m5nr.solr
+          data_type: m5nr annotation
+          file_format: tgz json
+          description: gzip-tar of m5nr annotations in solr load format
+          db: solr
+
+    Hierarchies:
+        - file: taxonomy.tree.json.gz
+          name: taxonomy
+          data_type: m5nr hierarchy map
+          file_format: gz json
+          description: gzip of m5nr organism hierarchy map
+    
+        - file: functional.map.json.gz
+          name: ontology
+          data_type: m5nr hierarchy map
+          file_format: gz json
+          description: gzip of m5nr functional hierarchy map
+    
+        - file: taxonomy.tree.json.gz
+          name: taxonomy
+          data_type: m5nr hierarchy tree
+          file_format: gz json
+          description: gzip of m5nr organism hierarchy tree
+    
+        - file: functional.tree.json.gz
+          name: ontology
+          data_type: m5nr hierarchy tree
+          file_format: gz json
+          description: gzip of m5nr functional hierarchy tree
+

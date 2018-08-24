@@ -3,7 +3,6 @@
 #
 # supported variables:
 #
-# M5NR_VERSION   Version of this build of M5NR
 # M5NR_BIN       Full path to the "bin" directory in the myM5NR repository
 # PARSED_DIR     Full path to the directory containing parsed source data
 # SOURCE_FILE    Full path to sources.yaml file in the myM5NR repository
@@ -43,7 +42,7 @@
     - ${M5NR_BIN}/seq_length_stats.py --input m5nr.fasta --output m5nr.stats --protein --strict --iupac --x_percent 85
     - ${M5NR_BIN}/seqUtil --input m5nr.fasta --output m5nr --splitfasta 4
     - for i in `seq 1 4`; do diamond makedb --in m5nr.${i}.fasta --db m5nr.${i}; done
-    - for i in `seq 1 4`; do rm -f m5nr.${i}.fasta; done
+    - for i in `seq 1 4`; do rm -fv m5nr.${i}.fasta; done
 
 # m5rna.fasta
 - name: M5rna
@@ -65,34 +64,25 @@
     - Functions
     - LCA
   parser:
-    - mkdir -p m5nr_v${M5NR_VERSION}-full.ldb
-    - mkdir -p m5nr_v${M5NR_VERSION}-min.ldb
-    - ${M5NR_BIN}/merge_annotation.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --lca ../LCA/md52lca.txt --func ../Functions/id2func.txt --sources ${SOURCE_FILE} --db_full m5nr_v${M5NR_VERSION}-full.ldb --db_min m5nr_v${M5NR_VERSION}-min.ldb
-    - tar -zcf m5nr_v${M5NR_VERSION}-full.ldb.tgz m5nr_v${M5NR_VERSION}-full.ldb
-    - tar -zcf m5nr_v${M5NR_VERSION}-min.ldb.tgz m5nr_v${M5NR_VERSION}-min.ldb
-
-## m5nr_v#.bdb
-#- name: BerkelyDB
-#  rank: 3
-#  depends:
-#    - LevelDB
-#  parser:
-#    - ${M5NR_BIN}/export_annotation_for_bdb.py --sources ${SOURCE_FILE} --db ../LevelDB/m5nr.ldb --output m5nr_v${M5NR_VERSION}.bdb
-#    - gzip m5nr_v${M5NR_VERSION}.bdb
+    - mkdir -p m5nr-full.ldb
+    - mkdir -p m5nr-min.ldb
+    - ${M5NR_BIN}/merge_annotation.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.json --lca ../LCA/md52lca.txt --func ../Functions/id2func.txt --sources ${SOURCE_FILE} --db_full m5nr-full.ldb --db_min m5nr-min.ldb
+    - tar -zcf m5nr-full.ldb.tgz m5nr-full.ldb
+    - tar -zcf m5nr-min.ldb.tgz m5nr-min.ldb
 
 - name: Cassandra
   rank: 3
   depends:
     - LevelDB
   parser:
-    - ${M5NR_BIN}/export_annotation_for_cass.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr_v${M5NR_VERSION}-full.ldb --output m5nr_v${M5NR_VERSION}
-    - tar -zcf m5nr_v${M5NR_VERSION}.cass.tgz m5nr_v${M5NR_VERSION}.*
+    - ${M5NR_BIN}/export_annotation_for_cass.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr-full.ldb --output m5nr
+    - tar -zcf m5nr.cass.tgz m5nr.*
 
 - name: Solr
   rank: 3
   depends:
     - LevelDB
   parser:
-    - ${M5NR_BIN}/export_annotation_for_solr.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr_v${M5NR_VERSION}-full.ldb --output m5nr_v${M5NR_VERSION}
-    - tar -zcf m5nr_v${M5NR_VERSION}.solr.tgz m5nr_v${M5NR_VERSION}.*
+    - ${M5NR_BIN}/export_annotation_for_solr.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr-full.ldb --output m5nr
+    - tar -zcf m5nr.solr.tgz m5nr.*
 

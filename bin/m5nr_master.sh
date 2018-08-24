@@ -3,32 +3,40 @@
 # set option
 HELP=0
 ACTION=''
+TOKEN=''
 PROCS=4
 M5NR_VERSION=''
 SOURCE_CONFIG='/myM5NR/sources.yaml'
 BUILD_CONFIG='/myM5NR/build.yaml'
+UPLOAD_CONFIG='/myM5NR/upload.yaml'
 COMPILER='/myM5NR/bin/m5nr_compiler.py'
+UPLOADER='/myM5NR/bin/shock_upload.py'
 
 function usage {
-  echo "Usage:   $0 -a <action> -p <procs> -s <source config> -b <build config> -c <m5nr_compiler.py> -v <m5nr version> [-h <help>] "
+  echo "Usage: $0 -a <action> -t <token> -p <procs> -s <source config> -b <build config> -u <upload config> -c <m5nr_compiler.py> -v <m5nr version> [-h <help>] "
   echo "   -h <help>  "
-  echo "   -a (download|parse|build) "
+  echo "   -a (download|parse|build|upload) "
+  echo "   -t mg-rast token for shock upload "
   echo "   -p <# of threads to use> "
   echo "   -s sources.yaml file "
   echo "   -b build.yaml file "
+  echo "   -u upload.yaml file "
   echo "   -c /path/to/m5nr_compiler.py "
   echo "   -v m5nr version "
+  echo "Note: run this in base /m5nr_data dir"
 }
 
 # get options
-while getopts ha:p:s:b:c:v: option; do
+while getopts ha:t:p:s:b:u:c:v: option; do
     case "${option}"
 	in
 	    h) HELP=1;;
 	    a) ACTION=${OPTARG};;
+        a) TOKEN=${OPTARG};;
 	    p) PROCS=${OPTARG};;
 	    s) SOURCE_CONFIG=${OPTARG};;
 	    b) BUILD_CONFIG=${OPTARG};;
+        u) UPLOAD_CONFIG=${OPTARG};;
         c) COMPILER=${OPTARG};;
         v) M5NR_VERSION=${OPTARG};;
     esac
@@ -122,6 +130,28 @@ elif [ "${ACTION}" == "build" ] ; then
     echo "Building ${THIRD_LIST[@]}"
     echo ${THIRD_LIST[@]} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} build -v ${M5NR_VERSION} -d -f -a {}
     echo "Building Completed: "`date +"%Y%m%d.%H%M"`
+elif [ "${ACTION}" == "upload" ] ; then
+    if [ ! -e "${UPLOAD_CONFIG}" ]; then
+        echo "upload action requires upload.yaml file"
+        usage
+        exit 1
+    fi
+    if [ "${M5NR_VERSION}" == "" ]; then
+        echo "upload action requires m5nr version"
+        usage
+        exit 1
+    fi
+    if [ "${TOKEN}" == "" ]; then
+        echo "upload action requires mg-rast token"
+        usage
+        exit 1
+    fi
+    echo "Uploading Started: "`date +"%Y%m%d.%H%M"`
+    echo
+    echo "Data\tFile\tNode ID"
+    ${UPLOADER} --type build --dir Build --token ${TOKEN} --config ${UPLOAD_CONFIG} --version ${M5NR_VERSION}
+    echo
+    echo "Uploading Completed: "`date +"%Y%m%d.%H%M"`
 else
     echo "invalid action"
     usage

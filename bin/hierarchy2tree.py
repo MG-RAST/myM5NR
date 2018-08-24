@@ -65,7 +65,7 @@ def main(args):
         parser.error("invalid dir for parsed source dirs")
     
     hierTree = {}
-    hierMaP  = {}
+    hierMap  = {}
     
     # parse just a single file
     if args.type == 'taxonomy':
@@ -73,7 +73,7 @@ def main(args):
         if (args.format == 'both') or (args.format == 'tree'):
             hierTree, count = buildTree(args.input, True)
         if (args.format == 'both') or (args.format == 'map'):
-            hierMaP, count = buildMap(args.input, True)
+            hierMap, count = buildMap(args.input, True)
         print "done reading: "+str(datetime.now())
         print "processed %d taxa"%(count)
         
@@ -96,7 +96,7 @@ def main(args):
                 hierTree[source] = subTree
             if (args.format == 'both') or (args.format == 'map'):
                 subMap, count = buildMap(fname, False)
-                hierMaP[source] = subMap
+                hierMap[source] = subMap
             print "done reading: "+str(datetime.now())
             print "processed %d branches for %s"%(count, source)
         
@@ -105,8 +105,8 @@ def main(args):
     
     if hierTree:
         json.dump(hierTree, open(args.output+'.tree.json', 'w'))
-    if hierMaP:
-        json.dump(hierMaP, open(args.output+'.map.json', 'w'))
+    if hierMap:
+        json.dump(hierMap, open(args.output+'.map.json', 'w'))
     
     return 0
 
