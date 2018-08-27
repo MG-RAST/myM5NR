@@ -146,6 +146,7 @@ elif [ "${ACTION}" == "upload" ] ; then
         usage
         exit 1
     fi
+    
     echo "Uploading Started: "`date +"%Y%m%d.%H%M"`
     echo
     echo "Data\tFile\tNode ID"

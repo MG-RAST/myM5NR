@@ -28,5 +28,5 @@ COPY parse/bin/* /myM5NR/bin/
 COPY config/sources.yaml /myM5NR/
 ENV PATH $PATH:/myM5NR/bin
 
-RUN mkdir -p /m5nr_data/Parsed
+RUN mkdir -p /m5nr_data
 WORKDIR /m5nr_data

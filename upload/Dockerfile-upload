@@ -37,5 +37,5 @@ COPY upload/bin/* /myM5NR/bin/
 COPY config/upload.yaml /myM5NR/
 ENV PATH $PATH:/myM5NR/bin
 
-RUN mkdir -p /m5nr_data/Upload
+RUN mkdir -p /m5nr_data
 WORKDIR /m5nr_data
