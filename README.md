@@ -10,18 +10,25 @@ To build this image:
 
 
 ```bash
-git clone --recursive https://github.com/MG-RAST/myM5NR.git
+git clone https://github.com/MG-RAST/myM5NR.git
 ```
 
-To build the image either download the Docker file into an empty directory of provide the url to Dockerfile as in this example:
+There are seperate dockerfiles for the different actions available: download, parse, build, upload
+They can be built with the following commands:
 
 ```bash
-docker build -t mgrast/m5nr-build .
+docker build -t mgrast/m5nr-download -f download/Dockerfile-download .
+docker build -t mgrast/m5nr-parse -f parse/Dockerfile-parse .
+docker build -t mgrast/m5nr-build -f build/Dockerfile-build .
+docker build -t mgrast/m5nr-upload -f upload/Dockerfile-upload .
 ```
 
-Example for manual invocation:
+Examples for manual invocation:
 ```bash
-docker run -t -d --name m5nr -v /var/tmp/m5nr:/m5nr_data mgrast/m5nr-build bash
+docker run -t -d --name m5nr-download -v /var/tmp/m5nr:/m5nr_data mgrast/m5nr-download bash
+docker run -t -d --name m5nr-parse -v /var/tmp/m5nr:/m5nr_data mgrast/m5nr-parse bash
+docker run -t -d --name m5nr-build -v /var/tmp/m5nr:/m5nr_data mgrast/m5nr-build bash
+docker run -t -d --name m5nr-upload -v /var/tmp/m5nr:/m5nr_data mgrast/m5nr-upload bash
 ```
 
 From now steps execute inside the container
@@ -30,6 +37,7 @@ Set up some environment bits
 ```bash
 mkdir -p /m5nr_data/Sources
 mkdir -p /m5nr_data/Parsed
+mkdir -p /m5nr_data/Build
 ```
 
 To initiate the download (you can use --force to delete old _part directories)

@@ -37,6 +37,7 @@ RUN mkdir -p /myM5NR /myM5NR/bin
 COPY bin/* /myM5NR/bin/
 COPY download/bin/* /myM5NR/bin/
 COPY config/sources.yaml /myM5NR/
+COPY config/build.yaml /myM5NR/
 ENV PATH $PATH:/myM5NR/bin
 
 RUN mkdir -p /m5nr_data
