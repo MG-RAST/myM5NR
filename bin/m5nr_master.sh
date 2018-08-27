@@ -18,10 +18,10 @@ function usage {
   echo "   -a (download|parse|build|upload) "
   echo "   -t mg-rast token for shock upload "
   echo "   -p <# of threads to use> "
-  echo "   -s sources.yaml file "
-  echo "   -b build.yaml file "
-  echo "   -u upload.yaml file "
-  echo "   -c /path/to/m5nr_compiler.py "
+  echo "   -s sources.yaml file, default ${SOURCE_CONFIG} "
+  echo "   -b build.yaml file, default ${BUILD_CONFIG} "
+  echo "   -u upload.yaml file, default ${UPLOAD_CONFIG} "
+  echo "   -c /path/to/m5nr_compiler.py, default ${COMPILER} "
   echo "   -v m5nr version "
   echo "Note: run this in base /m5nr_data dir"
 }
@@ -43,7 +43,7 @@ while getopts ha:t:p:s:b:u:c:v: option; do
 done
 
 # check options
-if   [ "${HELP}" -eq 1 ] || [ -z "${ACTION}" ]; then
+if [ "${HELP}" -eq 1 ] || [ -z "${ACTION}" ]; then
     usage
     exit 1
 fi
