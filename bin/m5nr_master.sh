@@ -45,7 +45,7 @@ done
 # check options
 if [ "${HELP}" -eq 1 ] || [ -z "${ACTION}" ]; then
     usage
-    exit 1
+    exit 0
 fi
 
 # make sure directeries exist or else compiler fails

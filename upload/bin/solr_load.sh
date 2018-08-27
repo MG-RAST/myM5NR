@@ -18,9 +18,9 @@ function usage {
   echo "   -n input uri is shock node "
   echo "   -i input file path or shock url "
   echo "   -v m5nr version "
-  echo "   -v solr url "
+  echo "   -s solr url "
   echo "   -l loader cmd, default: ${LOADER} "
-  echo "   -d work die, default: ${WORK_DIR} "
+  echo "   -d work dir, default: ${WORK_DIR} "
 }
 
 # get options
@@ -40,13 +40,15 @@ done
 # check options
 if [ "${HELP}" -eq 1 ] || [ -z "${INPUT_URI}" ] || [ -z "${M5NR_VERSION}" ] || [ -z "${SOLR_URL}" ]; then
     usage
-    exit 1
+    exit 0
 fi
+
+mkdir -p ${WORK_DIR}
 
 # optional download
 if [ "${IS_NODE}" -eq 1 ]; then
     echo "downloading ${INPUT_URI} from shock"
-    FILE_PATH=${WORK_DIR}/m5nr_v${M5NR_VERSION}.solr.tgz
+    FILE_PATH=${WORK_DIR}/m5nr.solr.tgz
     curl -s ${INPUT_URI} > ${FILE_PATH}
 else
     FILE_PATH=${INPUT_URI}
