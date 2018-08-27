@@ -48,6 +48,9 @@ if [ "${HELP}" -eq 1 ] || [ -z "${ACTION}" ]; then
     exit 1
 fi
 
+# make sure directeries exist or else compiler fails
+mkdir -p Sources Parsed Build
+
 # run actions
 if [ "${ACTION}" == "download" ] || [ "${ACTION}" == "parse" ]; then
     if [ ! -e "${SOURCE_CONFIG}" ]; then
@@ -59,12 +62,10 @@ if [ "${ACTION}" == "download" ] || [ "${ACTION}" == "parse" ]; then
     SOURCES=`grep '^[A-Za-z]' ${SOURCE_CONFIG} | cut -f1 -d':'`
     
     if [ "${ACTION}" == "download" ]; then
-        mkdir -p Sources
         echo "Downloading Started: "`date +"%Y%m%d.%H%M"`
         echo ${SOURCES} | tr ' ' '\n' | xargs -n 1 -I {} -P ${PROCS} ${COMPILER} download -f -d -s {}
         echo "Downloading Completed: "`date +"%Y%m%d.%H%M"`
     elif [ "${ACTION}" == "parse" ]; then
-        mkdir -p Parsed
         FIRST_LIST=()
         SECOND_LIST=()
         THIRD_LIST=()
@@ -100,8 +101,6 @@ elif [ "${ACTION}" == "build" ] ; then
         usage
         exit 1
     fi
-    
-    mkdir -p Build
     
     TOTAL=`grep '^- name:' ${BUILD_CONFIG} | wc -l`
     TOTAL=$((TOTAL-1))
