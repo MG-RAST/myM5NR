@@ -68,7 +68,7 @@ def main(args):
     if not os.path.isdir(args.dir):
         parser.error("invalid base dir")
     
-    configInfo = yaml.load(open(args.sources, 'r'))
+    configInfo = yaml.load(open(args.config, 'r'))
     if args.type not in configInfo:
         parser.error("invalid upload type: "+args.type)
     
