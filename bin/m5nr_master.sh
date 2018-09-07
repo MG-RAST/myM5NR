@@ -32,7 +32,7 @@ while getopts ha:t:p:s:b:u:c:v: option; do
 	in
 	    h) HELP=1;;
 	    a) ACTION=${OPTARG};;
-        a) TOKEN=${OPTARG};;
+        t) TOKEN=${OPTARG};;
 	    p) PROCS=${OPTARG};;
 	    s) SOURCE_CONFIG=${OPTARG};;
 	    b) BUILD_CONFIG=${OPTARG};;
