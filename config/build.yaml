@@ -37,9 +37,9 @@
   rank: 1
   parser:
     - sort -T . -m -u ${PARSED_DIR}/*/md52seq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5nr.raw.fasta
-    - ${M5NR_BIN}/seq_length_stats.py --input m5nr.raw.fasta --output m5nr.raw.stats --protein --strict --iupac --x_percent 85
+    - ${M5NR_BIN}/seq_length_stats.py --input m5nr.raw.fasta --output m5nr.raw.stats --json --protein --strict --iupac --x_percent 85
     - ${M5NR_BIN}/seqUtil --input m5nr.raw.fasta --output m5nr.fasta --stdfasta --protein --iupac --ambig_trim --dna_trim --per_trim 85 --minimum 20
-    - ${M5NR_BIN}/seq_length_stats.py --input m5nr.fasta --output m5nr.stats --protein --strict --iupac --x_percent 85
+    - ${M5NR_BIN}/seq_length_stats.py --input m5nr.fasta --output m5nr.stats --json --protein --strict --iupac --x_percent 85
     - ${M5NR_BIN}/seqUtil --input m5nr.fasta --output m5nr --splitfasta 4
     - for i in `seq 1 4`; do diamond makedb --in m5nr.${i}.fasta --db m5nr.${i}; done
     - for i in `seq 1 4`; do rm -fv m5nr.${i}.fasta; done
@@ -49,10 +49,10 @@
   rank: 1
   parser:
     - sort -T . -m -u ${PARSED_DIR}/*/md52rnaseq.sort.txt | ${M5NR_BIN}/tab2fasta.pl > m5rna.fasta
-    - ${M5NR_BIN}/seq_length_stats.py --input m5rna.fasta --output m5rna.stats --strict
+    - ${M5NR_BIN}/seq_length_stats.py --input m5rna.fasta --output m5rna.stats --strict --json
     - diamond makedb --in m5rna.fasta -d m5rna
     - vsearch --quiet --strand both --id 0.8 --cluster_fast m5rna.fasta --centroids m5rna.clust.fasta
-    - ${M5NR_BIN}/seq_length_stats.py --input m5rna.clust.fasta --output m5rna.clust.stats --strict
+    - ${M5NR_BIN}/seq_length_stats.py --input m5rna.clust.fasta --output m5rna.clust.stats --strict --json
     - mkdir -p index
     - indexdb_rna --ref m5rna.clust.fasta,index/m5rna.clust.index
 
