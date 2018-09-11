@@ -101,7 +101,7 @@ def main(args):
             data['created'] = DATE
             data['version'] = args.version
             # upload and make public
-            node = upload(filename, filepath, data)
+            node = upload(filename, filepath, json.dumps(data))
             public(node['id'])
             print "%s\t%s\t%s\n"%(name, filename, node['id'])
     return 0
