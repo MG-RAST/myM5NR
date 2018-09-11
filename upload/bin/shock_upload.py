@@ -103,7 +103,7 @@ def main(args):
             # upload and make public
             node = upload(filename, filepath, json.dumps(data))
             public(node['id'])
-            print "%s\t%s\t%s\n"%(name, filename, node['id'])
+            print "%s\t%s\t%d\t%s"%(name, filename, node['file']['size'], node['id'])
     return 0
     
 

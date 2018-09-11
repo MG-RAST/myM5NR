@@ -148,7 +148,7 @@ elif [ "${ACTION}" == "upload" ] ; then
     
     echo "Uploading Started: "`date +"%Y%m%d.%H%M"`
     echo
-    echo "Data\tFile\tNode ID"
+    echo $'Data\tFile\tSize\tNode ID'
     ${UPLOADER} --type build --dir Build --token ${TOKEN} --config ${UPLOAD_CONFIG} --version ${M5NR_VERSION}
     echo
     echo "Uploading Completed: "`date +"%Y%m%d.%H%M"`
