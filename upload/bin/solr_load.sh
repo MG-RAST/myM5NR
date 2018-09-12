@@ -62,8 +62,8 @@ mkdir -p ${WORK_DIR}/solr_extract
 tar -zxf ${FILE_PATH} -C ${WORK_DIR}/solr_extract
 
 # create new collection / config for m5nr version
-# must have docker socket mounted: -v "/var/run/docker.sock:/var/run/docker.sock"
-docker exec ${SOLR_CONTAINER} bash -c "cd /MG-RAST-infrastructure/ && git pull && cd services/solr-m5nr && ./setup-m5nr-core.sh ${M5NR_VERSION}"
+# must have docker socket mounted: -v "/var/run/docker.sock:/var/run/docker.sock" and docker installed: docker_setup.sh
+/usr/bin/docker exec ${SOLR_CONTAINER} bash -c "cd /MG-RAST-infrastructure/ && git pull && cd services/solr-m5nr && ./setup-m5nr-core.sh ${M5NR_VERSION}"
 
 # load files
 for FILE in `ls ${WORK_DIR}/solr_extract`; do
