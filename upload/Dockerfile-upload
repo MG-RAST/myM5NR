@@ -1,4 +1,4 @@
-# docker build -t mgrast/m5nr-upload upload/.
+# docker build -t mgrast/m5nr-upload -f upload/Dockerfile-upload .
 # docker run -i -d \
 #        --name m5nr-upload \
 #        --env DOCKERVERSION=$(/usr/bin/docker --version | grep -o '[0-9]*\.[0-9]*\.[0-9][a-z-]*') \

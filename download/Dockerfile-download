@@ -1,4 +1,4 @@
-# docker build -t mgrast/m5nr-download download/.
+# docker build -t mgrast/m5nr-download -f download/Dockerfile-download .
 
 FROM ubuntu:16.04
 

@@ -1,4 +1,4 @@
-# docker build -t mgrast/m5nr-parse parse/.
+# docker build -t mgrast/m5nr-parse -f parse/Dockerfile-parse .
 
 FROM ubuntu:16.04
 
