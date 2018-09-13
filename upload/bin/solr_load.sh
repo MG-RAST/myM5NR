@@ -63,12 +63,16 @@ tar -zxf ${FILE_PATH} -C ${WORK_DIR}/solr_extract
 
 # create new collection / config for m5nr version
 # must have docker socket mounted: -v "/var/run/docker.sock:/var/run/docker.sock" and docker installed: docker_setup.sh
+echo "creating collection for m5nr_${M5NR_VERSION}"
 /usr/bin/docker exec ${SOLR_CONTAINER} bash -c "cd /MG-RAST-infrastructure/ && git pull && cd services/solr-m5nr && ./setup-m5nr-core.sh ${M5NR_VERSION}"
+/usr/bin/docker exec ${SOLR_CONTAINER} /opt/solr/bin/solr create -c m5nr_${M5NR_VERSION}
 
 # load files
 for FILE in `ls ${WORK_DIR}/solr_extract`; do
-    echo "importing ${FILE} to ${SOLR_URL}"
+    START=`date +"%Y%m%d.%H%M"`
+    echo "$START - importing ${FILE} to ${SOLR_URL}"
     ${LOADER} -s ${SOLR_URL} -a import -o ${FILE}
+    END=`date +"%Y%m%d.%H%M"`
+    echo "$END - done"
 done
-echo "done"
 

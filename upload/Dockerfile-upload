@@ -9,7 +9,7 @@
 #
 # docker exec m5nr-upload m5nr_master.sh -a upload -v $VERSION -t $TOKEN
 # docker exec m5nr-upload docker_setup.sh $DOCKERVERSION
-# docker exec m5nr-upload solr_load.sh -i $INPUT_URI -v M5NR_VERSION -s $SOLR_URL 
+# docker exec m5nr-upload solr_load.sh -n -i $INPUT_URI -v M5NR_VERSION -s $SOLR_URL 
 #
 
 FROM ubuntu
