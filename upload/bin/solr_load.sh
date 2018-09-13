@@ -9,7 +9,7 @@ INPUT_URI=''
 M5NR_VERSION=''
 SOLR_URL=''
 SOLR_CONTAINER='solr-m5nr'
-LOADER='/solr-import-export-json/run.sh'
+LOADER='/solr-import-export-json'
 WORK_DIR='/m5nr_data/Upload'
 FILE_PATH=''
 
@@ -68,10 +68,11 @@ echo "creating collection for m5nr_${M5NR_VERSION}"
 /usr/bin/docker exec ${SOLR_CONTAINER} /opt/solr/bin/solr create -c m5nr_${M5NR_VERSION}
 
 # load files
+cd ${LOADER}
 for FILE in `ls ${WORK_DIR}/solr_extract`; do
     START=`date +"%Y%m%d.%H%M"`
     echo "$START - importing ${FILE} to ${SOLR_URL}"
-    ${LOADER} -s ${SOLR_URL} -a import -o ${FILE}
+    ./run.sh -s ${SOLR_URL} -a import -o ${FILE}
     END=`date +"%Y%m%d.%H%M"`
     echo "$END - done"
 done
