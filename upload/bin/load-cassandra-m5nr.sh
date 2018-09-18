@@ -10,6 +10,9 @@ REP_NUM="4"
 DATA_DIR="/var/lib/cassandra"
 DATA_URL=""
 
+SCHEMA_DIR="/myM5NR/schema"
+LOAD_DIR="/myM5NR/BulkLoader"
+
 CASS_BIN="/usr/bin"
 CASS_DIR="/usr/share/cassandra"
 CASS_CONF="/etc/cassandra/cassandra.yaml"
@@ -51,29 +54,15 @@ fi
 
 set -x
 
-LOAD_DIR=$DATA_DIR/BulkLoader
-SCHEMA_DIR=$DATA_DIR/schema
-M5NR_DATA=$DATA_DIR/src/v${VERSION}
-SCHEMA_TABLE=$SCHEMA_DIR/m5nr_table_v${VERSION}.cql
-SCHEMA_COPY=$SCHEMA_DIR/m5nr_copy_v${VERSION}.cql
-
 CQLSH=$CASS_BIN/cqlsh
 SST_LOAD=$CASS_BIN/sstableloader
+M5NR_DATA=$DATA_DIR/src/v${VERSION}
 
-# download schema template
-mkdir -p $SCHEMA_DIR
-cd $SCHEMA_DIR
-curl -s $LOAD_URL/m5nr/m5nr_table.cql.tt | \
-    sed -e "s;\[\% version \%\];$VERSION;g" -e "s;\[\% replication \%\];$REP_NUM;g" > $SCHEMA_TABLE
-curl -s $LOAD_URL/m5nr/m5nr_copy.cql.tt | \
-    sed -e "s;\[\% version \%\];$VERSION;g" -e "s;\[\% data_dir \%\];$M5NR_DATA;g" > $SCHEMA_COPY
-
-# download bulkloader
-mkdir -p $LOAD_DIR
-cd $LOAD_DIR
-curl -s -O $LOAD_URL/BulkLoader/BulkLoader.sh
-curl -s -O $LOAD_URL/BulkLoader/BulkLoader.java
-curl -s -O $LOAD_URL/BulkLoader/opencsv-3.4.jar
+# schema from template
+SCHEMA_TABLE=$SCHEMA_DIR/m5nr_table_v${VERSION}.cql
+SCHEMA_COPY=$SCHEMA_DIR/m5nr_copy_v${VERSION}.cql
+sed -e "s;\[\% version \%\];$VERSION;g" -e "s;\[\% replication \%\];$REP_NUM;g" $SCHEMA_DIR/m5nr_table.cql.tt > $SCHEMA_TABLE
+sed -e "s;\[\% version \%\];$VERSION;g" -e "s;\[\% data_dir \%\];$M5NR_DATA;g" $SCHEMA_DIR/m5nr_copy.cql.tt > $SCHEMA_COPY
 
 # download data
 if [ "$VERSION" == "1" ]; then

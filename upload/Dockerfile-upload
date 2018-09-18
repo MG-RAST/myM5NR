@@ -44,10 +44,12 @@ RUN curl -L "https://github.com/mikefarah/yq/releases/download/1.14.0/yq_linux_a
     && chmod +x /usr/bin/yq
 
 # copy myM5NR and set up env
-RUN mkdir -p /myM5NR /myM5NR/bin
+RUN mkdir -p /myM5NR /myM5NR/bin /myM5NR/BulkLoader
 COPY bin/* /myM5NR/bin/
 COPY upload/bin/* /myM5NR/bin/
 COPY config/upload.yaml /myM5NR/
+COPY upload/schema/* /myM5NR/schema/
+COPY upload/BulkLoader/* /myM5NR/BulkLoader/
 ENV PATH $PATH:/myM5NR/bin
 
 RUN mkdir -p /m5nr_data
