@@ -76,14 +76,14 @@
   depends:
     - LevelDB
   parser:
-    - ${M5NR_BIN}/export_annotation_for_cass.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr-full.ldb --output m5nr_v${M5NR_VERSION}
-    - tar -zcf m5nr.cass.tgz m5nr_v${M5NR_VERSION}.*
+    - ${M5NR_BIN}/export_annotation_for_cass.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr-full.ldb --output m5nr
+    - tar -zcf m5nr.cass.tgz m5nr.*
 
 - name: Solr
   rank: 3
   depends:
     - LevelDB
   parser:
-    - ${M5NR_BIN}/export_annotation_for_solr.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr-full.ldb --output m5nr_v${M5NR_VERSION}
-    - tar -zcf m5nr.solr.tgz m5nr_v${M5NR_VERSION}.*
+    - ${M5NR_BIN}/export_annotation_for_solr.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr-full.ldb --output m5nr
+    - tar -zcf m5nr.solr.tgz m5nr.*
 

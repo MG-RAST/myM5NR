@@ -96,10 +96,10 @@ mkdir -p $SST_DIR
 for TYPE in midx md5; do
     # split large file
     cd $M5NR_DATA
-    split -a 2 -d -l 2500000 ${KEYSPACE}.annotation.${TYPE} ${KEYSPACE}.annotation.${TYPE}.
+    split -a 2 -d -l 2500000 m5nr.annotation.${TYPE} m5nr.annotation.${TYPE}.
     # create sstables
     cd $LOAD_DIR
-    for FILE in `ls $M5NR_DATA/${KEYSPACE}.annotation.${TYPE}.*`; do
+    for FILE in `ls $M5NR_DATA/m5nr.annotation.${TYPE}.*`; do
         /bin/bash BulkLoader.sh -c $CASS_CONF -d $CASS_DIR -k $KEYSPACE -t ${TYPE}_annotation -i $FILE -o $SST_DIR
         rm $FILE
     done
