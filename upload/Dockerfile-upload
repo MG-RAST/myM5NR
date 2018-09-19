@@ -35,8 +35,7 @@ RUN python -m pip install requests_toolbelt
 
 # use java 8 instead of default 7
 RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java" 1 \
-    && update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/java-8-openjdk-amd64/bin/javac" 1 \
-    && update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/java-8-openjdk-amd64/bin/javaws" 1
+    && update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/java-8-openjdk-amd64/bin/javac" 1
 
 ### install solr-import-export-json
 RUN cd / \
