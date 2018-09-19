@@ -5,36 +5,37 @@ set -e
 # set default value
 MY_IP=""
 ALL_IPS=""
-VERSION="1"
+VERSION=""
 REP_NUM="4"
-DATA_DIR="/var/lib/cassandra"
 DATA_URL=""
 
+DATA_DIR="/m5nr_data/Upload/cassandra"
 SCHEMA_DIR="/myM5NR/schema"
 LOAD_DIR="/myM5NR/BulkLoader"
 
 CASS_BIN="/usr/bin"
 CASS_DIR="/usr/share/cassandra"
 CASS_CONF="/etc/cassandra/cassandra.yaml"
-LOAD_URL="https://raw.githubusercontent.com/MG-RAST/MG-RAST-infrastructure/master/services/cassandra-load"
 
 function usage {
-  echo "Usage: $0 -i <this node IP> -a <all node IPs> -v <m5nr version> -r <replica number> -d <data install dir> -u <data shock URL> [-h <help>] "
+  echo "Usage: $0 -i <this node IP> -a <all node IPs> -v <m5nr version> -u <data shock URL> -r <replica number> -d <data install dir> [-h <help>] "
   echo "   -h <help>  "
   echo "   -i this node IP "
   echo "   -a all node IPs, comma seperated "
-  echo "   -v m5nr version, default use Version 1 "
+  echo "   -v m5nr version "
+  echo "   -u data input URL "
   echo "   -r replica number, default ${REP_NUM} "
   echo "   -d data install dir, default ${DATA_DIR} "
-  echo "   -u data shock URL, default use Version 1 "
 }
 
-while getopts i:a:v:r:d: option; do
+while getopts hi:a:v:u:r:d: option; do
     case "${option}"
         in
+            h) HELP=1;;
             i) MY_IP=${OPTARG};;
             a) ALL_IPS=${OPTARG};;
             v) VERSION=${OPTARG};;
+            u) DATA_URL=${OPTARG};;
             r) REP_NUM=${OPTARG};;
             d) DATA_DIR=${OPTARG};;
     esac
@@ -46,8 +47,8 @@ if [ "${HELP}" -eq 1 ]; then
     exit 0
 fi
 
-if [ -z "$MY_IP" ] || [ -z "$ALL_IPS" ]; then
-    echo "Missing IPs"
+if [ -z "$VERSION" ] || [ -z "$DATA_URL" ] || [ -z "$MY_IP" ] || [ -z "$ALL_IPS" ]; then
+    echo "Missing required option"
     usage
     exit 1
 fi
@@ -63,16 +64,6 @@ SCHEMA_TABLE=$SCHEMA_DIR/m5nr_table_v${VERSION}.cql
 SCHEMA_COPY=$SCHEMA_DIR/m5nr_copy_v${VERSION}.cql
 sed -e "s;\[\% version \%\];$VERSION;g" -e "s;\[\% replication \%\];$REP_NUM;g" $SCHEMA_DIR/m5nr_table.cql.tt > $SCHEMA_TABLE
 sed -e "s;\[\% version \%\];$VERSION;g" -e "s;\[\% data_dir \%\];$M5NR_DATA;g" $SCHEMA_DIR/m5nr_copy.cql.tt > $SCHEMA_COPY
-
-# download data
-if [ "$VERSION" == "1" ]; then
-    DATA_URL="http://shock.metagenomics.anl.gov/node/4ce1ec2f-58f1-48fa-86cd-3bff227db165?download"
-fi
-if [ "$DATA_URL" == "" ]; then
-    echo "Data URL required for version > 1"
-    usage
-    exit 1
-fi
 
 echo ""
 echo "REPLICATES = $REP_NUM"

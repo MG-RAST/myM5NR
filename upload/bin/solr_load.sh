@@ -66,6 +66,7 @@ tar -zxf ${FILE_PATH} -C ${WORK_DIR}/solr_extract
 echo "creating collection for m5nr_${M5NR_VERSION}"
 /usr/bin/docker exec ${SOLR_CONTAINER} bash -c "cd /MG-RAST-infrastructure/ && git pull && cd services/solr-m5nr && ./setup-m5nr-core.sh ${M5NR_VERSION}"
 /usr/bin/docker exec ${SOLR_CONTAINER} /opt/solr/bin/solr create -c m5nr_${M5NR_VERSION}
+SOLR_URL=${SOLR_URL}/m5nr_${M5NR_VERSION}
 
 # load files
 cd ${LOADER}

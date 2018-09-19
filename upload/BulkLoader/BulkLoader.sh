@@ -40,7 +40,7 @@ if [ ! -f "$INFILE" ]; then
     exit
 fi
 if [ -z "$OUTDIR" ]; then
-    OUTDIR=/var/lib/cassandra/sstable
+    OUTDIR=/m5nr_data/Upload/cassandra/sstable
 fi
 if [ -z "$CASS_CONF" ]; then
     CASS_CONF=/etc/cassandra/cassandra.yaml

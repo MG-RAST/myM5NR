@@ -1,18 +1,24 @@
+#
 # docker build -t mgrast/m5nr-upload -f upload/Dockerfile-upload .
 # docker run -i -d \
 #        --name m5nr-upload \
-#        --env DOCKERVERSION=$(/usr/bin/docker --version | grep -o '[0-9]*\.[0-9]*\.[0-9][a-z-]*') \
 #        -v $DIR/m5nr/:/m5nr_data/ \
 #        -v $DIR/docker:/docker/ \
 #        -v /var/run/docker.sock:/var/run/docker.sock
 #        mgrast/m5nr-upload bash
 #
-# docker exec m5nr-upload m5nr_master.sh -a upload -v $VERSION -t $TOKEN
+# M5NR_VERSION=12
+# DOCKERVERSION=`/usr/bin/docker --version | grep -o '[0-9]*\.[0-9]*\.[0-9][a-z-]*'`
+# SOLR_URL="http://140.221.76.69:8983/solr"
+# ALL_IPS=`fleetctl list-units | grep cassandra | cut -f2 -d"/" | cut -f1 | sort -u | tr "\n" ","`
+#
+# docker exec m5nr-upload m5nr_master.sh -a upload -v $M5NR_VERSION -t $TOKEN
 # docker exec m5nr-upload docker_setup.sh $DOCKERVERSION
-# docker exec m5nr-upload solr_load.sh -n -i $INPUT_URI -v M5NR_VERSION -s $SOLR_URL 
+# docker exec m5nr-upload solr_load.sh -n -i $INPUT_URI -v $M5NR_VERSION -s $SOLR_URL
+# docker exec m5nr-upload load-cassandra-m5nr.sh -v $M5NR_VERSION -u $INPUT_URI -i $COREOS_PRIVATE_IPV4 -a $ALL_IPS
 #
 
-FROM ubuntu
+FROM cassandra:3.10
 
 RUN apt-get update && apt-get install -y \
   software-properties-common \
