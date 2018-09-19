@@ -25,12 +25,13 @@ RUN apt-get update && apt-get install -y \
   vim \
   curl \
   python-pip \
+  python-yaml \
   openjdk-8-jdk \
   maven
 
 # python dependencies
 RUN pip2 install --upgrade pip
-RUN python -m pip install yaml requests_toolbelt
+RUN python -m pip install requests_toolbelt
 
 # use java 8 instead of default 7
 RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java" 1 \
