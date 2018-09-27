@@ -77,6 +77,7 @@
     - LevelDB
   parser:
     - ${M5NR_BIN}/export_annotation_for_cass.py --parsedir ${PARSED_DIR} --taxa ${PARSED_DIR}/NCBI-Taxonomy/taxonomy.tsv --sources ${SOURCE_FILE} --db ../LevelDB/m5nr-full.ldb --output m5nr
+    - cp ../Functions/id2func.txt m5nr.functions
     - tar -zcf m5nr.cass.tgz m5nr.*
 
 - name: Solr

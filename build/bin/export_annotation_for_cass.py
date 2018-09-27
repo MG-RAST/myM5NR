@@ -54,6 +54,7 @@ id2hierarchy.txt file:
 """
 
 HIERARCHY_FILE = 'id2hierarchy.txt'
+ONTOLOGY_LEVEL = 4
 
 def leaf_name(taxa):
     rtaxa = reversed(taxa)
@@ -82,6 +83,12 @@ def getleaf(md5, data, isid=True):
             return data['lca'][-1]
         else:
             return ''
+
+def padlist(l, n, pad=""):
+    if len(l) >= n:
+        return l[:n]
+    return l + ([pad] * (n - len(l)))
+
 
 def main(args):
     parser = argparse.ArgumentParser()
@@ -166,11 +173,12 @@ def main(args):
             hier  = line.strip().split("\t")
             accid = hier.pop(0)
             level = len(hier)
-            if accid and (level < 5):
+            if accid and (level <= ONTOLOGY_LEVEL):
                 count += 1
                 for i in range(level):
                     if hier[i] != '-':
                         hcvswriters[i].writerow([source, hier[i], accid])
+                hier = padlist(hier, ONTOLOGY_LEVEL)
                 hcvs.writerow([source, accid]+hier)
         print "done reading: "+str(datetime.now())
         print "processed %d brances for %s"%(count, source)
