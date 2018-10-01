@@ -54,6 +54,7 @@ def public(nid):
 def main(args):
     global URL, AUTH
     parser = argparse.ArgumentParser()
+    parser.add_argument("--name", dest="name", default=None, help="specific name in --type to upload, default is all")
     parser.add_argument("--type", dest="type", default=None, help="upload type: one of source, parsed, build")
     parser.add_argument("--dir", dest="dir", default=None, help="base dir to search through")
     parser.add_argument("--token", dest="token", default=None, help="auth token")
@@ -86,6 +87,9 @@ def main(args):
             print "[warning] "+path+" does not exist, skipping"
             continue
         for data in toUpload[name]:
+            # if using --name option
+            if args.name and (args.name != data['name']):
+                continue
             # extract filepath
             if 'file' not in data:
                 continue
