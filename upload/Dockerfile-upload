@@ -12,9 +12,12 @@
 # export SOLR_URL="http://140.221.76.69:8983/solr"
 # export ALL_IPS=`fleetctl list-units | grep cassandra | cut -f2 -d"/" | cut -f1 | sort -u | tr "\n" "," | head --bytes -1`
 #
+### to upload files to shock ###
 # docker exec m5nr-upload m5nr_master.sh -a upload -v $M5NR_VERSION -t $TOKEN
+### to load solr m5nr data ###
 # docker exec m5nr-upload docker_setup.sh $DOCKERVERSION
 # docker exec m5nr-upload solr_load.sh -n -i $INPUT_URI -v $M5NR_VERSION -s $SOLR_URL
+### to load cassandra m5nr data ###
 # docker exec m5nr-upload load-cassandra-m5nr.sh -v $M5NR_VERSION -u $INPUT_URI -i $COREOS_PRIVATE_IPV4 -a $ALL_IPS
 #
 

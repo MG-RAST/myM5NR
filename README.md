@@ -57,3 +57,23 @@ To view status
 cd /m5nr_data
 /myM5NR/bin/m5nr_compiler.py status --debug
 ```
+
+To use automated wrapper script for full round build
+```bash
+docker exec m5nr-download m5nr_master.sh -a download
+docker exec m5nr-parse m5nr_master.sh -a parse
+docker exec m5nr-build m5nr_master.sh -a build -v <m5nr version #>
+docker exec m5nr-upload m5nr_master.sh -a upload -v <m5nr version #> -t <shock token>
+```
+
+To load build data on solr server, run following on same host
+```bash
+docker exec m5nr-upload docker_setup.sh
+docker exec m5nr-upload solr_load.sh -n -i <shock file download url> -v <m5nr version #> -s <solr url>
+```
+
+To load build data on cassandra cluster, run following on same host
+```bash
+docker exec m5nr-upload load-cassandra-m5nr.sh -v <m5nr version #> -u <shock file download url> -i <current host IP> -a <all cassandra host IPs>
+```
+
