@@ -1,19 +1,19 @@
 
 use m5nr_v[% version %];
 
-COPY functions (id, name) FROM '[% data_dir %]/m5nr.functions' WITH DELIMITER='\t';
+COPY functions (id, name) FROM '[% data_dir %]/m5nr.functions' WITH ESCAPE='"';
 
-COPY ontologies (source, name, level1, level2, level3, level4) FROM '[% data_dir %]/m5nr.ontology.all';
-COPY ont_level1 (source, level1, name) FROM '[% data_dir %]/m5nr.ontology.level1';
-COPY ont_level2 (source, level2, name) FROM '[% data_dir %]/m5nr.ontology.level2';
-COPY ont_level3 (source, level3, name) FROM '[% data_dir %]/m5nr.ontology.level3';
-COPY ont_level4 (source, level4, name) FROM '[% data_dir %]/m5nr.ontology.level4';
+COPY ontologies (source, name, level1, level2, level3, level4) FROM '[% data_dir %]/m5nr.ontology.all' WITH ESCAPE='"';
+COPY ont_level1 (source, level1, name) FROM '[% data_dir %]/m5nr.ontology.level1' WITH ESCAPE='"';
+COPY ont_level2 (source, level2, name) FROM '[% data_dir %]/m5nr.ontology.level2' WITH ESCAPE='"';
+COPY ont_level3 (source, level3, name) FROM '[% data_dir %]/m5nr.ontology.level3' WITH ESCAPE='"';
+COPY ont_level4 (source, level4, name) FROM '[% data_dir %]/m5nr.ontology.level4' WITH ESCAPE='"';
 
-COPY organisms_ncbi (name, tax_domain, tax_phylum, tax_class, tax_order, tax_family, tax_genus, tax_species, ncbi_tax_id) FROM '[% data_dir %]/m5nr.taxonomy.all';
-COPY tax_domain (tax_domain, name) FROM '[% data_dir %]/m5nr.taxonomy.domain';
-COPY tax_phylum (tax_phylum, name) FROM '[% data_dir %]/m5nr.taxonomy.phylum';
-COPY tax_class (tax_class, name) FROM '[% data_dir %]/m5nr.taxonomy.class';
-COPY tax_order (tax_order, name) FROM '[% data_dir %]/m5nr.taxonomy.order';
-COPY tax_family (tax_family, name) FROM '[% data_dir %]/m5nr.taxonomy.family';
-COPY tax_genus (tax_genus, name) FROM '[% data_dir %]/m5nr.taxonomy.genus';
-COPY tax_species (tax_species, name) FROM '[% data_dir %]/m5nr.taxonomy.species';
+COPY organisms_ncbi (name, tax_domain, tax_phylum, tax_class, tax_order, tax_family, tax_genus, tax_species, ncbi_tax_id) FROM '[% data_dir %]/m5nr.taxonomy.all' WITH ESCAPE='"';
+COPY tax_domain (tax_domain, name) FROM '[% data_dir %]/m5nr.taxonomy.domain' WITH ESCAPE='"';
+COPY tax_phylum (tax_phylum, name) FROM '[% data_dir %]/m5nr.taxonomy.phylum' WITH ESCAPE='"';
+COPY tax_class (tax_class, name) FROM '[% data_dir %]/m5nr.taxonomy.class' WITH ESCAPE='"';
+COPY tax_order (tax_order, name) FROM '[% data_dir %]/m5nr.taxonomy.order' WITH ESCAPE='"';
+COPY tax_family (tax_family, name) FROM '[% data_dir %]/m5nr.taxonomy.family' WITH ESCAPE='"';
+COPY tax_genus (tax_genus, name) FROM '[% data_dir %]/m5nr.taxonomy.genus' WITH ESCAPE='"';
+COPY tax_species (tax_species, name) FROM '[% data_dir %]/m5nr.taxonomy.species' WITH ESCAPE='"';
