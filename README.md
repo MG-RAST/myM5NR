@@ -77,3 +77,8 @@ To load build data on cassandra cluster, run following on same host
 docker exec m5nr-upload load-cassandra-m5nr.sh -v <m5nr version #> -u <shock file download url> -i <current host IP> -a <all cassandra host IPs>
 ```
 
+To check table sizes in cassandra for new m5nr build
+```bash
+CQLSH="/usr/bin/cqlsh --request-timeout 600 --connect-timeout 600"
+for T in `docker exec cassandra-simple $CQLSH -e "USE m5nr_v12; describe tables;"`; do echo $T; docker exec cassandra-simple $CQLSH -e "USE m5nr_v12; CONSISTENCY QUORUM; SELECT COUNT(*) FROM $T;"; done
+```

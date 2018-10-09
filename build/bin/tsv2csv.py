@@ -3,7 +3,7 @@
 import sys
 import csv
 
-tsvin  = csv.reader(sys.stdin, dialect=csv.excel_tab)
 csvout = csv.writer(sys.stdout, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-for row in tsvin:
+for line in sys.stdin:
+    row = line.strip().split("\t")
     csvout.writerow(row)

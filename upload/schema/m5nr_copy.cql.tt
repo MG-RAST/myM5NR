@@ -1,7 +1,7 @@
 
 use m5nr_v[% version %];
 
-COPY functions (id, name) FROM '[% data_dir %]/m5nr.functions';
+COPY functions (id, name) FROM '[% data_dir %]/m5nr.functions' WITH DELIMITER='\t';
 
 COPY ontologies (source, name, level1, level2, level3, level4) FROM '[% data_dir %]/m5nr.ontology.all';
 COPY ont_level1 (source, level1, name) FROM '[% data_dir %]/m5nr.ontology.level1';
