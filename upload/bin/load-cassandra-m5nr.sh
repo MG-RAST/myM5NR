@@ -98,7 +98,7 @@ mkdir -p $SST_DIR
 for TYPE in midx md5; do
     # split large file
     cd $M5NR_DATA
-    split -a 2 -d -l 2500000 m5nr.annotation.${TYPE} m5nr.annotation.${TYPE}.
+    split -a 3 -d -l 2500000 m5nr.annotation.${TYPE} m5nr.annotation.${TYPE}.
     # create sstables
     cd $LOAD_DIR
     for FILE in `ls $M5NR_DATA/m5nr.annotation.${TYPE}.*`; do
