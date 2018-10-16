@@ -28,17 +28,18 @@ RUN apt-get update && apt-get install -y \
   vim \
   curl \
   python-pip \
-  python-yaml \
-  openjdk-8-jdk \
-  maven
+  python-yaml
+
+RUN echo "deb http://http.debian.net/debian jessie-backports main" | tee --append /etc/apt/sources.list.d/jessie-backports.list > /dev/null
+RUN apt-get update && \
+    apt-get install -y -t jessie-backports openjdk-8-jdk && \
+    update-java-alternatives -s java-1.8.0-openjdk-amd64
+
+RUN apt-get update && apt-get install -y maven
 
 # python dependencies
 RUN pip2 install --upgrade pip
 RUN python -m pip install requests_toolbelt
-
-# use java 8 instead of default 7
-RUN update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java" 1 \
-    && update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/java-8-openjdk-amd64/bin/javac" 1
 
 ### install solr-import-export-json
 RUN cd / \
