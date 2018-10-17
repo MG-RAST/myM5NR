@@ -43,48 +43,13 @@ public class BulkLoader {
         System.out.println("outdir: "+outdir);
         
         // Schema and Insert for bulk load
-        if (table.equals("index_annotation")) {
+        if (table.equals("midx_annotation")) {
             schema = String.format("CREATE TABLE %s.%s (" +
-                                        "id int, " +
-                                        "source text, " +
                                         "md5 text, " +
+                                        "source text, " +
                                         "is_protein boolean, " +
                                         "single int, " +
-                                        "accession list<int>, " +
-                                        "function list<int>, " +
-                                        "organism list<int>, " +
-                                        "PRIMARY KEY (id, source) " +
-                                    ")", keyspace, table);
-            insert = String.format("INSERT INTO %s.%s (" +
-                                        "id, source, md5, is_protein, single, accession, function, organism" +
-                                    ") VALUES (" +
-                                        "?, ?, ?, ?, ?, ?, ?, ?" +
-                                    ")", keyspace, table);
-        } else if (table.equals("id_annotation")) {
-            schema = String.format("CREATE TABLE %s.%s (" +
-                                        "id int, " +
-                                        "source text, " +
-                                        "md5 text, " +
-                                        "is_protein boolean, " +
-                                        "single text, " +
-                                        "lca list<text>, " +
                                         "accession list<text>, " +
-                                        "function list<text>, " +
-                                        "organism list<text>, " +
-                                        "PRIMARY KEY (id, source) " +
-                                    ")", keyspace, table);
-            insert = String.format("INSERT INTO %s.%s (" +
-                                        "id, source, md5, is_protein, single, lca, accession, function, organism" +
-                                    ") VALUES (" +
-                                        "?, ?, ?, ?, ?, ?, ?, ?, ?" +
-                                    ")", keyspace, table);
-        } else if (table.equals("midx_annotation")) {
-            schema = String.format("CREATE TABLE %s.%s (" +
-                                        "md5 text, " +
-                                        "source text, " +
-                                        "is_protein boolean, " +
-                                        "single int, " +
-                                        "accession list<int>, " +
                                         "function list<int>, " +
                                         "organism list<int>, " +
                                         "PRIMARY KEY (md5, source) " +
@@ -214,31 +179,12 @@ public class BulkLoader {
             while ((line = csvReader.readNext()) != null) {
                 // We use Java types here based on
                 // http://www.datastax.com/drivers/java/2.0/com/datastax/driver/core/DataType.Name.html#asJavaClass%28%29
-                if (table.equals("index_annotation")) {
-                    writer.addRow(Integer.parseInt(line[0]),
-                                  line[1],
-                                  line[2],
-                                  Boolean.valueOf(line[3]),
-                                  safeParseInt(line[4]),
-                                  parseIntList(line[5]),
-                                  parseIntList(line[6]),
-                                  parseIntList(line[7]));
-                } else if (table.equals("id_annotation")) {
-                    writer.addRow(Integer.parseInt(line[0]),
-                                  line[1],
-                                  line[2],
-                                  Boolean.valueOf(line[3]),
-                                  line[4],
-                                  parseStringList(line[5]),
-                                  parseStringList(line[6]),
-                                  parseStringList(line[7]),
-                                  parseStringList(line[8]));
-                } else if (table.equals("midx_annotation")) {
+                if (table.equals("midx_annotation")) {
                     writer.addRow(line[0],
                                   line[1],
                                   Boolean.valueOf(line[2]),
                                   safeParseInt(line[3]),
-                                  parseIntList(line[4]),
+                                  parseStringList(line[4]),
                                   parseIntList(line[5]),
                                   parseIntList(line[6]));
                 } else if (table.equals("md5_annotation")) {
