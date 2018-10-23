@@ -6,7 +6,7 @@ set -e
 MY_IP=""
 ALL_IPS=""
 VERSION=""
-REP_NUM="4"
+REP_NUM="3"
 DATA_URL=""
 
 DATA_DIR="/m5nr_data/Upload/cassandra"

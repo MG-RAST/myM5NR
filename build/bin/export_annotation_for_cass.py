@@ -2,9 +2,9 @@
 
 import os
 import sys
-import csv
 import json
 import yaml
+import pickle
 import plyvel
 import argparse
 from datetime import datetime
@@ -36,21 +36,21 @@ taxonomy.tsv file:
 id2hierarchy.txt file:
     accession, level1, level2, level3 (optional), level4 (optional)
 
-------- Outputs: CSV format -------
+------- Outputs: (binary) pickeled python array for each row to insert, multi-pickles per file -------
 
 <output>.annotation.md5:
     text, text,   boolean,    text,     text array, text array, text array, text array
-    md5,  source, is_protein, lca leaf, lca,        accesions,  functions,  organisms
+  [ md5,  source, is_protein, lca leaf, lca,        accesions,  functions,  organisms ]
 
 <output>.annotation.midx
     text, text,   boolean,    int,       text array, int array, int array
-    md5,  source, is_protein, lca taxid, accesions,  funcids,   taxids
+  [ md5,  source, is_protein, lca taxid, accesions,  funcids,   taxids ]
 
 <output>.taxonomy.all
-    leaf name, domain, phylum, class, order, family, genus, species, taxid
+  [ leaf name, domain, phylum, class, order, family, genus, species, taxid ]
 
 <output>.ontology.all
-    source, accession, level1, level2, level3, level4
+  [ source, accession, level1, level2, level3, level4 ]
 """
 
 HIERARCHY_FILE = 'id2hierarchy.txt'
@@ -119,7 +119,6 @@ def main(args):
     
     # taxonomy files (required)
     thdl = open(args.output+'.taxonomy.all', 'w')
-    tcvs = csv.writer(thdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
     touthdls = [
         open(args.output+'.taxonomy.domain', 'w'),
         open(args.output+'.taxonomy.phylum', 'w'),
@@ -129,7 +128,6 @@ def main(args):
         open(args.output+'.taxonomy.genus', 'w'),
         open(args.output+'.taxonomy.species', 'w')
     ]
-    tcvswriters = map(lambda h: csv.writer(h, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL), touthdls)
     # parse input
     print "start reading %s: %s"%(args.taxa, str(datetime.now()))
     count = 0
@@ -142,10 +140,10 @@ def main(args):
         name = leaf_name(taxa)
         if name and tid:
             count += 1
-            for i, cw in enumerate(tcvswriters):
+            for i, fh in enumerate(touthdls):
                 if (taxa[i] != '-') and (not taxa[i].startswith('unknown')) and (name != taxa[i]):
-                    cw.writerow([taxa[i], name])
-            tcvs.writerow([name]+taxa[:7]+[tid])
+                    pickle.dump(fh, [taxa[i], name])
+            pickle.dump(thdl, [name]+taxa[:7]+[tid])
 
     print "done reading: "+str(datetime.now())
     print "processed %d taxa"%(count)
@@ -156,14 +154,12 @@ def main(args):
     
     # functional hierarchy files (required)
     hhdl = open(args.output+'.ontology.all', 'w')
-    hcvs = csv.writer(hhdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
     houthdls = [
         open(args.output+'.ontology.level1', 'w'),
         open(args.output+'.ontology.level2', 'w'),
         open(args.output+'.ontology.level3', 'w'),
         open(args.output+'.ontology.level4', 'w')
     ]
-    hcvswriters = map(lambda h: csv.writer(h, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL), houthdls)
     # parse files
     for source in fhSrcs:
         print "start reading %s: %s"%(source, str(datetime.now()))
@@ -177,9 +173,9 @@ def main(args):
                 count += 1
                 for i in range(level):
                     if hier[i] != '-':
-                        hcvswriters[i].writerow([source, hier[i], accid])
+                        pickle.dump(houthdls[i], [source, hier[i], accid])
                 hier = padlist(hier, ONTOLOGY_LEVEL)
-                hcvs.writerow([source, accid]+hier)
+                pickle.dump(hhdl, [source, accid]+hier)
         print "done reading: "+str(datetime.now())
         print "processed %d brances for %s"%(count, source)
         ihdl.close()
@@ -202,9 +198,7 @@ def main(args):
                 return 1
         
         mhdl = open(args.output+'.annotation.md5', 'w')
-        mcvs = csv.writer(mhdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
         ihdl = open(args.output+'.annotation.midx', 'w')
-        icvs = csv.writer(ihdl, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
         
         print "start reading %s: %s"%(args.db, str(datetime.now()))
         count = 0
@@ -232,8 +226,8 @@ def main(args):
                     getlist(ann, 'funid', True),
                     getlist(ann, 'taxid', True)
                 ]
-                mcvs.writerow(md5ann)
-                icvs.writerow(midxann)
+                pickle.dump(mhdl, md5ann)
+                pickle.dump(ihdl, midxann)
         
         print "done reading: "+str(datetime.now())
         print "processed %d md5s"%(count)
