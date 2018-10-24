@@ -142,13 +142,13 @@ def main(args):
             count += 1
             for i, fh in enumerate(touthdls):
                 if (taxa[i] != '-') and (not taxa[i].startswith('unknown')) and (name != taxa[i]):
-                    pickle.dump(fh, [taxa[i], name])
-            pickle.dump(thdl, [name]+taxa[:7]+[tid])
+                    pickle.dump([taxa[i], name], fh)
+            pickle.dump([name]+taxa[:7]+[tid], thdl)
 
     print "done reading: "+str(datetime.now())
     print "processed %d taxa"%(count)
-    for h in touthdls:
-        h.close()
+    for fh in touthdls:
+        fh.close()
     thdl.close()
     ihdl.close()
     
@@ -173,15 +173,15 @@ def main(args):
                 count += 1
                 for i in range(level):
                     if hier[i] != '-':
-                        pickle.dump(houthdls[i], [source, hier[i], accid])
+                        pickle.dump([source, hier[i], accid], houthdls[i])
                 hier = padlist(hier, ONTOLOGY_LEVEL)
-                pickle.dump(hhdl, [source, accid]+hier)
+                pickle.dump([source, accid]+hier, hhdl)
         print "done reading: "+str(datetime.now())
         print "processed %d brances for %s"%(count, source)
         ihdl.close()
     # done
-    for h in houthdls:
-        h.close()
+    for fh in houthdls:
+        fh.close()
     hhdl.close()
     
     # annotation files from levelDB (optional)
@@ -226,8 +226,8 @@ def main(args):
                     getlist(ann, 'funid', True),
                     getlist(ann, 'taxid', True)
                 ]
-                pickle.dump(mhdl, md5ann)
-                pickle.dump(ihdl, midxann)
+                pickle.dump(md5ann, mhdl)
+                pickle.dump(midxann, ihdl)
         
         print "done reading: "+str(datetime.now())
         print "processed %d md5s"%(count)

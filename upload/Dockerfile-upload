@@ -10,7 +10,6 @@
 # export M5NR_VERSION=12
 # export DOCKERVERSION=`/usr/bin/docker --version | grep -o '[0-9]*\.[0-9]*\.[0-9][a-z-]*'`
 # export SOLR_URL="http://140.221.76.69:8983/solr"
-# export ALL_IPS=`fleetctl list-units | grep cassandra | cut -f2 -d"/" | cut -f1 | sort -u | tr "\n" "," | head --bytes -1`
 #
 ### to upload files to shock ###
 # docker exec m5nr-upload m5nr_master.sh -a upload -v $M5NR_VERSION -t $TOKEN
@@ -18,10 +17,10 @@
 # docker exec m5nr-upload docker_setup.sh $DOCKERVERSION
 # docker exec m5nr-upload solr_load.sh -n -i $INPUT_URI -v $M5NR_VERSION -s $SOLR_URL
 ### to load cassandra m5nr data ###
-# docker exec m5nr-upload load-cassandra-m5nr.sh -v $M5NR_VERSION -u $INPUT_URI -i $COREOS_PRIVATE_IPV4 -a $ALL_IPS
+# docker exec m5nr-upload cassandra_load.py -v $M5NR_VERSION -u $INPUT_URI
 #
 
-FROM cassandra:3.10
+FROM FROM ubuntu:16.04
 
 RUN apt-get update && apt-get install -y \
   git-core \
@@ -30,12 +29,9 @@ RUN apt-get update && apt-get install -y \
   python-pip \
   python-yaml
 
-RUN echo "deb http://http.debian.net/debian jessie-backports main" | tee --append /etc/apt/sources.list.d/jessie-backports.list > /dev/null
-RUN apt-get update && \
-    apt-get install -y -t jessie-backports openjdk-8-jdk && \
-    update-java-alternatives -s java-1.8.0-openjdk-amd64
-
-RUN apt-get update && apt-get install -y maven
+RUN add-apt-repository ppa:openjdk-r/ppa && \
+    apt-get update && \
+    apt-get install -y openjdk-8-jdk maven
 
 # python dependencies
 RUN pip2 install --upgrade pip
@@ -52,12 +48,11 @@ RUN curl -L "https://github.com/mikefarah/yq/releases/download/1.14.0/yq_linux_a
     && chmod +x /usr/bin/yq
 
 # copy myM5NR and set up env
-RUN mkdir -p /myM5NR /myM5NR/bin /myM5NR/BulkLoader
+RUN mkdir -p /myM5NR /myM5NR/bin
 COPY bin/* /myM5NR/bin/
 COPY upload/bin/* /myM5NR/bin/
 COPY config/upload.yaml /myM5NR/
 COPY upload/schema/* /myM5NR/schema/
-COPY upload/BulkLoader/* /myM5NR/BulkLoader/
 ENV PATH $PATH:/myM5NR/bin
 
 RUN mkdir -p /m5nr_data
