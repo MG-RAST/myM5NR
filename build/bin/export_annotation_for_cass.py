@@ -118,15 +118,15 @@ def main(args):
         sys.stderr.write("missing functional hierarchies in %s\n"%(args.sources))
     
     # taxonomy files (required)
-    thdl = open(args.output+'.taxonomy.all', 'w')
+    thdl = open(args.output+'.taxonomy.all', 'wb')
     touthdls = [
-        open(args.output+'.taxonomy.domain', 'w'),
-        open(args.output+'.taxonomy.phylum', 'w'),
-        open(args.output+'.taxonomy.class', 'w'),
-        open(args.output+'.taxonomy.order', 'w'),
-        open(args.output+'.taxonomy.family', 'w'),
-        open(args.output+'.taxonomy.genus', 'w'),
-        open(args.output+'.taxonomy.species', 'w')
+        open(args.output+'.taxonomy.domain', 'wb'),
+        open(args.output+'.taxonomy.phylum', 'wb'),
+        open(args.output+'.taxonomy.class', 'wb'),
+        open(args.output+'.taxonomy.order', 'wb'),
+        open(args.output+'.taxonomy.family', 'wb'),
+        open(args.output+'.taxonomy.genus', 'wb'),
+        open(args.output+'.taxonomy.species', 'wb')
     ]
     # parse input
     print "start reading %s: %s"%(args.taxa, str(datetime.now()))
@@ -153,12 +153,12 @@ def main(args):
     ihdl.close()
     
     # functional hierarchy files (required)
-    hhdl = open(args.output+'.ontology.all', 'w')
+    hhdl = open(args.output+'.ontology.all', 'wb')
     houthdls = [
-        open(args.output+'.ontology.level1', 'w'),
-        open(args.output+'.ontology.level2', 'w'),
-        open(args.output+'.ontology.level3', 'w'),
-        open(args.output+'.ontology.level4', 'w')
+        open(args.output+'.ontology.level1', 'wb'),
+        open(args.output+'.ontology.level2', 'wb'),
+        open(args.output+'.ontology.level3', 'wb'),
+        open(args.output+'.ontology.level4', 'wb')
     ]
     # parse files
     for source in fhSrcs:
@@ -197,8 +197,8 @@ def main(args):
                 sys.stderr.write("unable to open DB at %s\n"%(args.db))
                 return 1
         
-        mhdl = open(args.output+'.annotation.md5', 'w')
-        ihdl = open(args.output+'.annotation.midx', 'w')
+        mhdl = open(args.output+'.annotation.md5', 'wb')
+        ihdl = open(args.output+'.annotation.midx', 'wb')
         
         print "start reading %s: %s"%(args.db, str(datetime.now()))
         count = 0
