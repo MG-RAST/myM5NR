@@ -1,6 +1,8 @@
 
 upload-info:
+    upload-dir: /m5nr_data/Upload
     shock-url: http://shock.mg-rast.org
+    api-url: http://api.mg-rast.org
     bearer: mgrast
 
 static:

@@ -66,16 +66,16 @@ def leaf_name(taxa):
 def getlist(data, key, isint=True):
     if key in data:
         if isint:
-            return '['+','.join(map(str, data[key]))+']'
+            return map(int, data[key])
         else:
-            return '['+','.join(map(lambda x: "'"+str(x)+"'", data[key]))+']'
+            return data[key]
     else:
-        return '[]'
+        return []
 
 def getleaf(md5, data, isid=True):
     if isid:
         if ('lcaid' in data) and data['lcaid']:
-            return data['lcaid']
+            return int(data['lcaid'])
         else:
             return 0
     else:
@@ -136,7 +136,7 @@ def main(args):
         taxa = line.strip().split("\t")
         if len(taxa) != 9:
             continue
-        tid  = taxa.pop(0)
+        tid  = int(taxa.pop(0))
         name = leaf_name(taxa)
         if name and tid:
             count += 1
@@ -204,7 +204,7 @@ def main(args):
         count = 0
         for key, value in db:
             data = json.loads(value)
-            isaa = 'true' if data['is_aa'] else 'false'
+            isaa = True if data['is_aa'] else False
             count += 1
             for ann in data['ann']:
                 md5ann = [
@@ -222,7 +222,7 @@ def main(args):
                     ann['source'],
                     isaa,
                     getleaf(key, data, True),
-                    getlist(ann, 'accession', False) if data['is_aa'] and ann['source'] in fhSrcs else '[]',
+                    getlist(ann, 'accession', False) if data['is_aa'] and ann['source'] in fhSrcs else [],
                     getlist(ann, 'funid', True),
                     getlist(ann, 'taxid', True)
                 ]

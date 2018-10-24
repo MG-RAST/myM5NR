@@ -17,7 +17,7 @@
 # docker exec m5nr-upload docker_setup.sh $DOCKERVERSION
 # docker exec m5nr-upload solr_load.sh -n -i $INPUT_URI -v $M5NR_VERSION -s $SOLR_URL
 ### to load cassandra m5nr data ###
-# docker exec m5nr-upload cassandra_load.py -v $M5NR_VERSION -u $INPUT_URI
+# docker exec m5nr-upload cassandra_load.py -n -i $INPUT_URI -v $M5NR_VERSION -t $TOKEN
 #
 
 FROM FROM ubuntu:16.04
