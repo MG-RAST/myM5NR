@@ -142,8 +142,8 @@ def main(args):
             count += 1
             for i, fh in enumerate(touthdls):
                 if (taxa[i] != '-') and (not taxa[i].startswith('unknown')) and (name != taxa[i]):
-                    pickle.dump([taxa[i], name], fh)
-            pickle.dump([name]+taxa[:7]+[tid], thdl)
+                    pickle.dump([taxa[i], name], fh, pickle.HIGHEST_PROTOCOL)
+            pickle.dump([name]+taxa[:7]+[tid], thdl, pickle.HIGHEST_PROTOCOL)
 
     print "done reading: "+str(datetime.now())
     print "processed %d taxa"%(count)
@@ -173,9 +173,9 @@ def main(args):
                 count += 1
                 for i in range(level):
                     if hier[i] != '-':
-                        pickle.dump([source, hier[i], accid], houthdls[i])
+                        pickle.dump([source, hier[i], accid], houthdls[i], pickle.HIGHEST_PROTOCOL)
                 hier = padlist(hier, ONTOLOGY_LEVEL)
-                pickle.dump([source, accid]+hier, hhdl)
+                pickle.dump([source, accid]+hier, hhdl, pickle.HIGHEST_PROTOCOL)
         print "done reading: "+str(datetime.now())
         print "processed %d brances for %s"%(count, source)
         ihdl.close()
@@ -226,8 +226,8 @@ def main(args):
                     getlist(ann, 'funid', True),
                     getlist(ann, 'taxid', True)
                 ]
-                pickle.dump(md5ann, mhdl)
-                pickle.dump(midxann, ihdl)
+                pickle.dump(md5ann, mhdl, pickle.HIGHEST_PROTOCOL)
+                pickle.dump(midxann, ihdl, pickle.HIGHEST_PROTOCOL)
         
         print "done reading: "+str(datetime.now())
         print "processed %d md5s"%(count)
