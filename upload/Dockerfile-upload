@@ -20,7 +20,7 @@
 # docker exec m5nr-upload cassandra_load.py -n -i $INPUT_URI -v $M5NR_VERSION -t $TOKEN
 #
 
-FROM FROM ubuntu:16.04
+FROM ubuntu:16.04
 
 RUN apt-get update && apt-get install -y \
   git-core \
