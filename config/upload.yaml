@@ -80,11 +80,11 @@ build:
           db: leveldb
 
     Cassandra:
-        - file: m5nr.cass.tar
+        - file: m5nr.cass.tgz
           name: m5nr.cass
           data_type: m5nr annotation
-          file_format: tar python-pickle
-          description: tar of m5nr annotations in cassandra load format
+          file_format: tgz python-pickle
+          description: gzip-tar of m5nr annotations in cassandra load format
           db: cassandra
 
     Solr:
