@@ -91,12 +91,15 @@ def main(args):
     filePath = os.path.join(args.dir, 'm5nr.cass.tgz')
     # optional download
     if args.is_node:
-        print "Downloading "+args.input+" from shock"
-        res = requests.get(args.input, stream=True)
-        res.raise_for_status()
-        with open(filePath, 'wb') as handle:
-            for block in res.iter_content(1024):
-                handle.write(block)
+        if not os.path.isfile(filePath):
+            print "Downloading "+args.input+" from shock"
+            res = requests.get(args.input, stream=True)
+            res.raise_for_status()
+            with open(filePath, 'wb') as handle:
+                for block in res.iter_content(1024):
+                    handle.write(block)
+        else:
+            print args.input+" is already downloaded from shock"
     else:
         filePath = args.input
     
