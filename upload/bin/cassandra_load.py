@@ -1,3 +1,4 @@
+#!/usr/bin/python -u
 
 import os
 import sys
@@ -20,7 +21,7 @@ def apiPost(fullurl, data):
     msg = None
     if 'ERROR' in rj:
         msg = rj['ERROR']
-    if '(error' in rj) and (rj['error'] != ""):
+    if ('error' in rj) and (rj['error'] != ""):
         msg = rj['error']
     if rj['status'] != 'success':
         msg = "unknown problem, status is "+rj['status']
