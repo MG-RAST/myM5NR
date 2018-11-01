@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 import yaml
 import pickle
 import tarfile
@@ -16,7 +17,7 @@ def apiPost(fullurl, data):
     headers = {}
     if AUTH:
         headers['Authorization'] = AUTH
-    res = requests.post(fullurl, headers=headers, data=data, allow_redirects=True)
+    res = requests.post(fullurl, headers=headers, data=json.dumps(data), allow_redirects=True)
     rj  = res.json()
     msg = None
     if 'ERROR' in rj:
