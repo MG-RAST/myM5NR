@@ -13,11 +13,11 @@ URL  = ''
 AUTH = ''
 CHUNK = 5000
 
-def apiPost(fullurl, data):
+def apiPost(fullurl, pdata):
     headers = {}
     if AUTH:
         headers['Authorization'] = AUTH
-    res = requests.post(fullurl, headers=headers, data=json.dumps(data), allow_redirects=True)
+    res = requests.post(fullurl, headers=headers, data=json.dumps(pdata), allow_redirects=True)
     rj  = res.json()
     msg = None
     if 'ERROR' in rj:
@@ -34,12 +34,11 @@ def createM5nr(version):
     apiPost(URL+'/m5nr/cassandra/create', {'version': int(version)})
 
 def uploadData(version, table, data):
-    pdata = {
+    apiPost(URL+'/m5nr/cassandra/insert', {
         'version': int(version),
         'table': table,
         'data': data
-    }
-    apiPost(URL+'/m5nr/cassandra/insert', pdata)
+    })
 
 def pickleIter(fname):
     with open(fname, "rb") as f:
