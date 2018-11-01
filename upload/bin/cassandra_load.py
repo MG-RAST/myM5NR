@@ -27,7 +27,7 @@ def apiPost(fullurl, data):
         msg = "unknown problem, status is "+rj['status']
     if msg:
         sys.stderr.write("error POSTing data: %s\n"%(msg))
-        os.exit(1)
+        sys.exit(1)
 
 def createM5nr(version):
     apiPost(URL+'/m5nr/cassandra/create', {'version': int(version)})
