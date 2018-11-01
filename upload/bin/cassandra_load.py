@@ -19,15 +19,11 @@ def apiPost(fullurl, pdata):
         headers['Authorization'] = AUTH
     res = requests.post(fullurl, headers=headers, data=json.dumps(pdata), allow_redirects=True)
     rj  = res.json()
-    msg = None
-    if 'ERROR' in rj:
-        msg = rj['ERROR']
-    if ('error' in rj) and (rj['error'] != ""):
-        msg = rj['error']
-    if ('status' in rj) and (rj['status'] != 'success'):
-        msg = "unknown problem, status is "+rj['status']
-    if msg:
-        sys.stderr.write("error POSTing data: %s\n"%(msg))
+    err = False
+    if ('ERROR' in rj) or (('error' in rj) and (rj['error'] != "")) or (('status' in rj) and (rj['status'] != 'success')):
+        err = True
+    if err:
+        sys.stderr.write("error POSTing data:\n%s\n"%(json.dump(rj, sort_keys=True, indent=4, separators=(',', ': '))))
         sys.exit(1)
 
 def createM5nr(version):
