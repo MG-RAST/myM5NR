@@ -115,6 +115,7 @@ def main(args):
         tar.extractall(extractDir)
         tar.close()
     
+    print "creating schema for m5nr_v"+args.version
     createM5nr(args.version)
     
     # extract and upload file rows
