@@ -23,7 +23,7 @@ def apiPost(fullurl, data):
         msg = rj['ERROR']
     if ('error' in rj) and (rj['error'] != ""):
         msg = rj['error']
-    if rj['status'] != 'success':
+    if ('status' in rj) and (rj['status'] != 'success'):
         msg = "unknown problem, status is "+rj['status']
     if msg:
         sys.stderr.write("error POSTing data: %s\n"%(msg))
@@ -104,7 +104,6 @@ def main(args):
         filePath = args.input
     
     # unpack
-    print "extracting "+filePath
     extractDir = os.path.join(args.dir, 'Cassandra')
     if os.path.isdir(extractDir):
         print filePath+" is already extracted into "+extractDir
