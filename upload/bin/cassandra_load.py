@@ -121,7 +121,7 @@ def main(args):
     # extract and upload file rows
     for f in os.listdir(extractDir):
         fname = os.path.join(extractDir, f)
-        if not os.isfile(fname):
+        if not os.path.isfile(fname):
             continue
         print "uploading "+fname
         uploadFile(fname, args.version)
