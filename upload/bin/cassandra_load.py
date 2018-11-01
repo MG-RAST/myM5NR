@@ -65,7 +65,7 @@ def uploadFile(fname, version):
 def main(args):
     global URL, AUTH
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--dir", dest="dir", default=".", help="base dir to upload / download in")
+    parser.add_argument("-d", "--dir", dest="dir", default=None, help="base dir to upload / download in")
     parser.add_argument("-i", "--input", dest="input", default=None, help="input file path or shock url")
     parser.add_argument("-n", "--is_node", dest="is_node", default=False, action="store_true", help="input is shock node")
     parser.add_argument("-t", "--token", dest="token", default=None, help="auth token")
