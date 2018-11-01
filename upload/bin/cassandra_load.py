@@ -23,7 +23,7 @@ def apiPost(fullurl, pdata):
     if ('ERROR' in rj) or (('error' in rj) and (rj['error'] != "")) or (('status' in rj) and (rj['status'] != 'success')):
         err = True
     if err:
-        sys.stderr.write("error POSTing data:\n%s\n"%(json.dump(rj, sort_keys=True, indent=4, separators=(',', ': '))))
+        sys.stderr.write("error POSTing data:\n%s\n"%(json.dumps(rj, sort_keys=True, indent=4, separators=(',', ': '))))
         sys.exit(1)
 
 def createM5nr(version):
