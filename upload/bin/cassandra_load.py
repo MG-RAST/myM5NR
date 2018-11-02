@@ -7,20 +7,41 @@ import yaml
 import pickle
 import tarfile
 import argparse
-import requests
+from httplib2 import Http
+from urllib import urlencode
 
 URL  = ''
 AUTH = ''
-CHUNK = 5000
+CHUNK = 100
 
 def apiPost(fullurl, pdata):
     headers = {}
     if AUTH:
         headers['Authorization'] = AUTH
-    res = requests.post(fullurl, headers=headers, data=json.dumps(pdata), allow_redirects=True)
-    rj  = res.json()
+    h = Http()
+    resp, content = h.request(fullurl, "POST", body=json.dumps(data), headers=headers)
+    rj = json.loads(content)
     err = False
-    if ('ERROR' in rj) or (('error' in rj) and (rj['error'] != "")) or (('status' in rj) and (rj['status'] != 'success')):
+    if 'ERROR' in rj:
+        err = True
+    elif ('error' in rj) and (rj['error'] != ""):
+        # handle batch to large error
+        if "Batch too large" in rj['error']:
+            print "splitting: table %s, data %d"%(pdata['table'], len(pdata['data']))
+            half = len(pdata['data']) / 2
+            apiPost(fullurl, {
+                'version': pdata['version'],
+                'table': pdata['table'],
+                'data': pdata['data'][:half]
+            })
+            apiPost(fullurl, {
+                'version': pdata['version'],
+                'table': pdata['table'],
+                'data': pdata['data'][half:]
+            })
+        else:
+            err = True
+    elif ('status' in rj) and (rj['status'] != 'success'):
         err = True
     if err:
         sys.stderr.write("error POSTing data:\n%s\n"%(json.dumps(rj, sort_keys=True, indent=4, separators=(',', ': '))))
@@ -45,9 +66,9 @@ def pickleIter(fname):
                 break
 
 def uploadFile(fname, version):
-    table = fname
-    if fname.startswith('m5nr.'):
-        table = fname[5:]
+    table = os.path.basename(fname)
+    if table.startswith('m5nr.'):
+        table = table[5:]
     
     data = []
     for row in pickleIter(fname):

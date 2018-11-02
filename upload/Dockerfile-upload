@@ -28,7 +28,8 @@ RUN apt-get update && apt-get install -y \
   curl \
   software-properties-common \
   python-pip \
-  python-yaml
+  python-yaml \
+  python-httplib2
 
 RUN add-apt-repository ppa:openjdk-r/ppa && \
     apt-get update && \
