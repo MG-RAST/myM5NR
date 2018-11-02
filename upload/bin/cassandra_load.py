@@ -15,30 +15,41 @@ AUTH = ''
 CHUNK = 100
 
 def apiPost(fullurl, pdata):
-    headers = {}
+    pstr = json.dumps(pdata)
+    # test for data being too large
+    if ('data' in pdata) and (len(pdata['data']) > 1):
+        size = len(pstr.encode('utf-8'))
+        if size > (50 * 1024):
+            splitPost(fullurl, pdata, 'pre-post')            
+    # post data
+    headers = {'Content-Type': 'application/json'}
     if AUTH:
         headers['Authorization'] = AUTH
     h = Http()
-    resp, content = h.request(fullurl, "POST", body=json.dumps(pdata), headers=headers)
+    resp, content = h.request(fullurl, "POST", body=pstr, headers=headers)
     rj = json.loads(content)
+    # error check
     if ('ERROR' in rj) or (('error' in rj) and (rj['error'] != "")) or (('status' in rj) and (rj['status'] != 'success')):
-        # maybe data to large, try and split first
+        # maybe data issue, try and split first
         if ('data' in pdata) and (len(pdata['data']) > 1):
-            print "splitting: table %s, data %d"%(pdata['table'], len(pdata['data']))
-            half = len(pdata['data']) / 2
-            apiPost(fullurl, {
-                'version': pdata['version'],
-                'table': pdata['table'],
-                'data': pdata['data'][:half]
-            })
-            apiPost(fullurl, {
-                'version': pdata['version'],
-                'table': pdata['table'],
-                'data': pdata['data'][half:]
-            })
+            splitPost(fullurl, pdata, 'after-post')
         else:
             sys.stderr.write("error POSTing data:\n%s\n"%(json.dumps(rj, sort_keys=True, indent=4, separators=(',', ': '))))
             sys.exit(1)
+
+def splitPost(fullurl, pdata, msg):
+    print "splitting %s: table %s, data %d"%(msg, pdata['table'], len(pdata['data']))
+    half = len(pdata['data']) / 2
+    apiPost(fullurl, {
+        'version': pdata['version'],
+        'table': pdata['table'],
+        'data': pdata['data'][:half]
+    })
+    apiPost(fullurl, {
+        'version': pdata['version'],
+        'table': pdata['table'],
+        'data': pdata['data'][half:]
+    })
 
 def createM5nr(version):
     apiPost(URL+'/m5nr/cassandra/create', {'version': int(version)})
