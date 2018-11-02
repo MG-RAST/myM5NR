@@ -21,12 +21,9 @@ def apiPost(fullurl, pdata):
     h = Http()
     resp, content = h.request(fullurl, "POST", body=json.dumps(pdata), headers=headers)
     rj = json.loads(content)
-    err = False
-    if 'ERROR' in rj:
-        err = True
-    elif ('error' in rj) and (rj['error'] != ""):
-        # handle batch to large error
-        if "Batch too large" in rj['error']:
+    if ('ERROR' in rj) or (('error' in rj) and (rj['error'] != "")) or (('status' in rj) and (rj['status'] != 'success')):
+        # maybe data to large, try and split first
+        if ('data' in pdata) and (len(pdata['data']) > 1):
             print "splitting: table %s, data %d"%(pdata['table'], len(pdata['data']))
             half = len(pdata['data']) / 2
             apiPost(fullurl, {
@@ -40,12 +37,8 @@ def apiPost(fullurl, pdata):
                 'data': pdata['data'][half:]
             })
         else:
-            err = True
-    elif ('status' in rj) and (rj['status'] != 'success'):
-        err = True
-    if err:
-        sys.stderr.write("error POSTing data:\n%s\n"%(json.dumps(rj, sort_keys=True, indent=4, separators=(',', ': '))))
-        sys.exit(1)
+            sys.stderr.write("error POSTing data:\n%s\n"%(json.dumps(rj, sort_keys=True, indent=4, separators=(',', ': '))))
+            sys.exit(1)
 
 def createM5nr(version):
     apiPost(URL+'/m5nr/cassandra/create', {'version': int(version)})
