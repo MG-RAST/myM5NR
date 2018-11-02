@@ -19,7 +19,7 @@ def apiPost(fullurl, pdata):
     if AUTH:
         headers['Authorization'] = AUTH
     h = Http()
-    resp, content = h.request(fullurl, "POST", body=json.dumps(data), headers=headers)
+    resp, content = h.request(fullurl, "POST", body=json.dumps(pdata), headers=headers)
     rj = json.loads(content)
     err = False
     if 'ERROR' in rj:
