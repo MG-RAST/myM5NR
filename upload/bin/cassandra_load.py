@@ -10,35 +10,32 @@ import argparse
 from httplib2 import Http
 from urllib import urlencode
 
-URL  = ''
-AUTH = ''
-CHUNK = 100
+URL   = ''
+AUTH  = ''
+VERB  = False
+BATCH = 50 * 1024
 
 def apiPost(fullurl, pdata):
-    pstr = json.dumps(pdata)
-    # test for data being too large
-    if ('data' in pdata) and (len(pdata['data']) > 1):
-        size = len(pstr.encode('utf-8'))
-        if size > (50 * 1024):
-            splitPost(fullurl, pdata, 'pre-post')            
-    # post data
+    if VERB and ('data' in pdata):
+        print "table: %s, version: %s, data size: %d"%(pdata['version'], pdata['table'], len(pdata['data']))
     headers = {'Content-Type': 'application/json'}
     if AUTH:
         headers['Authorization'] = AUTH
     h = Http()
-    resp, content = h.request(fullurl, "POST", body=pstr, headers=headers)
+    resp, content = h.request(fullurl, "POST", body=json.dumps(pdata), headers=headers)
     rj = json.loads(content)
     # error check
     if ('ERROR' in rj) or (('error' in rj) and (rj['error'] != "")) or (('status' in rj) and (rj['status'] != 'success')):
         # maybe data issue, try and split first
         if ('data' in pdata) and (len(pdata['data']) > 1):
-            splitPost(fullurl, pdata, 'after-post')
+            splitPost(fullurl, pdata)
         else:
             sys.stderr.write("error POSTing data:\n%s\n"%(json.dumps(rj, sort_keys=True, indent=4, separators=(',', ': '))))
             sys.exit(1)
 
 def splitPost(fullurl, pdata, msg):
-    print "splitting %s: table %s, data %d"%(msg, pdata['table'], len(pdata['data']))
+    if VERB:
+        print "splitting: table %s, data %d"%(pdata['table'], len(pdata['data']))
     half = len(pdata['data']) / 2
     apiPost(fullurl, {
         'version': pdata['version'],
@@ -76,15 +73,20 @@ def uploadFile(fname, version):
     
     data = []
     for row in pickleIter(fname):
-        if len(data) == CHUNK:
-            uploadData(version, table, data)
-            data = []
         data.append(row)
+        if len(json.dumps(data).encode('utf-8')) > BATCH:
+            if len(data) == 1:
+                uploadData(version, table, data)
+                data = []
+            else:
+                data.pop()
+                uploadData(version, table, data)
+                data = [row]
     if len(data) > 0:
         uploadData(version, table, data)
 
 def main(args):
-    global URL, AUTH
+    global URL, AUTH, VERB
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--dir", dest="dir", default=None, help="base dir to upload / download in")
     parser.add_argument("-i", "--input", dest="input", default=None, help="input file path or shock url")
@@ -92,6 +94,7 @@ def main(args):
     parser.add_argument("-t", "--token", dest="token", default=None, help="auth token")
     parser.add_argument("-c", "--config", dest="config", default="/myM5NR/upload.yaml", help="upload.yaml file")
     parser.add_argument("-v", "--version", dest="version", default=None, help="version to apply to attributes")
+    parser.add_argument("--verbose", dest="verbose", default=False, action="store_true", help="lots of text")
     args = parser.parse_args()
     
     if not os.path.isfile(args.config):
@@ -100,6 +103,9 @@ def main(args):
     configInfo = yaml.load(open(args.config, 'r'))
     upInfo = configInfo['upload-info']
     URL = upInfo['api-url']
+    
+    if args.verbose:
+        VERB = True
     
     if not args.dir:
         args.dir = upInfo['upload-dir']

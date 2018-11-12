@@ -72,9 +72,9 @@ docker exec m5nr-upload docker_setup.sh
 docker exec m5nr-upload solr_load.sh -n -i <shock file download url> -v <m5nr version #> -s <solr url>
 ```
 
-To load build data on cassandra cluster, run following on same host
+To load build data on cassandra cluster, run following
 ```bash
-docker exec m5nr-upload load-cassandra-m5nr.sh -v <m5nr version #> -u <shock file download url> -i <current host IP> -a <all cassandra host IPs>
+docker exec m5nr-upload cassandra_load.py -n -i <shock file download url> -v <m5nr version #> -t <shock token>
 ```
 
 To check table sizes in cassandra for new m5nr build
