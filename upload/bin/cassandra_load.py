@@ -17,7 +17,7 @@ BATCH = 50 * 1024
 
 def apiPost(fullurl, pdata):
     if VERB and ('data' in pdata):
-        print "table: %s, version: %s, data size: %d"%(pdata['version'], pdata['table'], len(pdata['data']))
+        print "table: %s, version: %s, data: len %d size %d"%(pdata['version'], pdata['table'], len(pdata['data']), len(json.dumps(data).encode('utf-8')))
     headers = {'Content-Type': 'application/json'}
     if AUTH:
         headers['Authorization'] = AUTH
@@ -33,7 +33,7 @@ def apiPost(fullurl, pdata):
             sys.stderr.write("error POSTing data:\n%s\n"%(json.dumps(rj, sort_keys=True, indent=4, separators=(',', ': '))))
             sys.exit(1)
 
-def splitPost(fullurl, pdata, msg):
+def splitPost(fullurl, pdata):
     if VERB:
         print "splitting: table %s, data %d"%(pdata['table'], len(pdata['data']))
     half = len(pdata['data']) / 2
