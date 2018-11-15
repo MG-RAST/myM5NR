@@ -17,7 +17,7 @@ BATCH = 50 * 1024
 
 def apiPost(fullurl, pdata):
     if VERB and ('data' in pdata):
-        print "table: %s, version: %s, data: len %d size %d"%(pdata['version'], pdata['table'], len(pdata['data']), len(json.dumps(pdata['data']).encode('utf-8')))
+        print "table: %s, version: %s, data: len %d size %d"%(pdata['table'], pdata['version'], len(pdata['data']), len(json.dumps(pdata['data']).encode('utf-8')))
     headers = {'Content-Type': 'application/json'}
     if AUTH:
         headers['Authorization'] = AUTH
@@ -145,7 +145,7 @@ def main(args):
     createM5nr(args.version)
     
     # extract and upload file rows
-    for f in os.listdir(extractDir):
+    for f in reversed(os.listdir(extractDir)):
         fname = os.path.join(extractDir, f)
         if not os.path.isfile(fname):
             continue
