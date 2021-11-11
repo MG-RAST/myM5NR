@@ -97,7 +97,7 @@ def main(args):
             # continue if node is broken
             continue
     
-    print "[status] %d nodes parsed\n"%(nodeCount)
+    print("[status] %d nodes parsed\n"%(nodeCount))
     
     data = {
         'rootNode' : '1',
